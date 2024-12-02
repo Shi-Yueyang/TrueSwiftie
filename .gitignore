@@ -11,14 +11,6 @@ node_modules/
 build/
 dist/
 
-# Ignore database files
-db.sqlite3
-
-# Ignore static files
-/static/
-
-# Ignore media files
-/media/
 
 # Ignore environment variables file
 .env
