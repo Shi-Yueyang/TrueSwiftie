@@ -1,0 +1,27 @@
+# Ignore compiled Python files
+*.pyc
+
+# Ignore virtual environment
+venv/
+
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore build artifacts
+build/
+dist/
+
+# Ignore database files
+db.sqlite3
+
+# Ignore static files
+/static/
+
+# Ignore media files
+/media/
+
+# Ignore environment variables file
+.env
+
+# Ignore Python cache files
+__pycache__/
