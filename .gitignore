@@ -10,7 +10,8 @@ node_modules/
 # Ignore build artifacts
 build/
 dist/
-
+**/songs/
+db.sqlite3
 
 # Ignore environment variables file
 .env
