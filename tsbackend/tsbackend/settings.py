@@ -50,7 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-        'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
 
 ]
@@ -81,8 +81,12 @@ WSGI_APPLICATION = 'tsbackend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'true_swiftie',
+        'USER': 'root',
+        'PASSWORD': 'syy19990319',
+        'HOST': 'localhost',  # Set to 'localhost' if using local MySQL
+        'PORT': '',  # Set to '' for default
     }
 }
 

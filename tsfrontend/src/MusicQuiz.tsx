@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Box, Button, Container, Typography, Paper } from "@mui/material";
+import { Box, Button, Typography, Paper } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
@@ -22,9 +22,24 @@ interface Props {
   handleNext: () => void;
 }
 
-const MusicQuizComponent = ({ correctSong, options,handleNext }: Props) => {
+const MusicQuizComponent = ({ correctSong, options, handleNext }: Props) => {
   const [revealed, setRevealed] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
+
+  const onClickNext = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0; // Reset audio to start
+    }
+    setRevealed(false);
+    handleNext();
+  };
+
+  const onChoose = (option: string) => {
+    if (option === correctSong.song_title.title) {
+      setRevealed(true);
+    }
+  };
+
   const playSong = () => {
     if (audioRef.current) {
       audioRef.current.play();
@@ -35,7 +50,6 @@ const MusicQuizComponent = ({ correctSong, options,handleNext }: Props) => {
   }, [correctSong]);
 
   return (
-    <Container>
       <Paper
         elevation={3}
         sx={{
@@ -78,11 +92,7 @@ const MusicQuizComponent = ({ correctSong, options,handleNext }: Props) => {
                 aria-label={`Select option ${option}`}
                 startIcon={<IoMusicalNotes />}
                 disabled={revealed}
-                onClick={() => {
-                  if (option === correctSong.song_title.title) {
-                    setRevealed(true);
-                  }
-                }}
+                onClick={() => onChoose(option)}
               >
                 {option}
               </StyledButton>
@@ -98,10 +108,7 @@ const MusicQuizComponent = ({ correctSong, options,handleNext }: Props) => {
                 minHeight: "50px",
                 padding: "10px",
               }}
-              onClick={()=>{
-                setRevealed(false);
-                handleNext();
-              }}
+              onClick={onClickNext}
             >
               <IoArrowForwardOutline />
             </Button>
@@ -109,7 +116,6 @@ const MusicQuizComponent = ({ correctSong, options,handleNext }: Props) => {
         </Grid>
         <audio ref={audioRef} src={correctSong.file} />
       </Paper>
-    </Container>
   );
 };
 

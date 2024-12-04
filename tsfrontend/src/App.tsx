@@ -6,7 +6,7 @@ import axios from 'axios';
 
 function App() {
 
-
+  const backendIp = import.meta.env.VITE_BACKEND_IP;
   const [options, setOptions] = useState<string[]>([]);
   const [song,setSong] = useState<Song >({} as Song);
   const [next,setNext] = useState(0);
@@ -16,7 +16,7 @@ function App() {
   useEffect(() => {
     const fetchSong = async () => {
       try {
-        const response = await axios.get('http://127.0.0.1:8000/ts/songs/random_song/');
+        const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
         setSong(response.data);
       } catch (error) {
         console.error('Error fetching song data:', error);
@@ -28,7 +28,7 @@ function App() {
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const randOptions:string[] = (await axios.get('http://127.0.0.1:8000/ts/random-titles/')).data;
+        const randOptions:string[] = (await axios.get(`${backendIp}/ts/random-titles/`)).data;
         
         const filteredOptions = randOptions
               .filter((option) => option !== song.song_title.title)

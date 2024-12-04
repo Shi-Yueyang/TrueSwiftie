@@ -13,6 +13,7 @@ dist/
 **/songs/
 db.sqlite3
 **/media
+**/taylor_swift_images/
 # Ignore environment variables file
 .env
 

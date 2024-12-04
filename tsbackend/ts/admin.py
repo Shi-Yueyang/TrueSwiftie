@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Song, SongTitle, GameHistory
+from .models import Song, SongTitle, GameHistory,Poster
 
 class SongAdmin(admin.ModelAdmin):
     list_display = ('id', 'file', 'song_title')
@@ -7,15 +7,27 @@ class SongAdmin(admin.ModelAdmin):
     list_filter = ('song_title',)
 
 class SongTitleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title', 'poster_pic')
+    list_display = ('id', 'title','album','lyrics')
     search_fields = ('title',)
     list_filter = ('title',)
-
+    filter_horizontal = ('poster_pics',) 
+    
 class GameHistoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'score')
     search_fields = ('score',)
     list_filter = ('score',)
 
+class PosterAdmin(admin.ModelAdmin):
+    list_display = ('id', 'image', 'related_song_titles')
+    search_fields = ('image',)
+    list_filter = ('image',)
+
+    def related_song_titles(self, obj):
+        return ", ".join([st.title for st in obj.song_titles.all()])
+    related_song_titles.short_description = 'Related Song Titles'
+
+
 admin.site.register(Song, SongAdmin)
 admin.site.register(SongTitle, SongTitleAdmin)
 admin.site.register(GameHistory, GameHistoryAdmin)
+admin.site.register(Poster,PosterAdmin)
