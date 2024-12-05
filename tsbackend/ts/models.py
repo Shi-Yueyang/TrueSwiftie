@@ -8,16 +8,16 @@ class Song(models.Model):
         return self.file.name
     
 class Poster(models.Model):
+    poster_name = models.CharField(max_length=255, default='');
     image = models.ImageField(upload_to='posters/')
-
     def __str__(self):
-        return self.image.name
+        return self.poster_name
     
 class SongTitle(models.Model):
     title = models.CharField(max_length=255, unique=True,default='')
     album = models.CharField(max_length=255, default='')
     lyrics = models.TextField(default='')
-    poster_pics = models.ManyToManyField(Poster, related_name='song_titles')
+    poster_pics = models.ManyToManyField(Poster, related_name='song_titles',blank=True)
     def __str__(self):
         return self.title
     

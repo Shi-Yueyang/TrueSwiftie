@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import MusicQuizComponent, { Song } from './MusicQuiz'
+import MusicQuizComponent, { Poster, Song } from './MusicQuiz'
 
 import './App.css'
 import axios from 'axios';
@@ -9,6 +9,7 @@ function App() {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const [options, setOptions] = useState<string[]>([]);
   const [song,setSong] = useState<Song >({} as Song);
+  const [poster,setPoster] = useState<Poster>({} as Poster);
   const [next,setNext] = useState(0);
   
   const handleNext = ()=>{setNext(next+1)}
@@ -25,6 +26,9 @@ function App() {
     fetchSong();
   }, [next]);
   
+
+
+
   useEffect(() => {
     const fetchOptions = async () => {
       try {
@@ -46,9 +50,22 @@ function App() {
     fetchOptions();
   }, [song]);
 
+  useEffect(() => {
+    const fetchPoster = async () => {
+      try {
+        const randomPosterId = Math.floor(Math.random() * song.song_title.poster_pics.length);
+        const response = await axios.get(`${backendIp}/ts/posters/${song.song_title.poster_pics[randomPosterId]}/`);
+        setPoster(response.data);
+      }
+      catch (error) {
+        console.error('Error fetching poster data:', error);
+      }
+    }
+    fetchPoster();
+  },[song]);
   return (
     <>
-      <MusicQuizComponent correctSong={song} options={options} handleNext={handleNext} />
+      <MusicQuizComponent correctSong={song} options={options} handleNext={handleNext} poster={poster} />
     </>
   )
 }

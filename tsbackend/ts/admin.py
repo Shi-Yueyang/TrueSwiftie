@@ -8,7 +8,7 @@ class SongAdmin(admin.ModelAdmin):
     raw_id_fields = ('song_title',) 
 
 class SongTitleAdmin(admin.ModelAdmin):
-    list_display = ('id', 'title','album','lyrics')
+    list_display = ('id', 'title','album')
     search_fields = ('title',)
     list_filter = ('title',)
     filter_horizontal = ('poster_pics',) 

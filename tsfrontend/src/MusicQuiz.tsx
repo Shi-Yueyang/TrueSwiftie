@@ -5,24 +5,34 @@ import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
 import placeholderImg from "./assets/grey.jpg"; // Step 1: Import the image
 
-interface SongData {
+interface SongTitle {
   title: string;
-  poster_pic: string;
+  album:string;
+  lyrics: string;
+  poster_pics: number[];
 }
 
 export interface Song {
   id: number;
   file: string;
-  song_title: SongData;
+  song_title: SongTitle;
+}
+
+export interface Poster{
+  poster_name:string;
+  image:string;
 }
 
 interface Props {
   correctSong: Song;
+  poster: Poster;
   options: string[];
   handleNext: () => void;
 }
 
-const MusicQuizComponent = ({ correctSong, options, handleNext }: Props) => {
+const MusicQuizComponent = ({ correctSong, options,poster, handleNext }: Props) => {
+  console.log('data',poster.image)
+
   const [revealed, setRevealed] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
 
@@ -74,7 +84,7 @@ const MusicQuizComponent = ({ correctSong, options, handleNext }: Props) => {
           <ImageContainer>
             <StyledImage
               src={
-                revealed ? correctSong.song_title.poster_pic : placeholderImg
+                revealed ? poster.image : placeholderImg
               }
               alt="Music Quiz"
               style={{ opacity: revealed ? 1 : 0.5 }}
