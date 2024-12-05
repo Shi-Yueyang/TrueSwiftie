@@ -10,9 +10,9 @@ node_modules/
 # Ignore build artifacts
 build/
 dist/
-**/songs/
 db.sqlite3
-**/media
+**/media/**
+**/audio
 **/taylor_swift_images/
 # Ignore environment variables file
 .env

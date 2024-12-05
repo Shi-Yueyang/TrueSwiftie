@@ -7,7 +7,7 @@ import placeholderImg from "./assets/grey.jpg"; // Step 1: Import the image
 
 interface SongTitle {
   title: string;
-  album:string;
+  album: string;
   lyrics: string;
   poster_pics: number[];
 }
@@ -18,9 +18,9 @@ export interface Song {
   song_title: SongTitle;
 }
 
-export interface Poster{
-  poster_name:string;
-  image:string;
+export interface Poster {
+  poster_name: string;
+  image: string;
 }
 
 interface Props {
@@ -30,16 +30,18 @@ interface Props {
   handleNext: () => void;
 }
 
-const MusicQuizComponent = ({ correctSong, options,poster, handleNext }: Props) => {
-  console.log('data',poster.image)
+const MusicQuizComponent = ({
+  correctSong,
+  options,
+  poster,
+  handleNext,
+}: Props) => {
+  console.log("data", poster.image);
 
   const [revealed, setRevealed] = useState(false);
-  const audioRef = useRef<HTMLAudioElement>(null);
 
   const onClickNext = () => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0; // Reset audio to start
-    }
+
     setRevealed(false);
     handleNext();
   };
@@ -50,82 +52,73 @@ const MusicQuizComponent = ({ correctSong, options,poster, handleNext }: Props) 
     }
   };
 
-  const playSong = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-    }
-  };
-  useEffect(() => {
-    playSong();
-  }, [correctSong]);
+
+
 
   return (
-      <Paper
-        elevation={3}
-        sx={{
-          padding: "20px",
-          borderRadius: "15px",
-          boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
-          maxWidth: "600px",
-          margin: "auto",
-          marginTop: "40px",
-        }}
+    <Paper
+      elevation={3}
+      sx={{
+        padding: "20px",
+        borderRadius: "15px",
+        boxShadow: "0 8px 16px rgba(0,0,0,0.1)",
+        maxWidth: "600px",
+        margin: "auto",
+        marginTop: "40px",
+      }}
+    >
+      <Typography
+        variant="h4"
+        align="center"
+        gutterBottom
+        sx={{ fontWeight: "bold" }}
       >
-        <Typography
-          variant="h4"
-          align="center"
-          gutterBottom
-          sx={{ fontWeight: "bold" }}
-        >
-          Guess
-        </Typography>
+        Guess
+      </Typography>
 
-        {correctSong && correctSong.song_title && (
-          <ImageContainer>
-            <StyledImage
-              src={
-                revealed ? poster.image : placeholderImg
-              }
-              alt="Music Quiz"
-              style={{ opacity: revealed ? 1 : 0.5 }}
-            />
-          </ImageContainer>
-        )}
+      {correctSong && correctSong.song_title && (
+        <ImageContainer>
+          <StyledImage
+            src={revealed ? poster.image : placeholderImg}
+            alt="Music Quiz"
+            style={{ opacity: revealed ? 1 : 0.5 }}
+          />
+        </ImageContainer>
+      )}
 
-        <Grid container spacing={2}>
-          {options.map((option, index) => (
-            <Grid key={index}>
-              <StyledButton
-                key={index}
-                variant="contained"
-                color="primary"
-                aria-label={`Select option ${option}`}
-                startIcon={<IoMusicalNotes />}
-                disabled={revealed}
-                onClick={() => onChoose(option)}
-              >
-                {option}
-              </StyledButton>
-            </Grid>
-          ))}
-          {revealed && (
-            <Button
-              variant="outlined"
+      <Grid container spacing={2}>
+        {options.map((option, index) => (
+          <Grid key={index}>
+            <StyledButton
+              key={index}
+              variant="contained"
               color="primary"
-              style={{
-                borderRadius: "50%",
-                minWidth: "50px",
-                minHeight: "50px",
-                padding: "10px",
-              }}
-              onClick={onClickNext}
+              aria-label={`Select option ${option}`}
+              startIcon={<IoMusicalNotes />}
+              disabled={revealed}
+              onClick={() => onChoose(option)}
             >
-              <IoArrowForwardOutline />
-            </Button>
-          )}
-        </Grid>
-        <audio ref={audioRef} src={correctSong.file} />
-      </Paper>
+              {option}
+            </StyledButton>
+          </Grid>
+        ))}
+        {revealed && (
+          <Button
+            variant="outlined"
+            color="primary"
+            style={{
+              borderRadius: "50%",
+              minWidth: "50px",
+              minHeight: "50px",
+              padding: "10px",
+            }}
+            onClick={onClickNext}
+          >
+            <IoArrowForwardOutline />
+          </Button>
+        )}
+      </Grid>
+    </Paper>
   );
 };
 
