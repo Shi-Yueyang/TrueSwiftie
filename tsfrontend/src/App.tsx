@@ -19,15 +19,7 @@ function App() {
   const handleNext = () => {
     setNext(next + 1);
   };
-  const fadeOutSound = (sound: Howl, duration: number) => {
-    return new Promise<void>((resolve) => {
-      sound.fade(sound.volume(), 0, duration);
-      sound.once("fade", () => {
-        sound.stop();
-        resolve();
-      });
-    });
-  };
+
   // fetch new song
   useEffect(() => {
     const fetchSong = async () => {
@@ -93,26 +85,22 @@ function App() {
   useEffect(() => {
     const playNewSound = async () => {
       if (sound) {
-        await fadeOutSound(sound, 1000); // Fade out over 1 second
+        sound.fade(1, 0, 1000); // Fade out over 1 second
+        setTimeout(() => {
+          sound.stop();
+        }, 1000); // Stop the sound after the fade-out completes
       }
-
       const newSound = new Howl({
         src: [song.file],
         volume: 1,
         onend: handleNext,
       });
-
       setSound(newSound);
-      console.log("Playing new sound");
       newSound.play();
     };
-
+    
     playNewSound();
-    return () => {
-      if (sound) {
-        sound.stop();
-      }
-    };
+    console.log("playing sound");
   }, [song]);
 
   return (
