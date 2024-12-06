@@ -1,27 +1,37 @@
 import { useEffect, useState } from "react";
-import MusicQuizComponent, { Poster, Song } from "./MusicQuiz";
-
-import "./App.css";
+import MusicQuizComponent, { Song } from "./MusicQuiz";
+import MusicPoster, { Poster } from "./MusicPoster";
 import axios from "axios";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, useMediaQuery, useTheme } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import { motion } from "framer-motion";
 import { Howl } from "howler";
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./App.css";
+import placeholderImg from "./assets/grey.jpg";
 
 function App() {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const [options, setOptions] = useState<string[]>([]);
   const [song, setSong] = useState<Song>({} as Song);
   const [poster, setPoster] = useState<Poster>({} as Poster);
+  const [sound, setSound] = useState<Howl | null>(null);
+  const [imgSource, setImgSource] = useState(placeholderImg);
+
   const [score, setScore] = useState(0);
   const [isLoading, setLoading] = useState(true);
-  const [sound, setSound] = useState<Howl | null>(null);
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
 
   // lick next
   const handleNext = () => {
     setLoading(true);
     setScore(score + 1);
+    setImgSource(placeholderImg);
   };
 
+  const handleSelectCorrect = () => {
+    setImgSource(poster.image);
+  };
   // fetch new song
   useEffect(() => {
     const fetchSong = async () => {
@@ -107,25 +117,38 @@ function App() {
 
   return (
     <>
-      <TransitionGroup>
-        {isLoading ? (
-          <CircularProgress />
-        ) : (
-          <CSSTransition
-            timeout={300}
-            classNames="fade"
-          >
-            <div >
+      {isLoading ? (
+        <CircularProgress />
+      ) : (
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          direction={isSmallScreen ? "column" : "row"}
+          spacing={3}
+          style={{ height: "95vh", overflow: "hidden" }}
+        >
+          <Grid size={{ xs: 12, md: 6 }}>
+            <MusicPoster imgSource={imgSource} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <motion.div
+              key={song.song_title.title} // Ensure the motion div re-renders with a unique key
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 1 }}
+            >
               <MusicQuizComponent
-                correctSong={song}
+                correctOption={song.song_title.title}
                 options={options}
                 handleNext={handleNext}
-                poster={poster}
+                handleSelectCorrect={handleSelectCorrect}
               />
-            </div>
-          </CSSTransition>
-        )}
-      </TransitionGroup>
+            </motion.div>
+          </Grid>
+        </Grid>
+      )}
     </>
   );
 }
