@@ -4,20 +4,22 @@ import MusicQuizComponent, { Poster, Song } from "./MusicQuiz";
 import "./App.css";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
-import { Howl, Howler } from "howler";
+import { Howl } from "howler";
+import { CSSTransition, TransitionGroup } from "react-transition-group";
 
 function App() {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const [options, setOptions] = useState<string[]>([]);
   const [song, setSong] = useState<Song>({} as Song);
   const [poster, setPoster] = useState<Poster>({} as Poster);
-  const [next, setNext] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [score, setScore] = useState(0);
+  const [isLoading, setLoading] = useState(true);
   const [sound, setSound] = useState<Howl | null>(null);
 
   // lick next
   const handleNext = () => {
-    setNext(next + 1);
+    setLoading(true);
+    setScore(score + 1);
   };
 
   // fetch new song
@@ -26,10 +28,10 @@ function App() {
       try {
         const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
         const data = response.data;
-        if(data.song_title){
+        if (data.song_title) {
           setSong(response.data);
           setLoading(false);
-        }else{
+        } else {
           fetchSong();
         }
       } catch (error) {
@@ -38,7 +40,7 @@ function App() {
       }
     };
     fetchSong();
-  }, [next]);
+  }, [score]);
 
   // fetch options
   useEffect(() => {
@@ -80,12 +82,12 @@ function App() {
     };
     fetchPoster();
   }, [song]);
-  
+
   // set sound
   useEffect(() => {
     const playNewSound = async () => {
       if (sound) {
-        sound.fade(1, 0, 1000); // Fade out over 1 second
+        sound.fade(0, 0, 1000); // Fade out over 1 second
         setTimeout(() => {
           sound.stop();
         }, 1000); // Stop the sound after the fade-out completes
@@ -97,24 +99,35 @@ function App() {
       });
       setSound(newSound);
       newSound.play();
+      newSound.fade(0, 0, 1000);
     };
-    
+
     playNewSound();
-    console.log("playing sound");
   }, [song]);
 
   return (
     <>
-      {loading ? (
-        <CircularProgress />
-      ) : (
-        <MusicQuizComponent
-          correctSong={song}
-          options={options}
-          handleNext={handleNext}
-          poster={poster}
-        />
-      )}
+      <TransitionGroup>
+        {isLoading ? (
+          <CircularProgress />
+        ) : (
+          <CSSTransition
+            in={isLoading}
+            timeout={300}
+            classNames="fade"
+            unmountOnExit
+          >
+            <div className="fade-box">
+              <MusicQuizComponent
+                correctSong={song}
+                options={options}
+                handleNext={handleNext}
+                poster={poster}
+              />
+            </div>
+          </CSSTransition>
+        )}
+      </TransitionGroup>
     </>
   );
 }

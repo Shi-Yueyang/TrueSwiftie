@@ -1,9 +1,11 @@
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Box, Button, Typography, Paper } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
 import placeholderImg from "./assets/grey.jpg"; // Step 1: Import the image
+import { CSSTransition, TransitionGroup } from "react-transition-group";
+import "./App.css";
 
 interface SongTitle {
   title: string;
@@ -36,12 +38,9 @@ const MusicQuizComponent = ({
   poster,
   handleNext,
 }: Props) => {
-  console.log("data", poster.image);
-
-  const [revealed, setRevealed] = useState(false);
+  const [isPosterRevealed, setRevealed] = useState(false);
 
   const onClickNext = () => {
-
     setRevealed(false);
     handleNext();
   };
@@ -52,11 +51,9 @@ const MusicQuizComponent = ({
     }
   };
 
-
-
-
   return (
     <Paper
+      key={Math.random()}
       elevation={3}
       sx={{
         padding: "20px",
@@ -79,30 +76,35 @@ const MusicQuizComponent = ({
       {correctSong && correctSong.song_title && (
         <ImageContainer>
           <StyledImage
-            src={revealed ? poster.image : placeholderImg}
+            src={isPosterRevealed ? poster.image : placeholderImg}
             alt="Music Quiz"
-            style={{ opacity: revealed ? 1 : 0.5 }}
+            style={{ opacity: isPosterRevealed ? 1 : 0.5 }}
           />
         </ImageContainer>
       )}
 
       <Grid container spacing={2}>
-        {options.map((option, index) => (
-          <Grid key={index}>
-            <StyledButton
-              key={index}
-              variant="contained"
-              color="primary"
-              aria-label={`Select option ${option}`}
-              startIcon={<IoMusicalNotes />}
-              disabled={revealed}
-              onClick={() => onChoose(option)}
-            >
-              {option}
-            </StyledButton>
-          </Grid>
-        ))}
-        {revealed && (
+        <TransitionGroup component={null}>
+          {options.map((option, index) => (
+            <CSSTransition key={index} timeout={300} classNames="fade">
+              <Grid key={index}>
+                <StyledButton
+                  key={index}
+                  variant="contained"
+                  color="primary"
+                  aria-label={`Select option ${option}`}
+                  startIcon={<IoMusicalNotes />}
+                  disabled={isPosterRevealed}
+                  onClick={() => onChoose(option)}
+                >
+                  {option}
+                </StyledButton>
+              </Grid>
+            </CSSTransition>
+          ))}
+        </TransitionGroup>
+
+        {isPosterRevealed && (
           <Button
             variant="outlined"
             color="primary"
