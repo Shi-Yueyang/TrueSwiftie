@@ -13,9 +13,9 @@ class Command(BaseCommand):
         with open(csv_file, newline='', encoding='utf-8') as file:
             reader = csv.DictReader(file)
             for row in reader:
-                title = row['Title']
-                album = row['Album']
-                lyrics = row['Lyrics']
+                title = row['album_name']
+                album = row['track_name']
+                lyrics = row['lyrics']
                 SongTitle.objects.update_or_create(
                     title=title,
                     defaults={'album': album, 'lyrics': lyrics}
