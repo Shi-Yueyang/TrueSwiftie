@@ -87,7 +87,7 @@ function App() {
   useEffect(() => {
     const playNewSound = async () => {
       if (sound) {
-        sound.fade(0, 0, 1000); // Fade out over 1 second
+        sound.fade(1, 0, 1000); // Fade out over 1 second
         setTimeout(() => {
           sound.stop();
         }, 1000); // Stop the sound after the fade-out completes
@@ -99,7 +99,7 @@ function App() {
       });
       setSound(newSound);
       newSound.play();
-      newSound.fade(0, 0, 1000);
+      newSound.fade(0, 1, 1000);
     };
 
     playNewSound();
@@ -112,12 +112,10 @@ function App() {
           <CircularProgress />
         ) : (
           <CSSTransition
-            in={isLoading}
             timeout={300}
             classNames="fade"
-            unmountOnExit
           >
-            <div className="fade-box">
+            <div >
               <MusicQuizComponent
                 correctSong={song}
                 options={options}

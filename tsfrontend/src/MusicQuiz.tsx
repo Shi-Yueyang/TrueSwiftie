@@ -3,8 +3,8 @@ import { Box, Button, Typography, Paper } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
-import placeholderImg from "./assets/grey.jpg"; // Step 1: Import the image
-import { CSSTransition, TransitionGroup } from "react-transition-group";
+import placeholderImg from "./assets/grey.jpg";
+import { motion } from "framer-motion";
 import "./App.css";
 
 interface SongTitle {
@@ -53,7 +53,6 @@ const MusicQuizComponent = ({
 
   return (
     <Paper
-      key={Math.random()}
       elevation={3}
       sx={{
         padding: "20px",
@@ -74,35 +73,42 @@ const MusicQuizComponent = ({
       </Typography>
 
       {correctSong && correctSong.song_title && (
-        <ImageContainer>
-          <StyledImage
+        <Box
+          sx={{
+            width: "100%",
+            position: "relative",
+            borderRadius: "10px",
+            overflow: "hidden",
+            marginBottom: "20px",
+            backgroundColor: "#f5f5f5",
+          }}
+        >
+          <motion.img
             src={isPosterRevealed ? poster.image : placeholderImg}
-            alt="Music Quiz"
-            style={{ opacity: isPosterRevealed ? 1 : 0.5 }}
+            alt="transitioning image"
+            style={{ width: '100%', height: '100%' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }} // Duration of transition
           />
-        </ImageContainer>
+        </Box>
       )}
 
       <Grid container spacing={2}>
-        <TransitionGroup component={null}>
-          {options.map((option, index) => (
-            <CSSTransition key={index} timeout={300} classNames="fade">
-              <Grid key={index}>
-                <StyledButton
-                  key={index}
-                  variant="contained"
-                  color="primary"
-                  aria-label={`Select option ${option}`}
-                  startIcon={<IoMusicalNotes />}
-                  disabled={isPosterRevealed}
-                  onClick={() => onChoose(option)}
-                >
-                  {option}
-                </StyledButton>
-              </Grid>
-            </CSSTransition>
-          ))}
-        </TransitionGroup>
+        {options.map((option, index) => (
+          <Grid key={index}>
+            <StyledButton
+              variant="contained"
+              color="primary"
+              aria-label={`Select option ${option}`}
+              startIcon={<IoMusicalNotes />}
+              onClick={() => onChoose(option)}
+            >
+              {option}
+            </StyledButton>
+          </Grid>
+        ))}
 
         {isPosterRevealed && (
           <Button
@@ -124,25 +130,7 @@ const MusicQuizComponent = ({
   );
 };
 
-const ImageContainer = styled(Box)({
-  width: "100%",
-  paddingTop: "100%",
-  position: "relative",
-  borderRadius: "10px",
-  overflow: "hidden",
-  marginBottom: "20px",
-  backgroundColor: "#f5f5f5",
-});
 
-const StyledImage = styled("img")({
-  position: "absolute",
-  top: 0,
-  left: 0,
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-  transition: "opacity 0.3s ease",
-});
 
 const StyledButton = styled(Button)({
   borderRadius: "25px",
