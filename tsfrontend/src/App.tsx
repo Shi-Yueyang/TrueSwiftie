@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import MusicQuizComponent, { Song } from "./MusicQuiz";
 import MusicPoster, { Poster } from "./MusicPoster";
 import axios from "axios";
-import { CircularProgress, useMediaQuery, useTheme } from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
@@ -19,10 +19,7 @@ function App() {
 
   const [score, setScore] = useState(0);
   const [isLoading, setLoading] = useState(true);
-  const theme = useTheme();
-  const isSmallScreen = useMediaQuery(theme.breakpoints.down("sm"));
-
-  // lick next
+  
   const handleNext = () => {
     setLoading(true);
     setScore(score + 1);
@@ -124,9 +121,8 @@ function App() {
           container
           justifyContent="center"
           alignItems="center"
-          direction={isSmallScreen ? "column" : "row"}
           spacing={3}
-          style={{ height: "95vh", overflow: "hidden" }}
+          style={{ height: "95vh" }}
         >
           <Grid size={{ xs: 12, md: 6 }}>
             <MusicPoster imgSource={imgSource} />

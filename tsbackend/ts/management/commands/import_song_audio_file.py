@@ -36,7 +36,7 @@ class Command(BaseCommand):
                             audio = MP3(file_path_on_system, ID3=ID3)
                             if 'TIT2' in audio:
                                 song_title_str = audio['TIT2'].text[0]
-                                remove_trailing_one(song_title_str)
+                                song_title_str = remove_trailing_one(song_title_str)
                                 song_title = SongTitle.objects.filter(title=song_title_str).first()
                         except Exception as e:
                             self.stderr.write(self.style.ERROR(f'Error reading {file_path_on_system}: {e}'))
@@ -45,14 +45,21 @@ class Command(BaseCommand):
                             audio = FLAC(file_path_on_system)
                             if 'title' in audio:
                                 song_title_str = audio['title'][0]
-                                remove_trailing_one(song_title_str)
-                                
+                                song_title_str = remove_trailing_one(song_title_str)
+                                print(song_title_str)
                                 song_title = SongTitle.objects.filter(title=song_title_str).first()
                         except Exception as e:
                             self.stderr.write(self.style.ERROR(f'Error reading {file_path_on_system}: {e}'))
+                    song = Song.objects.filter(file=relative_path_to_project).first()
 
-                    song = Song.objects.filter(file=relative_path_to_project, song_title=song_title).first()
-                    if not song:
+                    if song:
+                        if song_title:
+                            song.song_title = song_title
+                            song.save()
+                            self.stdout.write(self.style.SUCCESS(f'Successfully updated Song {song_title}'))
+                    else:
                         song = Song.objects.create(file=relative_path_to_project, song_title=song_title)
-                        shutil.copyfile(file_path_on_system, file_path_to_project)
+                        if not os.path.exists(file_path_to_project):
+                            shutil.copyfile(file_path_on_system, file_path_to_project)
                         self.stdout.write(self.style.SUCCESS(f'Successfully created Song {song_title}'))
+                        

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Box, Button, Typography, Paper } from "@mui/material";
+import { Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
