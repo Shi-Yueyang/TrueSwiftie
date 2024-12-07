@@ -10,7 +10,7 @@ class SongAdmin(admin.ModelAdmin):
 class SongTitleAdmin(admin.ModelAdmin):
     list_display = ('id', 'title','album')
     search_fields = ('title',)
-    list_filter = ('title',)
+    list_filter = ('album',)
     filter_horizontal = ('poster_pics',) 
     
 class GameHistoryAdmin(admin.ModelAdmin):
