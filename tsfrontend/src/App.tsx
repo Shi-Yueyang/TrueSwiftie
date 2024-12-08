@@ -8,11 +8,11 @@ import { Howl } from "howler";
 import "./App.css";
 import placeholderImg from "./assets/music_mark.png";
 import noPicture from "./assets/ts_placeholder.jpg";
+import { Button, Typography } from "@mui/material";
 
 function App() {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
-
   const [options, setOptions] = useState<string[]>([]);
   const [song, setSong] = useState<Song>({} as Song);
   const [poster, setPoster] = useState<Poster>({} as Poster);
@@ -21,6 +21,7 @@ function App() {
 
   const [score, setScore] = useState(0);
   const [isLoading, setLoading] = useState(true);
+  const [isStarted, setIsStarted] = useState(false);
 
   const handleNext = () => {
     setLoading(true);
@@ -33,24 +34,26 @@ function App() {
   };
 
   const handleSelectWrong = () => {
-    if(score>0){
+    if (score > 0) {
       const historyData = {
         score: score,
         timestamp: new Date().toISOString(),
       };
-      axios
-      .post(`${backendIp}/ts/game-histories/`, historyData, {
+      axios.post(`${backendIp}/ts/game-histories/`, historyData, {
         headers: {
           "Content-Type": "application/json",
         },
-      })
+      });
     }
     setScore(0);
-
   };
 
+  const handleStart = () => {
+    setIsStarted(true);
+  };
   // fetch new song
   useEffect(() => {
+    console.log("fetching song");
     const fetchSong = async () => {
       try {
         const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
@@ -140,34 +143,62 @@ function App() {
 
   return (
     <>
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        spacing={3}
-        style={{ height: "95vh" }}
-      >
-        <Grid size={{ xs: 12, md: 6 }}>
-          <MusicPoster imgSource={imgSource} score={score} />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
-          <motion.div
-            key={song.song_title.title} // Ensure the motion div re-renders with a unique key
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 1 }}
+      {!isStarted ? (
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          style={{ height: "95vh" }}
+          direction={"column"}
+        >
+          <Typography variant="h4" gutterBottom>
+          ...Ready For It?
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleStart}
+            style={{
+              fontSize: "1.5rem",
+              padding: "1rem 2rem",
+              borderRadius: "50px",
+              backgroundColor: "#3f51b5",
+              color: "#fff",
+            }}
           >
-            <MusicQuiz
-              correctOption={song.song_title.title}
-              options={options}
-              handleNext={handleNext}
-              handleSelectCorrect={handleSelectCorrect}
-              handleSelectWrong={handleSelectWrong}
-            />
-          </motion.div>
+            Start
+          </Button>
         </Grid>
-      </Grid>
+      ) : (
+        <Grid
+          container
+          justifyContent="center"
+          alignItems="center"
+          spacing={3}
+          style={{ height: "95vh" }}
+        >
+          <Grid size={{ xs: 12, md: 6 }}>
+            <MusicPoster imgSource={imgSource} score={score} />
+          </Grid>
+          <Grid size={{ xs: 12, md: 6 }}>
+            <motion.div
+              key={song?.song_title?.title || ""}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 1 }}
+            >
+              <MusicQuiz
+                correctOption={song?.song_title?.title || ""}
+                options={options}
+                handleNext={handleNext}
+                handleSelectCorrect={handleSelectCorrect}
+                handleSelectWrong={handleSelectWrong}
+              />
+            </motion.div>
+          </Grid>
+        </Grid>
+      )}
     </>
   );
 }
