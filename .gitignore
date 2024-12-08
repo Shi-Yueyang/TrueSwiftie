@@ -10,13 +10,17 @@ node_modules/
 # Ignore build artifacts
 build/
 dist/
+
+# ignore data
 db.sqlite3
 **/media/**
 **/audio
 **/music
 **/taylor_swift_images/
+**/staticfiles
+**.log
+
 # Ignore environment variables file
 .env
-
 # Ignore Python cache files
 __pycache__/

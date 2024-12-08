@@ -12,6 +12,7 @@ mysqlclient = "*"
 requests = "*"
 beautifulsoup4 = "*"
 mutagen = "*"
+gunicorn = "*"
 
 [dev-packages]
 
