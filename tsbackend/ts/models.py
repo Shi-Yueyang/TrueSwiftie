@@ -23,3 +23,4 @@ class SongTitle(models.Model):
     
 class GameHistory(models.Model):
     score = models.IntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)

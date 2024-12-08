@@ -25,9 +25,10 @@ interface Props {
   options: string[];
   handleNext: () => void;
   handleSelectCorrect: () => void;
+  handleSelectWrong: () => void;
 }
 
-const MusicQuizComponent = ({ correctOption, options, handleNext, handleSelectCorrect }: Props) => {
+const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,handleSelectWrong}: Props) => {
   const [isPosterRevealed, setRevealed] = useState(false);
 
   const onClickNext = () => {
@@ -39,10 +40,13 @@ const MusicQuizComponent = ({ correctOption, options, handleNext, handleSelectCo
     if (option === correctOption) {
       handleSelectCorrect();
       setRevealed(true);
+    }else{
+      handleSelectWrong();
     }
   };
 
   return (
+
     <Grid container spacing={2}>
       {options.map((option, index) => (
         <Grid key={index}>
@@ -74,6 +78,7 @@ const MusicQuizComponent = ({ correctOption, options, handleNext, handleSelectCo
         </Button>
       )}
     </Grid>
+
   );
 };
 
@@ -88,4 +93,4 @@ const StyledButton = styled(Button)({
   },
 });
 
-export default MusicQuizComponent;
+export default MusicQuiz;

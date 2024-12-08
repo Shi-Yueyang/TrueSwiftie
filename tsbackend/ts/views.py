@@ -1,7 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets
-from .models import Song, SongTitle,Poster
-from .serializers import SongSerializer, SongTitleSerializer,PosterSerializer
+from .models import Song, SongTitle,Poster,GameHistory
+from .serializers import SongSerializer, SongTitleSerializer,PosterSerializer,GameHistorySerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import random
@@ -24,6 +24,10 @@ class SongTitleViewSet(viewsets.ModelViewSet):
 class PosterViewSet(viewsets.ModelViewSet):
     queryset = Poster.objects.all()
     serializer_class = PosterSerializer
+
+class GameHistoryViewSet(viewsets.ModelViewSet):
+    queryset = GameHistory.objects.all()
+    serializer_class = GameHistorySerializer
 
 @api_view(['GET'])
 def rand_titles(request):

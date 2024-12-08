@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import MusicQuizComponent, { Song } from "./MusicQuiz";
+import MusicQuiz, { Song } from "./MusicQuiz";
 import MusicPoster, { Poster } from "./MusicPoster";
 import axios from "axios";
-import { CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
 import "./App.css";
-import placeholderImg from "./assets/grey.jpg";
+import placeholderImg from "./assets/music_mark.png";
+import noPicture from "./assets/ts_placeholder.jpg";
 
 function App() {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
+  const volume = 1;
+
   const [options, setOptions] = useState<string[]>([]);
   const [song, setSong] = useState<Song>({} as Song);
   const [poster, setPoster] = useState<Poster>({} as Poster);
@@ -19,16 +21,34 @@ function App() {
 
   const [score, setScore] = useState(0);
   const [isLoading, setLoading] = useState(true);
-  
+
   const handleNext = () => {
     setLoading(true);
-    setScore(score + 1);
     setImgSource(placeholderImg);
   };
 
   const handleSelectCorrect = () => {
+    setScore(score + 1);
     setImgSource(poster.image);
   };
+
+  const handleSelectWrong = () => {
+    if(score>0){
+      const historyData = {
+        score: score,
+        timestamp: new Date().toISOString(),
+      };
+      axios
+      .post(`${backendIp}/ts/game-histories/`, historyData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+    }
+    setScore(0);
+
+  };
+
   // fetch new song
   useEffect(() => {
     const fetchSong = async () => {
@@ -46,8 +66,10 @@ function App() {
         setLoading(false);
       }
     };
-    fetchSong();
-  }, [score]);
+    if (isLoading) {
+      fetchSong();
+    }
+  }, [isLoading]);
 
   // fetch options
   useEffect(() => {
@@ -76,6 +98,10 @@ function App() {
   useEffect(() => {
     const fetchPoster = async () => {
       try {
+        if (song.song_title.poster_pics.length === 0) {
+          setPoster({ poster_name: "none", image: noPicture });
+          return;
+        }
         const randomPosterId = Math.floor(
           Math.random() * song.song_title.poster_pics.length
         );
@@ -94,7 +120,7 @@ function App() {
   useEffect(() => {
     const playNewSound = async () => {
       if (sound) {
-        sound.fade(1, 0, 1000); // Fade out over 1 second
+        sound.fade(volume, 0, 1000); // Fade out over 1 second
         setTimeout(() => {
           sound.stop();
         }, 1000); // Stop the sound after the fade-out completes
@@ -106,7 +132,7 @@ function App() {
       });
       setSound(newSound);
       newSound.play();
-      newSound.fade(0, 1, 1000);
+      newSound.fade(0, volume, 1000);
     };
 
     playNewSound();
@@ -114,37 +140,34 @@ function App() {
 
   return (
     <>
-      {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          spacing={3}
-          style={{ height: "95vh" }}
-        >
-          <Grid size={{ xs: 12, md: 6 }}>
-            <MusicPoster imgSource={imgSource} />
-          </Grid>
-          <Grid size={{ xs: 12, md: 6 }}>
-            <motion.div
-              key={song.song_title.title} // Ensure the motion div re-renders with a unique key
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 1 }}
-            >
-              <MusicQuizComponent
-                correctOption={song.song_title.title}
-                options={options}
-                handleNext={handleNext}
-                handleSelectCorrect={handleSelectCorrect}
-              />
-            </motion.div>
-          </Grid>
+      <Grid
+        container
+        justifyContent="center"
+        alignItems="center"
+        spacing={3}
+        style={{ height: "95vh" }}
+      >
+        <Grid size={{ xs: 12, md: 6 }}>
+          <MusicPoster imgSource={imgSource} score={score} />
         </Grid>
-      )}
+        <Grid size={{ xs: 12, md: 6 }}>
+          <motion.div
+            key={song.song_title.title} // Ensure the motion div re-renders with a unique key
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 1 }}
+          >
+            <MusicQuiz
+              correctOption={song.song_title.title}
+              options={options}
+              handleNext={handleNext}
+              handleSelectCorrect={handleSelectCorrect}
+              handleSelectWrong={handleSelectWrong}
+            />
+          </motion.div>
+        </Grid>
+      </Grid>
     </>
   );
 }
