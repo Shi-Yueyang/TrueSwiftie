@@ -24,4 +24,4 @@ class SongSerializer(serializers.ModelSerializer):
 class GameHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = GameHistory
-        fields = ['score','timestamp']
+        fields = ['score','timestamp','player_name']

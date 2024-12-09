@@ -14,7 +14,7 @@ class SongTitleAdmin(admin.ModelAdmin):
     filter_horizontal = ('poster_pics',) 
     
 class GameHistoryAdmin(admin.ModelAdmin):
-    list_display = ('id', 'score')
+    list_display = ('id',  'player_name', 'score','timestamp')
     search_fields = ('score',)
     list_filter = ('score',)
 

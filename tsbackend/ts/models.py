@@ -22,5 +22,6 @@ class SongTitle(models.Model):
         return self.title
     
 class GameHistory(models.Model):
+    player_name = models.CharField(max_length=255,default='null')
     score = models.IntegerField()
     timestamp = models.DateTimeField(auto_now_add=True)
