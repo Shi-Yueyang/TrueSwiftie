@@ -132,6 +132,7 @@ function App() {
         src: [song.file],
         volume: 1,
         onend: handleNext,
+        html5: true,
       });
       setSound(newSound);
       newSound.play();
