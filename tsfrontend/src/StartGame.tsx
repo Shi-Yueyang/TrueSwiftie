@@ -1,14 +1,20 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
+import { AppContext } from "./AppContext";
 
-interface Props {
-  handleStart: (username: string) => void;
-}
 
-const StartGame = ({ handleStart }: Props) => {
-  const [username, setUsername] = useState<string>("");
+
+const StartGame = () => {
+  const context = useContext(AppContext);
+  const {setGameState,setUsername, username,setStartTime} = context;
+
+  const handleStart = (name: string) => {
+    setUsername(name);
+    setStartTime(new Date());
+    setGameState("playing");
+  };
   const [error, setError] = useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {

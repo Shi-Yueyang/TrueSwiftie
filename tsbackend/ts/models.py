@@ -24,4 +24,7 @@ class SongTitle(models.Model):
 class GameHistory(models.Model):
     player_name = models.CharField(max_length=255,default='null')
     score = models.IntegerField()
-    timestamp = models.DateTimeField(auto_now_add=True)
+    start_time = models.DateTimeField(auto_now=False)
+    end_time = models.DateTimeField(auto_now=False)
+    correct_choice = models.CharField(max_length=255,default='null')
+    last_choice = models.CharField(max_length=255,default='null')

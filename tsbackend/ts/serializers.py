@@ -12,16 +12,13 @@ class SongTitleSerializer(serializers.ModelSerializer):
         model = SongTitle
         fields = ['id', 'title', 'album', 'lyrics', 'poster_pics']
 
-        
 class SongSerializer(serializers.ModelSerializer):
     song_title = SongTitleSerializer()
     class Meta:
         model = Song
         fields = ['id','file', 'song_title']
 
-
-
 class GameHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = GameHistory
-        fields = ['score','timestamp','player_name']
+        fields = ['id','player_name','score','start_time','end_time','correct_choice','last_choice']

@@ -25,7 +25,7 @@ interface Props {
   options: string[];
   handleNext: () => void;
   handleSelectCorrect: () => void;
-  handleSelectWrong: () => void;
+  handleSelectWrong: (lastChoice:string,correctOption:string) => void;
 }
 
 const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,handleSelectWrong}: Props) => {
@@ -41,7 +41,7 @@ const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,ha
       handleSelectCorrect();
       setRevealed(true);
     }else{
-      handleSelectWrong();
+      handleSelectWrong(option,correctOption);
     }
   };
 
@@ -56,6 +56,7 @@ const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,ha
             aria-label={`Select option ${option}`}
             startIcon={<IoMusicalNotes />}
             onClick={() => onChoose(option)}
+            disabled={isPosterRevealed}
           >
             {option}
           </StyledButton>

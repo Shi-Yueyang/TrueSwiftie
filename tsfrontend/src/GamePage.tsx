@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MusicQuiz, { Song } from "./MusicQuiz";
 import MusicPoster, { Poster } from "./MusicPoster";
 import axios from "axios";
@@ -8,12 +8,15 @@ import { Howl } from "howler";
 import "./App.css";
 import placeholderImg from "./assets/music_mark.png";
 import noPicture from "./assets/ts_placeholder.jpg";
+import { AppContext } from "./AppContext";
 
-interface Props {
-  userName: string;
-}
 
-const GamePage = ({ userName }: Props) => {
+
+const GamePage = () => {
+
+  const context = useContext(AppContext);
+  const { username,setGameState, startTime,score,setScore } = context;
+
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [options, setOptions] = useState<string[]>([]);
@@ -21,16 +24,8 @@ const GamePage = ({ userName }: Props) => {
   const [poster, setPoster] = useState<Poster>({} as Poster);
   const [sound, setSound] = useState<Howl | null>(null);
   const [imgSource, setImgSource] = useState(placeholderImg);
-
-  const [score, setScore] = useState(0);
   const [isLoading, setLoading] = useState(true);
-  const getChinaTime = () => {
-    const date = new Date();
-    const offset = 8 * 60; // China Standard Time is UTC+8
- 
-    const localTime = new Date(date.getTime() + offset * 60 * 1000);
-    return localTime;
-  };
+
 
   const handleNext = () => {
     setLoading(true);
@@ -42,18 +37,25 @@ const GamePage = ({ userName }: Props) => {
     setImgSource(poster.image);
   };
 
-  const handleSelectWrong = () => {
+  const handleSelectWrong = (lastChoice:string,correctOption:string) => {
     if (score > 0) {
       const historyData = {
-        player_name: userName,
+        player_name: username,
         score: score,
-        timestamp: getChinaTime(),
+        start_time:startTime.toISOString(),
+        end_time: new Date().toISOString(),
+        correct_choice: correctOption,
+        last_choice: lastChoice,
       };
       axios.post(`${backendIp}/ts/game-histories/`, historyData, {
         headers: {
           "Content-Type": "application/json",
         },
-      });
+      }).then(()=>{
+        setGameState('gameOver');
+      })
+
+
     }
     setScore(0);
   };

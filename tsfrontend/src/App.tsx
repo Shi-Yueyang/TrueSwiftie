@@ -1,26 +1,21 @@
-
-
-import { useState } from "react";
+import { useContext } from "react";
 import "./App.css";
 
 import GamePage from "./GamePage";
 import StartGame from "./StartGame";
+import { AppContext } from "./AppContext";
+import GameOver from "./GameOver";
 
 function App() {
-  
-  const [isStarted, setIsStarted] = useState(false);
-  const [username, setUsername] = useState<string>("");
-  const handleStart = (name:string) => {
-    setUsername(name);
-    setIsStarted(true);
-  };
+  const context = useContext(AppContext);
+  const { gameState } = context;
+
+
   return (
     <>
-      {!isStarted ? (
-        <StartGame  handleStart={handleStart} />
-        ) : (
-          <GamePage userName={username}/>
-        )}
+      {gameState === "initial" && <StartGame />}
+      {gameState === "playing" && <GamePage />}
+      {gameState === "gameOver" && <GameOver/>}
     </>
   );
 }

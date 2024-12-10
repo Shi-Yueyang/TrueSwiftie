@@ -29,6 +29,13 @@ class GameHistoryViewSet(viewsets.ModelViewSet):
     queryset = GameHistory.objects.all()
     serializer_class = GameHistorySerializer
 
+    @action(detail=False, methods=['get'],url_path='top-scores')
+    def top_scores(self, request):
+        top_scores = GameHistory.objects.order_by('-score')[:5]
+        serializer = self.get_serializer(top_scores, many=True)
+        return Response(serializer.data)
+
+
 @api_view(['GET'])
 def rand_titles(request):
     song_titles = list(SongTitle.objects.values_list('title', flat=True))
