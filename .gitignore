@@ -21,6 +21,6 @@ db.sqlite3
 **.log
 
 # Ignore environment variables file
-.env
+.env**
 # Ignore Python cache files
 __pycache__/

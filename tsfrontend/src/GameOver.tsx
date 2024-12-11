@@ -1,21 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import { Typography, Button, Card, CardContent, Box } from "@mui/material";
-import Grid from "@mui/material/Grid2";
+import { Typography, Button, Box, Stack } from "@mui/material";
 import { AppContext } from "./AppContext";
 import RankList from "./RankList";
 import axios from "axios";
 
-export interface GameHistory{
-  id:number;
-  player_name:string;
-  score:number;
+export interface GameHistory {
+  id: number;
+  player_name: string;
+  score: number;
 }
 
 const GameOver = () => {
   const context = useContext(AppContext);
   const { setGameState, score } = context;
-  const [GameHistory,setGameHistory] = useState<GameHistory[]>([]);
+  const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const backendIp = import.meta.env.VITE_BACKEND_IP;
+
   const handleRestart = () => {
     setGameState("initial");
   };
@@ -35,18 +35,17 @@ const GameOver = () => {
   }, []);
 
   return (
-    <Grid
-      container
+    <Stack
       justifyContent="center"
       alignItems="center"
-      style={{
-        height: "95vh",
+      sx={{
+        height: "100vh",
         textAlign: "center",
         position: "relative",
+        padding: "2rem",
       }}
-      direction="column"
+      spacing={2}
     >
-      {/* Overlay for contrast */}
       <Box
         sx={{
           position: "absolute",
@@ -62,8 +61,9 @@ const GameOver = () => {
         sx={{
           fontFamily: "'Poppins', sans-serif",
           fontWeight: "bold",
-          color: "#FFD700", // Golden text for celebration
+          color: "#FFD700",
           marginBottom: "1rem",
+          textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
         }}
       >
         Game Over!
@@ -74,14 +74,13 @@ const GameOver = () => {
           fontFamily: "'Poppins', sans-serif",
           fontWeight: 600,
           marginBottom: "2rem",
+          color: "#5af",
+          textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
         }}
       >
-        Your Score: {score}
+        Your Score: {score+1}
       </Typography>
-
       <RankList scoreRank={GameHistory} />
-
-      {/* Restart Button */}
       <Button
         variant="contained"
         color="primary"
@@ -96,11 +95,12 @@ const GameOver = () => {
           "&:hover": {
             backgroundColor: "#FF80B5",
           },
+          marginTop: "2rem",
         }}
       >
         Oh, here we go again.
       </Button>
-    </Grid>
+    </Stack>
   );
 };
 

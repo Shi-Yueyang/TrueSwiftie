@@ -1,8 +1,6 @@
 import { List, ListItem, Card, CardContent, Typography, Box, CardHeader } from "@mui/material";
 import { GameHistory } from "./GameOver";
 
-
-
 interface Props {
   scoreRank: GameHistory[];
 }
@@ -11,21 +9,31 @@ const RankList = ({ scoreRank }: Props) => {
   return (
     <Card
       sx={{
-        backgroundColor: "rgba(255, 255, 255, 0.8)",
+        backgroundColor: "rgba(255, 255, 255, 0.9)",
         marginTop: "2rem",
         maxWidth: 400,
         borderRadius: "16px",
         padding: "1rem",
-        boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.1)",
+        boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
       }}
     >
-      <CardHeader>
-        <Typography>
-          Rank List
-        </Typography>
-      </CardHeader>
+      <CardHeader
+        title={
+          <Typography
+            variant="h5"
+            sx={{
+              fontFamily: "'Poppins', sans-serif",
+              fontWeight: "bold",
+              color: "#333",
+              textAlign: "center",
+            }}
+          >
+            Rank List
+          </Typography>
+        }
+        sx={{ paddingBottom: 0 }}
+      />
       <CardContent>
-
         <List sx={{ padding: 0 }}>
           {scoreRank.map((rank, index) => (
             <ListItem

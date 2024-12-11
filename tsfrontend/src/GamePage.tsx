@@ -10,22 +10,17 @@ import placeholderImg from "./assets/music_mark.png";
 import noPicture from "./assets/ts_placeholder.jpg";
 import { AppContext } from "./AppContext";
 
-
-
 const GamePage = () => {
-
   const context = useContext(AppContext);
-  const { username,setGameState, startTime,score,setScore,gameHistoryId } = context;
+  const { setGameState, score, setScore, gameHistoryId,sound,setSound } = context;
 
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [options, setOptions] = useState<string[]>([]);
   const [song, setSong] = useState<Song>({} as Song);
   const [poster, setPoster] = useState<Poster>({} as Poster);
-  const [sound, setSound] = useState<Howl | null>(null);
   const [imgSource, setImgSource] = useState(placeholderImg);
   const [isLoading, setLoading] = useState(true);
-
 
   const handleNext = () => {
     setLoading(true);
@@ -33,21 +28,23 @@ const GamePage = () => {
   };
 
   const handleSelectCorrect = () => {
+    setScore(score + 1);
     const historyData = {
       id: gameHistoryId,
-      score: score+1 
+      score: score + 1,
     };
-    axios.patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, historyData, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).then(()=>{
-      setImgSource(poster.image);
-    })
-    
+    axios
+      .patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, historyData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then(() => {
+        setImgSource(poster.image);
+      });
   };
 
-  const handleSelectWrong = (lastChoice:string,correctOption:string) => {
+  const handleSelectWrong = (lastChoice: string, correctOption: string) => {
     if (score > 0) {
       const historyData = {
         id: gameHistoryId,
@@ -55,15 +52,19 @@ const GamePage = () => {
         correct_choice: correctOption,
         last_choice: lastChoice,
       };
-      axios.patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, historyData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }).then(()=>{
-        setGameState('gameOver');
-      })
-
-
+      axios
+        .patch(
+          `${backendIp}/ts/game-histories/${gameHistoryId}/`,
+          historyData,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        )
+        .then(() => {
+          setGameState("gameOver");
+        });
     }
     setScore(0);
   };
@@ -139,24 +140,35 @@ const GamePage = () => {
   useEffect(() => {
     const playNewSound = async () => {
       if (sound) {
-        sound.fade(volume, 0, 1000); // Fade out over 1 second
+        sound.fade(volume, 0, 1000);
+        console.log("Fading out sound",sound);
         setTimeout(() => {
           sound.stop();
-        }, 1000); // Stop the sound after the fade-out completes
+        }, 1000);
       }
-      const newSound = new Howl({
-        src: [song.file],
-        volume: 1,
-        onend: handleNext,
-        html5: true,
-      });
-      setSound(newSound);
-      newSound.play();
-      newSound.fade(0, volume, 1000);
+      if (song.file) {
+        const newSound = new Howl({
+          src: [song.file],
+          volume: 1,
+          onend: handleNext,
+          html5: true,
+        });
+        console.log("New sound",newSound);
+        setSound(newSound);
+      }
     };
-
     playNewSound();
   }, [song]);
+
+  useEffect(() => {
+
+    if (sound) {
+      console.log("Playing sound",sound);
+      sound.play();
+      sound.fade(0, volume, 1000);
+    }
+
+  }, [sound]);
 
   return (
     <>

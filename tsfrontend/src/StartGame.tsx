@@ -1,9 +1,8 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "./AppContext";
-import { use } from "framer-motion/client";
 
 const StartGame = () => {
   const context = useContext(AppContext);
@@ -14,9 +13,21 @@ const StartGame = () => {
     setStartTime,
     startTime,
     setGameHistoryId,
+    sound,
+    setSound,
   } = context;
 
   const [error, setError] = useState<string>("");
+
+  if(sound){
+    if (sound) {
+      sound.fade(1, 0, 1000);
+      setTimeout(() => {
+        sound.stop();
+      }, 1000);
+    }
+    setSound(null);
+  }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);

@@ -1,4 +1,5 @@
 import { createContext, useState, ReactNode } from "react";
+import { Howl } from "howler";
 
 type GameState = "initial" | "playing" | "gameOver" ;
 
@@ -13,6 +14,8 @@ interface AppContextProps {
   setScore:(score:number)=>void;
   gameHistoryId:number;
   setGameHistoryId:(gameHistoryId:number)=>void;
+  sound:Howl|null;
+  setSound:(sound:Howl|null)=>void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -25,7 +28,9 @@ const AppContext = createContext<AppContextProps>({
   score:0,
   setScore:()=>{},
   gameHistoryId:0,
-  setGameHistoryId:()=>{}
+  setGameHistoryId:()=>{},
+  sound:null,
+  setSound:()=>{}
 });
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -34,9 +39,11 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [score,setScore] = useState<number>(0);
   const [gameHistoryId,setGameHistoryId] = useState(0);
+  const [sound, setSound] = useState<Howl | null>(null);
+
   return (
     <AppContext.Provider
-      value={{ gameState, username, setGameState, setUsername,startTime,setStartTime,score,setScore,gameHistoryId,setGameHistoryId }}
+      value={{ gameState, username, setGameState, setUsername,startTime,setStartTime,score,setScore,gameHistoryId,setGameHistoryId,sound,setSound }}
     >
       {children}
     </AppContext.Provider>
