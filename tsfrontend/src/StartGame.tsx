@@ -1,29 +1,59 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "./AppContext";
-
-
+import { use } from "framer-motion/client";
 
 const StartGame = () => {
   const context = useContext(AppContext);
-  const {setGameState,setUsername, username,setStartTime} = context;
+  const {
+    setGameState,
+    setUsername,
+    username,
+    setStartTime,
+    startTime,
+    setGameHistoryId,
+  } = context;
 
-  const handleStart = (name: string) => {
-    setUsername(name);
-    setStartTime(new Date());
-    setGameState("playing");
-  };
   const [error, setError] = useState<string>("");
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
+  const postGameHistory = async () => {
+    const historyData = {
+      player_name: username,
+      score: 0,
+      start_time: startTime,
+      end_time: startTime,
+      correct_choice: "null",
+      last_choice: "null",
+    };
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_IP}/ts/game-histories/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(historyData),
+        }
+      );
+      const data = await response.json();
+      setGameHistoryId(data.id);
+    } catch (error) {
+      console.error("Error posting game history:", error);
+    }
+  };
 
   const handleStartGame = () => {
     if (username.trim()) {
-      handleStart(username);
+      setUsername(username.trim());
+      setStartTime(new Date());
+      postGameHistory();
+      setGameState("playing");
     } else {
       setError("Please enter your name!");
     }
@@ -46,11 +76,11 @@ const StartGame = () => {
         variant="h2"
         gutterBottom
         style={{
-            fontFamily: "'Poppins', sans-serif",
-            fontWeight: "bold",
-            letterSpacing: "2px",
-            zIndex: 1, // Ensure the text is above the overlay
-          }}
+          fontFamily: "'Poppins', sans-serif",
+          fontWeight: "bold",
+          letterSpacing: "2px",
+          zIndex: 1, // Ensure the text is above the overlay
+        }}
       >
         ...Ready For It?
       </Typography>

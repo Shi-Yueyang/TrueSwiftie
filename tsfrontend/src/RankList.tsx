@@ -1,4 +1,4 @@
-import { List, ListItem, Card, CardContent, Typography, Box } from "@mui/material";
+import { List, ListItem, Card, CardContent, Typography, Box, CardHeader } from "@mui/material";
 import { GameHistory } from "./GameOver";
 
 
@@ -19,10 +19,13 @@ const RankList = ({ scoreRank }: Props) => {
         boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <CardContent>
-        <Typography variant="h5" sx={{ fontWeight: "bold", color: "#333", marginBottom: "1rem" }}>
-          Score Rank
+      <CardHeader>
+        <Typography>
+          Rank List
         </Typography>
+      </CardHeader>
+      <CardContent>
+
         <List sx={{ padding: 0 }}>
           {scoreRank.map((rank, index) => (
             <ListItem

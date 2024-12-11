@@ -11,6 +11,8 @@ interface AppContextProps {
   setStartTime: (startTime: Date) => void;
   score:number;
   setScore:(score:number)=>void;
+  gameHistoryId:number;
+  setGameHistoryId:(gameHistoryId:number)=>void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -21,7 +23,9 @@ const AppContext = createContext<AppContextProps>({
   startTime: new Date(),
   setStartTime: () => {},
   score:0,
-  setScore:()=>{}
+  setScore:()=>{},
+  gameHistoryId:0,
+  setGameHistoryId:()=>{}
 });
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -29,9 +33,10 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [username, setUsername] = useState<string>("");
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [score,setScore] = useState<number>(0);
+  const [gameHistoryId,setGameHistoryId] = useState(0);
   return (
     <AppContext.Provider
-      value={{ gameState, username, setGameState, setUsername,startTime,setStartTime,score,setScore }}
+      value={{ gameState, username, setGameState, setUsername,startTime,setStartTime,score,setScore,gameHistoryId,setGameHistoryId }}
     >
       {children}
     </AppContext.Provider>

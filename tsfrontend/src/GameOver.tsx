@@ -6,6 +6,7 @@ import RankList from "./RankList";
 import axios from "axios";
 
 export interface GameHistory{
+  id:number;
   player_name:string;
   score:number;
 }
@@ -33,7 +34,6 @@ const GameOver = () => {
     fetchTopScores();
   }, []);
 
-  const scoreRank = [{ name: "syy", score: 1 }];
   return (
     <Grid
       container
@@ -79,30 +79,7 @@ const GameOver = () => {
         Your Score: {score}
       </Typography>
 
-      {/* Score Rank */}
-      <Card
-        sx={{
-          backgroundColor: "rgba(255, 255, 255, 0.8)",
-          marginBottom: "2rem",
-          maxWidth: 400,
-          borderRadius: "16px",
-        }}
-      >
-        <CardContent>
-          <Typography
-            variant="h5"
-            sx={{
-              fontFamily: "'Poppins', sans-serif",
-              fontWeight: "bold",
-              marginBottom: "1rem",
-              color: "#333",
-            }}
-          >
-            Score Rank
-          </Typography>
-          <RankList scoreRank={GameHistory} />
-        </CardContent>
-      </Card>
+      <RankList scoreRank={GameHistory} />
 
       {/* Restart Button */}
       <Button

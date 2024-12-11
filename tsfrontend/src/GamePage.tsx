@@ -15,7 +15,7 @@ import { AppContext } from "./AppContext";
 const GamePage = () => {
 
   const context = useContext(AppContext);
-  const { username,setGameState, startTime,score,setScore } = context;
+  const { username,setGameState, startTime,score,setScore,gameHistoryId } = context;
 
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
@@ -33,21 +33,29 @@ const GamePage = () => {
   };
 
   const handleSelectCorrect = () => {
-    setScore(score + 1);
-    setImgSource(poster.image);
+    const historyData = {
+      id: gameHistoryId,
+      score: score+1 
+    };
+    axios.patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, historyData, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then(()=>{
+      setImgSource(poster.image);
+    })
+    
   };
 
   const handleSelectWrong = (lastChoice:string,correctOption:string) => {
     if (score > 0) {
       const historyData = {
-        player_name: username,
-        score: score,
-        start_time:startTime.toISOString(),
+        id: gameHistoryId,
         end_time: new Date().toISOString(),
         correct_choice: correctOption,
         last_choice: lastChoice,
       };
-      axios.post(`${backendIp}/ts/game-histories/`, historyData, {
+      axios.patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, historyData, {
         headers: {
           "Content-Type": "application/json",
         },
