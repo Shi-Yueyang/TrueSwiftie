@@ -36,13 +36,15 @@ const MusicQuiz = ({
   handleSelectWrong,
 }: Props) => {
   const [isPosterRevealed, setRevealed] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(timeLimit);
-
+  const [timeLeft, setTimeLeft] = useState(1);
   const onClickNext = () => {
     setRevealed(false);
     handleNext();
   };
-
+  useEffect(() => {
+    setTimeLeft(timeLimit);
+  }
+  , [correctOption, timeLimit]);
   const onChoose = (option: string) => {
     if (option === correctOption) {
       handleSelectCorrect();
@@ -54,7 +56,7 @@ const MusicQuiz = ({
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (timeLeft > 0) {
+      if (timeLeft > 0 && !isPosterRevealed) {
         setTimeLeft(timeLeft - 1);
         console.log(timeLeft);
         if (timeLeft === 1) {
