@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import MusicQuiz, { Song } from "./MusicQuiz";
 import MusicPoster, { Poster } from "./MusicPoster";
 import axios from "axios";
@@ -22,7 +22,7 @@ const GamePage = () => {
   const [poster, setPoster] = useState<Poster>({} as Poster);
   const [imgSource, setImgSource] = useState(placeholderImg);
   const [isLoading, setLoading] = useState(true);
-  const abortControllerRef = useRef<AbortController | null>(null);
+  const [timeLimit, setTimeLimit] = useState(-1);
 
   const handleNext = () => {
     setLoading(true);
@@ -31,6 +31,7 @@ const GamePage = () => {
 
   const handleSelectCorrect = () => {
     setScore(score + 1);
+    console.log(score)
     const historyData = {
       id: gameHistoryId,
       score: score + 1,
@@ -44,6 +45,9 @@ const GamePage = () => {
       .then(() => {
         setImgSource(poster.image);
       });
+    if(score>=5){
+      setTimeLimit(10);
+    }
   };
 
   const handleSelectWrong = (lastChoice: string, correctOption: string) => {
@@ -75,8 +79,6 @@ const GamePage = () => {
   useEffect(() => {
     const fetchSong = async () => {
       try {
-
-
         const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
         const data = response.data;
         if (data.song_title) {
@@ -197,6 +199,7 @@ const GamePage = () => {
               correctOption={song?.song_title?.title || ""}
               options={options}
               handleNext={handleNext}
+              timeLimit={timeLimit}
               handleSelectCorrect={handleSelectCorrect}
               handleSelectWrong={handleSelectWrong}
             />

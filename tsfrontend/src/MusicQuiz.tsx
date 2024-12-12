@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Button } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
@@ -18,18 +18,25 @@ export interface Song {
   song_title: SongTitle;
 }
 
-
-
 interface Props {
   correctOption: string;
   options: string[];
+  timeLimit: number;
   handleNext: () => void;
   handleSelectCorrect: () => void;
-  handleSelectWrong: (lastChoice:string,correctOption:string) => void;
+  handleSelectWrong: (lastChoice: string, correctOption: string) => void;
 }
 
-const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,handleSelectWrong}: Props) => {
+const MusicQuiz = ({
+  correctOption,
+  options,
+  handleNext,
+  timeLimit,
+  handleSelectCorrect,
+  handleSelectWrong,
+}: Props) => {
   const [isPosterRevealed, setRevealed] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(timeLimit);
 
   const onClickNext = () => {
     setRevealed(false);
@@ -40,13 +47,25 @@ const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,ha
     if (option === correctOption) {
       handleSelectCorrect();
       setRevealed(true);
-    }else{
-      handleSelectWrong(option,correctOption);
+    } else {
+      handleSelectWrong(option, correctOption);
     }
   };
 
-  return (
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (timeLeft > 0) {
+        setTimeLeft(timeLeft - 1);
+        console.log(timeLeft);
+        if (timeLeft === 1) {
+          handleSelectWrong("Time's up", correctOption);
+        }
+      }
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [timeLeft]);
 
+  return (
     <Grid container spacing={2}>
       {options.map((option, index) => (
         <Grid key={index}>
@@ -78,8 +97,13 @@ const MusicQuiz = ({ correctOption, options, handleNext, handleSelectCorrect ,ha
           <IoArrowForwardOutline />
         </Button>
       )}
+      {timeLimit > 0 && (
+        <CircularProgress
+          variant="determinate"
+          value={(timeLeft / timeLimit) * 100}
+        />
+      )}
     </Grid>
-
   );
 };
 
