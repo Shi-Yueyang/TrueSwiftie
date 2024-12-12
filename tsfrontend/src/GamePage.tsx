@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import MusicQuiz, { Song } from "./MusicQuiz";
 import MusicPoster, { Poster } from "./MusicPoster";
 import axios from "axios";
@@ -12,7 +12,8 @@ import { AppContext } from "./AppContext";
 
 const GamePage = () => {
   const context = useContext(AppContext);
-  const { setGameState, score, setScore, gameHistoryId,sound,setSound } = context;
+  const { setGameState, score, setScore, gameHistoryId, sound, setSound } =
+    context;
 
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
@@ -21,6 +22,7 @@ const GamePage = () => {
   const [poster, setPoster] = useState<Poster>({} as Poster);
   const [imgSource, setImgSource] = useState(placeholderImg);
   const [isLoading, setLoading] = useState(true);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const handleNext = () => {
     setLoading(true);
@@ -73,6 +75,8 @@ const GamePage = () => {
   useEffect(() => {
     const fetchSong = async () => {
       try {
+
+
         const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
         const data = response.data;
         if (data.song_title) {
@@ -141,9 +145,10 @@ const GamePage = () => {
     const playNewSound = async () => {
       if (sound) {
         sound.fade(volume, 0, 1000);
-        console.log("Fading out sound",sound);
+        console.log("Fading out sound", sound);
         setTimeout(() => {
           sound.stop();
+          sound.unload();
         }, 1000);
       }
       if (song.file) {
@@ -153,7 +158,7 @@ const GamePage = () => {
           onend: handleNext,
           html5: true,
         });
-        console.log("New sound",newSound);
+        console.log("New sound", newSound);
         setSound(newSound);
       }
     };
@@ -161,13 +166,11 @@ const GamePage = () => {
   }, [song]);
 
   useEffect(() => {
-
     if (sound) {
-      console.log("Playing sound",sound);
+      console.log("Playing sound", sound);
       sound.play();
       sound.fade(0, volume, 1000);
     }
-
   }, [sound]);
 
   return (
