@@ -1,6 +1,7 @@
 # Ignore compiled Python files
 *.pyc
-
+*.tar.gz
+*.tar
 # Ignore virtual environment
 venv/
 

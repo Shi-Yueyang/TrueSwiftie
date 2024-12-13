@@ -72,6 +72,19 @@ const GamePage = () => {
     }
   };
 
+  const handleSoundPlay = () => {
+    setIsLoaded(true);
+    if (score >= 30) {
+      setTimeLimit(3);
+    } else if (score >= 20) {
+      setTimeLimit(5);
+    } else if (score >= 10) {
+      setTimeLimit(10);
+    } else if (score >= 2) {
+      setTimeLimit(13);
+    }
+  };
+// 
   // fetch new song
   useEffect(() => {
     const fetchSong = async () => {
@@ -145,7 +158,6 @@ const GamePage = () => {
     const playNewSound = async () => {
       if (sound) {
         sound.fade(volume, 0, 1000);
-        console.log("Fading out sound", sound);
         setTimeout(() => {
           sound.stop();
           sound.unload();
@@ -157,14 +169,8 @@ const GamePage = () => {
           volume: 1,
           onend: handleNext,
           html5: true,
-          onplay: () => {
-            setIsLoaded(true);
-            if (score >= 3) {
-              setTimeLimit(13);
-            }
-          },
+          onplay: handleSoundPlay,
         });
-        console.log("New sound", newSound);
         setSound(newSound);
       }
     };
@@ -173,7 +179,6 @@ const GamePage = () => {
 
   useEffect(() => {
     if (sound) {
-      console.log("Playing sound", sound);
       sound.play();
       sound.fade(0, volume, 1000);
     }
@@ -212,7 +217,7 @@ const GamePage = () => {
               <div>
                 <div>Loading...</div>
                 <LinearProgress />
-                </div>
+              </div>
             )}
           </motion.div>
         </Grid>
