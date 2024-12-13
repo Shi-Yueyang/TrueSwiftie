@@ -3,7 +3,7 @@ import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "./AppContext";
-
+import readyForIt from "./assets/Taylor Swift - …Ready For It_.mp4";
 const StartGame = () => {
   const context = useContext(AppContext);
   const {
@@ -20,7 +20,7 @@ const StartGame = () => {
 
   const [error, setError] = useState<string>("");
 
-  if(sound){
+  if (sound) {
     if (sound) {
       sound.fade(1, 0, 1000);
       setTimeout(() => {
@@ -73,8 +73,7 @@ const StartGame = () => {
 
   useEffect(() => {
     setScore(0);
-  }
-  , []);
+  }, []);
 
   return (
     <Grid
@@ -89,12 +88,30 @@ const StartGame = () => {
       }}
       direction={"column"}
     >
+      <video
+        autoPlay
+        loop
+        muted
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          zIndex: -1,
+        }}
+      >
+        <source src={readyForIt} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
       <Typography
         variant="h2"
         gutterBottom
         style={{
           fontFamily: "'Poppins', sans-serif",
           fontWeight: "bold",
+          color: "#fff",
           letterSpacing: "2px",
           zIndex: 1, // Ensure the text is above the overlay
         }}
