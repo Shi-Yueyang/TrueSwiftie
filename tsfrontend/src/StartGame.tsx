@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
@@ -15,6 +15,7 @@ const StartGame = () => {
     setGameHistoryId,
     sound,
     setSound,
+    setScore,
   } = context;
 
   const [error, setError] = useState<string>("");
@@ -69,6 +70,11 @@ const StartGame = () => {
       setError("Please enter your name!");
     }
   };
+
+  useEffect(() => {
+    setScore(0);
+  }
+  , []);
 
   return (
     <Grid

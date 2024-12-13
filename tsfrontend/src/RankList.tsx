@@ -11,7 +11,7 @@ const RankList = ({ scoreRank }: Props) => {
       sx={{
         backgroundColor: "rgba(255, 255, 255, 0.9)",
         marginTop: "2rem",
-        maxWidth: 400,
+        maxWidth: 600,
         borderRadius: "16px",
         padding: "1rem",
         boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
@@ -61,6 +61,7 @@ const RankList = ({ scoreRank }: Props) => {
                     fontWeight: "500",
                     color: "#333",
                     fontSize: "1.1rem",
+                    marginRight: "20px", // Add margin to create space
                   }}
                 >
                   {rank.player_name}
@@ -71,6 +72,7 @@ const RankList = ({ scoreRank }: Props) => {
                   fontWeight: "500",
                   color: "#333",
                   fontSize: "1.1rem",
+                  marginLeft: "20px", // Add margin to create space
                 }}
               >
                 {rank.score}

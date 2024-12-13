@@ -4,7 +4,7 @@ from .models import Song, SongTitle, GameHistory,Poster
 class SongAdmin(admin.ModelAdmin):
     list_display = ('id', 'file', 'song_title')
     search_fields = ('file', 'song_title__title')
-    list_filter = ('song_title',)
+    list_filter = ('song_title__album',)
     raw_id_fields = ('song_title',) 
 
 class SongTitleAdmin(admin.ModelAdmin):

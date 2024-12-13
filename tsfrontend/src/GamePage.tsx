@@ -9,6 +9,7 @@ import "./App.css";
 import placeholderImg from "./assets/music_mark.png";
 import noPicture from "./assets/ts_placeholder.jpg";
 import { AppContext } from "./AppContext";
+import { LinearProgress } from "@mui/material";
 
 const GamePage = () => {
   const context = useContext(AppContext);
@@ -21,17 +22,17 @@ const GamePage = () => {
   const [song, setSong] = useState<Song>({} as Song);
   const [poster, setPoster] = useState<Poster>({} as Poster);
   const [imgSource, setImgSource] = useState(placeholderImg);
-  const [isLoading, setLoading] = useState(true);
+  const [isToFetch, setIsToFetch] = useState(true);
+  const [isLoaded, setIsLoaded] = useState(false);
   const [timeLimit, setTimeLimit] = useState(-1);
 
   const handleNext = () => {
-    setLoading(true);
+    setIsToFetch(true);
     setImgSource(placeholderImg);
   };
 
   const handleSelectCorrect = () => {
     setScore(score + 1);
-    console.log(score)
     const historyData = {
       id: gameHistoryId,
       score: score + 1,
@@ -45,9 +46,6 @@ const GamePage = () => {
       .then(() => {
         setImgSource(poster.image);
       });
-    if(score>=5){
-      setTimeLimit(10);
-    }
   };
 
   const handleSelectWrong = (lastChoice: string, correctOption: string) => {
@@ -72,7 +70,6 @@ const GamePage = () => {
           setGameState("gameOver");
         });
     }
-    setScore(0);
   };
 
   // fetch new song
@@ -83,19 +80,20 @@ const GamePage = () => {
         const data = response.data;
         if (data.song_title) {
           setSong(response.data);
-          setLoading(false);
+          setIsToFetch(false);
         } else {
           fetchSong();
         }
       } catch (error) {
         console.error("Error fetching song data:", error);
-        setLoading(false);
+        setIsToFetch(false);
       }
     };
-    if (isLoading) {
+    if (isToFetch) {
       fetchSong();
+      setIsLoaded(false);
     }
-  }, [isLoading]);
+  }, [isToFetch]);
 
   // fetch options
   useEffect(() => {
@@ -159,6 +157,12 @@ const GamePage = () => {
           volume: 1,
           onend: handleNext,
           html5: true,
+          onplay: () => {
+            setIsLoaded(true);
+            if (score >= 3) {
+              setTimeLimit(13);
+            }
+          },
         });
         console.log("New sound", newSound);
         setSound(newSound);
@@ -195,14 +199,21 @@ const GamePage = () => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 1 }}
           >
-            <MusicQuiz
-              correctOption={song?.song_title?.title || ""}
-              options={options}
-              handleNext={handleNext}
-              timeLimit={timeLimit}
-              handleSelectCorrect={handleSelectCorrect}
-              handleSelectWrong={handleSelectWrong}
-            />
+            {isLoaded ? (
+              <MusicQuiz
+                correctOption={song?.song_title?.title || ""}
+                options={options}
+                handleNext={handleNext}
+                timeLimit={timeLimit}
+                handleSelectCorrect={handleSelectCorrect}
+                handleSelectWrong={handleSelectWrong}
+              />
+            ) : (
+              <div>
+                <div>Loading...</div>
+                <LinearProgress />
+                </div>
+            )}
           </motion.div>
         </Grid>
       </Grid>

@@ -12,7 +12,8 @@ export interface GameHistory {
 
 const GameOver = () => {
   const context = useContext(AppContext);
-  const { setGameState, score } = context;
+  const { setGameState, score,username } = context;
+  console.log(username)
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const backendIp = import.meta.env.VITE_BACKEND_IP;
 
@@ -66,7 +67,7 @@ const GameOver = () => {
           textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
         }}
       >
-        Game Over!
+        End Game
       </Typography>
       <Typography
         variant="h4"
@@ -78,7 +79,7 @@ const GameOver = () => {
           textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
         }}
       >
-        Your Score: {score+1}
+        Your Swiftiness: {score}
       </Typography>
       <RankList scoreRank={GameHistory} />
       <Button
@@ -88,7 +89,7 @@ const GameOver = () => {
         sx={{
           padding: "0.75rem 2rem",
           borderRadius: "30px",
-          fontSize: "1.25rem",
+          fontSize: "1rem",
           fontFamily: "'Poppins', sans-serif",
           letterSpacing: "1.5px",
           backgroundColor: "#F5A3C7",
