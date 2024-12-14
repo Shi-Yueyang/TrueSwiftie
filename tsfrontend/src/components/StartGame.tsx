@@ -2,8 +2,8 @@ import { useContext, useEffect, useState } from "react";
 import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
-import { AppContext } from "./AppContext";
-import readyForIt from "./assets/Taylor Swift - …Ready For It_.mp4";
+import { AppContext } from "../context/AppContext";
+import readyForIt from "../assets/Taylor Swift - …Ready For It_.mp4";
 const StartGame = () => {
   const context = useContext(AppContext);
   const {

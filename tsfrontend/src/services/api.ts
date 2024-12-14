@@ -1,0 +1,26 @@
+import axios from "axios";
+
+const backendIp = import.meta.env.VITE_BACKEND_IP;
+
+export const fetchRandomSong = async () => {
+  const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
+  return response.data;
+};
+
+export const fetchRandomTitles = async () => {
+  const response = await axios.get(`${backendIp}/ts/random-titles/`);
+  return response.data;
+};
+
+export const fetchPosterById = async (id: string) => {
+  const response = await axios.get(`${backendIp}/ts/posters/${id}/`);
+  return response.data;
+};
+
+export const updateGameHistory = async (gameHistoryId: string, data: any) => {
+  await axios.patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, data, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

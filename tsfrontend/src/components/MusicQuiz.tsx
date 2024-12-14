@@ -3,7 +3,7 @@ import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
-import "./App.css";
+import "../styles/App.css";
 
 interface SongTitle {
   title: string;

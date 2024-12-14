@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { motion } from "framer-motion";
-import "./App.css";
+import "../styles/App.css";
 
 interface Props {
   imgSource: string;

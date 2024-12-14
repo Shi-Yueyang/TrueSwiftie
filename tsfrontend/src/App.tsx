@@ -1,10 +1,10 @@
 import { useContext } from "react";
-import "./App.css";
+import './styles/App.css';
 
-import GamePage from "./GamePage";
-import StartGame from "./StartGame";
-import { AppContext } from "./AppContext";
-import GameOver from "./GameOver";
+import GamePage from "./components/GamePage";
+import StartGame from "./components/StartGame";
+import { AppContext } from "./context/AppContext";
+import GameOver from "./components/GameOver";
 
 function App() {
   const context = useContext(AppContext);

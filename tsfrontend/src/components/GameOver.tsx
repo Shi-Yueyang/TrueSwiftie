@@ -1,6 +1,6 @@
 import { useContext, useEffect, useState } from "react";
 import { Typography, Button, Box, Stack } from "@mui/material";
-import { AppContext } from "./AppContext";
+import { AppContext } from "../context/AppContext";
 import RankList from "./RankList";
 import axios from "axios";
 
