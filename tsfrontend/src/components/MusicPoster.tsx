@@ -13,6 +13,7 @@ export interface Poster {
 }
 
 const MusicPoster = ({ imgSource, score }: Props) => {
+  console.log(imgSource);
   return (
     <Box
       sx={{

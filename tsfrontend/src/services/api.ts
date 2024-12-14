@@ -7,6 +7,20 @@ export const fetchRandomSong = async () => {
   return response.data;
 };
 
+export const fetchRandomSongStartFromTime = async (
+  url:string,
+  startTimeInSeconds: number
+) => {
+  const startByte = (startTimeInSeconds * 128 * 1024) / 8;
+  const response = await axios.get(url, {
+    headers: {
+      Range: `bytes=${startByte}-`,
+    },
+    responseType: "arraybuffer",
+  });
+  return response.data;
+};
+
 export const fetchRandomTitles = async () => {
   const response = await axios.get(`${backendIp}/ts/random-titles/`);
   return response.data;
@@ -23,4 +37,9 @@ export const updateGameHistory = async (gameHistoryId: string, data: any) => {
       "Content-Type": "application/json",
     },
   });
+};
+
+export const createBlobUrl = (arrayBuffer: ArrayBuffer, mimeType: string) => {
+  const blob = new Blob([arrayBuffer], { type: mimeType });
+  return URL.createObjectURL(blob);
 };

@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import { LinearProgress } from "@mui/material";
 import { motion } from "framer-motion";
@@ -7,8 +7,8 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import MusicQuiz from "./MusicQuiz";
 import MusicPoster from "./MusicPoster";
-import { useSong,useOptions,usePoster } from "../hooks/hooks";
-
+import { useSong, useOptions, usePoster } from "../hooks/hooks";
+import { fetchRandomSongStartFromTime, createBlobUrl } from "../services/api";
 import "../styles/App.css";
 import placeholderImg from "../assets/music_mark.png";
 
@@ -20,15 +20,17 @@ const GamePage = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [imgSource, setImgSource] = useState(placeholderImg);
-  const [isToFetch, setIsToFetch] = useState(1);
+  const [nextClickCnt, setNextClickCnt] = useState(1);
   const [timeLimit, setTimeLimit] = useState(-1);
+  const soundCreatedRef = useRef(false);
+  const soundPlayedRef = useRef(false);
 
-  const handleNext = () => {
-    setIsToFetch(isToFetch + 1);
+  const handleNextQuestionClicked = () => {
+    setNextClickCnt(nextClickCnt + 1);
     setImgSource(placeholderImg);
   };
 
-  const handleSelectCorrect = () => {
+  const handleSelectIsCorrect = () => {
     setScore(score + 1);
     const historyData = {
       id: gameHistoryId,
@@ -41,11 +43,11 @@ const GamePage = () => {
         },
       })
       .then(() => {
-        setImgSource(poster.image);
+        console.log('set image',poster)
       });
   };
 
-  const handleSelectWrong = (lastChoice: string, correctOption: string) => {
+  const handleSelectIsWrong = (lastChoice: string, correctOption: string) => {
     if (score > 0) {
       const historyData = {
         id: gameHistoryId,
@@ -81,16 +83,17 @@ const GamePage = () => {
       setTimeLimit(13);
     }
   };
-// 
-  // fetch new song
-  const { song, isSoundLoaded, setIsSoundLoaded } = useSong(isToFetch);
+
+  // fetch song, options, and poster
+  const { song, isSoundLoaded, setIsSoundLoaded } = useSong(nextClickCnt);
   const options = useOptions(song);
-  const poster  = usePoster(song);
+  const poster = usePoster(song);
 
-
-  // set sound
+  // fetch sound
   useEffect(() => {
-    const playNewSound = async () => {
+    const setNewSound = async () => {
+      if (soundCreatedRef.current) return;
+
       if (sound) {
         sound.fade(volume, 0, 1000);
         setTimeout(() => {
@@ -98,22 +101,37 @@ const GamePage = () => {
           sound.unload();
         }, 1000);
       }
+
       if (song.file) {
+        soundCreatedRef.current = true;
+        soundPlayedRef.current = false;
+
+        const startTime = Math.floor(Math.random() * 120);
+        const arrayBuffer = await fetchRandomSongStartFromTime(
+          song.file,
+          startTime
+        );
+        const blobUrl = createBlobUrl(arrayBuffer, "audio/mpeg");
+        const songSource = score >= 1 ? blobUrl : song.file;
         const newSound = new Howl({
-          src: [song.file],
+          src: [songSource],
           volume: 1,
-          onend: handleNext,
+          onend: handleNextQuestionClicked,
           html5: true,
           onplay: handleSoundOnPlay,
         });
         setSound(newSound);
       }
     };
-    playNewSound();
+    setNewSound();
   }, [song]);
 
+  // play sound
   useEffect(() => {
+    if (soundPlayedRef.current) return;
     if (sound) {
+      soundPlayedRef.current = true;
+      soundCreatedRef.current = false;
       sound.play();
       sound.fade(0, volume, 1000);
     }
@@ -143,10 +161,10 @@ const GamePage = () => {
               <MusicQuiz
                 correctOption={song?.song_title?.title || ""}
                 options={options}
-                handleNext={handleNext}
+                handleNext={handleNextQuestionClicked}
                 timeLimit={timeLimit}
-                handleSelectCorrect={handleSelectCorrect}
-                handleSelectWrong={handleSelectWrong}
+                handleSelectCorrect={handleSelectIsCorrect}
+                handleSelectWrong={handleSelectIsWrong}
               />
             ) : (
               <div>

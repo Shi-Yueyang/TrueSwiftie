@@ -13,6 +13,7 @@ requests = "*"
 beautifulsoup4 = "*"
 mutagen = "*"
 gunicorn = "*"
+matplotlib = "*"
 
 [dev-packages]
 

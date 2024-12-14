@@ -75,10 +75,11 @@ export const usePoster = (song: Song) => {
         const randomPosterId = Math.floor(
           Math.random() * song.song_title.poster_pics.length
         );
-        const response = await fetchPosterById(
+        const poster = await fetchPosterById(
           song.song_title.poster_pics[randomPosterId].toString()
         );
-        setPoster(response.data);
+        console.log('response',poster);
+        setPoster(poster);
       } catch (error) {
         console.error("Error fetching poster data:", error);
       }
@@ -89,3 +90,4 @@ export const usePoster = (song: Song) => {
 
   return poster;
 };
+
