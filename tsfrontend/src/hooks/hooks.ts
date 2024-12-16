@@ -10,7 +10,6 @@ import noPicture from "../assets/ts_placeholder.jpg";
 
 export const useSong = (isToFetch: number) => {
   const [song, setSong] = useState<Song>({} as Song);
-  const [isSoundLoaded, setIsSoundLoaded] = useState(false);
 
   useEffect(() => {
     const fetchSong = async () => {
@@ -28,12 +27,11 @@ export const useSong = (isToFetch: number) => {
 
     if (isToFetch) {
       fetchSong();
-      setIsSoundLoaded(false);
       
     }
   }, [isToFetch]);
 
-  return { song, isSoundLoaded, setIsSoundLoaded };
+  return song ;
 };
 
 export const useOptions = (song: Song) => {
@@ -55,7 +53,7 @@ export const useOptions = (song: Song) => {
         console.error("Error fetching options data:", error);
       }
     };
-
+    console.log('fetchoptions',song);
     fetchOptions();
   }, [song]);
 
@@ -78,7 +76,6 @@ export const usePoster = (song: Song) => {
         const poster = await fetchPosterById(
           song.song_title.poster_pics[randomPosterId].toString()
         );
-        console.log('response',poster);
         setPoster(poster);
       } catch (error) {
         console.error("Error fetching poster data:", error);

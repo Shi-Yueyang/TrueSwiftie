@@ -22,6 +22,8 @@ const GamePage = () => {
   const [imgSource, setImgSource] = useState(placeholderImg);
   const [nextClickCnt, setNextClickCnt] = useState(1);
   const [timeLimit, setTimeLimit] = useState(-1);
+  const [isSoundLoaded, setIsSoundLoaded] = useState(false);
+
   const soundCreatedRef = useRef(false);
   const soundPlayedRef = useRef(false);
 
@@ -43,7 +45,7 @@ const GamePage = () => {
         },
       })
       .then(() => {
-        console.log('set image',poster)
+        setImgSource(poster.image)
       });
   };
 
@@ -85,7 +87,7 @@ const GamePage = () => {
   };
 
   // fetch song, options, and poster
-  const { song, isSoundLoaded, setIsSoundLoaded } = useSong(nextClickCnt);
+  const song  = useSong(nextClickCnt);
   const options = useOptions(song);
   const poster = usePoster(song);
 

@@ -58,7 +58,6 @@ const MusicQuiz = ({
     const timer = setTimeout(() => {
       if (timeLeft > 0 && !isPosterRevealed) {
         setTimeLeft(timeLeft - 1);
-        console.log(timeLeft);
         if (timeLeft === 1) {
           handleSelectWrong("Time's up", correctOption);
         }

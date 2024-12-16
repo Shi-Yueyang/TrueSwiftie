@@ -12,8 +12,7 @@ export interface GameHistory {
 
 const GameOver = () => {
   const context = useContext(AppContext);
-  const { setGameState, score,username } = context;
-  console.log(username)
+  const { setGameState, score } = context;
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const backendIp = import.meta.env.VITE_BACKEND_IP;
 
