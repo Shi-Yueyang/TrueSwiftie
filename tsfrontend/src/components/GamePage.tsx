@@ -1,4 +1,4 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import { LinearProgress } from "@mui/material";
 import { motion } from "framer-motion";
@@ -24,8 +24,7 @@ const GamePage = () => {
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
 
-  const soundCreatedRef = useRef(false);
-  const soundPlayedRef = useRef(false);
+
 
   const handleNextQuestionClicked = () => {
     setNextClickCnt(nextClickCnt + 1);
@@ -45,7 +44,7 @@ const GamePage = () => {
         },
       })
       .then(() => {
-        setImgSource(poster.image)
+        poster && setImgSource(poster.image)
       });
   };
 
@@ -90,11 +89,11 @@ const GamePage = () => {
   const song  = useSong(nextClickCnt);
   const options = useOptions(song);
   const poster = usePoster(song);
-
-  // fetch sound
+  // console.log('poster',poster,'song',song,'options',options);
+  
+  // set sound
   useEffect(() => {
     const setNewSound = async () => {
-      if (soundCreatedRef.current) return;
 
       if (sound) {
         sound.fade(volume, 0, 1000);
@@ -104,10 +103,8 @@ const GamePage = () => {
         }, 1000);
       }
 
-      if (song.file) {
-        soundCreatedRef.current = true;
-        soundPlayedRef.current = false;
-
+      console.log("song:", song);
+      if (song) {
         const startTime = Math.floor(Math.random() * 120);
         const arrayBuffer = await fetchRandomSongStartFromTime(
           song.file,
@@ -130,10 +127,7 @@ const GamePage = () => {
 
   // play sound
   useEffect(() => {
-    if (soundPlayedRef.current) return;
     if (sound) {
-      soundPlayedRef.current = true;
-      soundCreatedRef.current = false;
       sound.play();
       sound.fade(0, volume, 1000);
     }
@@ -159,9 +153,9 @@ const GamePage = () => {
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 1 }}
           >
-            {isSoundLoaded ? (
+            {isSoundLoaded && song && options ? (
               <MusicQuiz
-                correctOption={song?.song_title?.title || ""}
+                correctOption={song.song_title.title}
                 options={options}
                 handleNext={handleNextQuestionClicked}
                 timeLimit={timeLimit}

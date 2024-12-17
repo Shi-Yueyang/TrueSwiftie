@@ -9,7 +9,7 @@ import { Poster } from "../components/MusicPoster";
 import noPicture from "../assets/ts_placeholder.jpg";
 
 export const useSong = (isToFetch: number) => {
-  const [song, setSong] = useState<Song>({} as Song);
+  const [song, setSong] = useState<Song|null>(null);
 
   useEffect(() => {
     const fetchSong = async () => {
@@ -34,10 +34,11 @@ export const useSong = (isToFetch: number) => {
   return song ;
 };
 
-export const useOptions = (song: Song) => {
-  const [options, setOptions] = useState<string[]>([]);
+export const useOptions = (song: Song|null) => {
+  const [options, setOptions] = useState<string[]>();
 
   useEffect(() => {
+    if(!song) return;
     const fetchOptions = async () => {
       try {
         const randOptions: string[] = await fetchRandomTitles();
@@ -53,17 +54,17 @@ export const useOptions = (song: Song) => {
         console.error("Error fetching options data:", error);
       }
     };
-    console.log('fetchoptions',song);
     fetchOptions();
   }, [song]);
 
   return options;
 };
 
-export const usePoster = (song: Song) => {
-  const [poster, setPoster] = useState<Poster>({} as Poster);
+export const usePoster = (song: Song|null) => {
+  const [poster, setPoster] = useState<Poster>();
 
   useEffect(() => {
+    if (!song) return;
     const fetchPoster = async () => {
       try {
         if (song.song_title.poster_pics.length === 0) {
