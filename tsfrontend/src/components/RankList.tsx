@@ -1,11 +1,39 @@
-import { List, ListItem, Card, CardContent, Typography, Box, CardHeader } from "@mui/material";
+import {
+  List,
+  ListItem,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  CardHeader,
+  IconButton,
+} from "@mui/material";
 import { GameHistory } from "./GameOver";
+import { useState } from "react";
+import { IoArrowBack, IoArrowForward } from "react-icons/io5";
 
 interface Props {
   scoreRank: GameHistory[];
 }
 
 const RankList = ({ scoreRank }: Props) => {
+  const [page, setPage] = useState(0);
+  const rowsPerPage = 3;
+  const paginatedScoreRank = scoreRank.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
+  const handleNextPage = () => {
+    if ((page + 1) * rowsPerPage < scoreRank.length) {
+      setPage(page + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (page > 0) {
+      setPage(page - 1);
+    }
+  };
   return (
     <Card
       sx={{
@@ -28,28 +56,38 @@ const RankList = ({ scoreRank }: Props) => {
               textAlign: "center",
             }}
           >
-            Rank List
+            Rankings
           </Typography>
         }
         sx={{ paddingBottom: 0 }}
       />
       <CardContent>
         <List sx={{ padding: 0 }}>
-          {scoreRank.map((rank, index) => (
+          {paginatedScoreRank.map((rank, index) => (
             <ListItem
               key={index}
               sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 padding: "10px 0",
-                borderBottom: index === scoreRank.length - 1 ? "none" : "1px solid #ddd",
+                borderBottom:
+                  index === paginatedScoreRank.length - 1
+                    ? "none"
+                    : "1px solid #ddd",
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <Typography
                   sx={{
                     fontWeight: "bold",
-                    color: index === 0 ? "#EFD700" : index === 1 ? "#C0C0C0" : index === 2 ? "#CD7F32" : "#333",
+                    color:
+                      index === 0
+                        ? "#EFD700"
+                        : index === 1
+                        ? "#C0C0C0"
+                        : index === 2
+                        ? "#CD7F32"
+                        : "#333",
                     fontSize: "1.2rem",
                     marginRight: "10px",
                   }}
@@ -80,6 +118,36 @@ const RankList = ({ scoreRank }: Props) => {
             </ListItem>
           ))}
         </List>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginTop: "1rem",
+          }}
+        >
+          <IconButton
+            onClick={handlePreviousPage}
+            disabled={page === 0}
+            sx={{
+              borderRadius: "50%",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+            }}
+          >
+            <IoArrowBack />
+          </IconButton>
+          <IconButton
+            onClick={handleNextPage}
+            disabled={(page + 1) * rowsPerPage >= scoreRank.length}
+            sx={{
+              borderRadius: "50%",
+              backgroundColor: "#1976d2",
+              color: "#fff",
+            }}
+          >
+            <IoArrowForward />
+          </IconButton>
+        </Box>
       </CardContent>
     </Card>
   );

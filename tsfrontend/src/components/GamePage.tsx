@@ -7,7 +7,7 @@ import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import MusicQuiz from "./MusicQuiz";
 import MusicPoster from "./MusicPoster";
-import { useSong, useOptions, usePoster } from "../hooks/hooks";
+import { useRandomSong, useOptions, usePoster } from "../hooks/hooks";
 import { fetchRandomSongStartFromTime, createBlobUrl } from "../services/api";
 import "../styles/App.css";
 import placeholderImg from "../assets/music_mark.png";
@@ -84,10 +84,9 @@ const GamePage = () => {
   };
 
   // fetch song, options, and poster
-  const song = useSong(nextClickCnt);
+  const song = useRandomSong(nextClickCnt);
   const options = useOptions(song);
   const poster = usePoster(song);
-  // console.log('poster',poster,'song',song,'options',options);
 
   // set sound
   useEffect(() => {

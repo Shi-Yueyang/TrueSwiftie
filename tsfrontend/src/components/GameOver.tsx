@@ -3,6 +3,8 @@ import { Typography, Button, Box, Stack } from "@mui/material";
 import { AppContext } from "../context/AppContext";
 import RankList from "./RankList";
 import axios from "axios";
+import MusicDisplay from "./MusicDisplay";
+import { usePoster } from "../hooks/hooks";
 
 export interface GameHistory {
   id: number;
@@ -11,10 +13,12 @@ export interface GameHistory {
 }
 
 const GameOver = () => {
-  const context = useContext(AppContext);
-  const { setGameState, score } = context;
-  const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const backendIp = import.meta.env.VITE_BACKEND_IP;
+  const context = useContext(AppContext);
+  const { setGameState, score, song } = context;
+  const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
+  const [showRankList, setShowRankList] = useState(false);
+  const poster = usePoster(song);
 
   const handleRestart = () => {
     setGameState("initial");
@@ -56,18 +60,7 @@ const GameOver = () => {
           zIndex: -1,
         }}
       />
-      <Typography
-        variant="h2"
-        sx={{
-          fontFamily: "'Poppins', sans-serif",
-          fontWeight: "bold",
-          color: "#FFD700",
-          marginBottom: "1rem",
-          textShadow: "2px 2px 4px rgba(0, 0, 0, 0.5)",
-        }}
-      >
-        End Game
-      </Typography>
+
       <Typography
         variant="h4"
         sx={{
@@ -80,7 +73,19 @@ const GameOver = () => {
       >
         Your Swiftiness: {score}
       </Typography>
-      <RankList scoreRank={GameHistory} />
+      {showRankList ? (
+        <RankList scoreRank={GameHistory} />
+      ) : (
+        poster && (
+          <MusicDisplay
+            imageUrl={poster.image}
+            onButtonClick={() => {
+              setShowRankList(!showRankList);
+            }}
+          />
+        )
+      )}
+
       <Button
         variant="contained"
         color="primary"
@@ -98,7 +103,7 @@ const GameOver = () => {
           marginTop: "2rem",
         }}
       >
-        Oh, here we go again.
+        Again
       </Button>
     </Stack>
   );

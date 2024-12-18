@@ -1,5 +1,6 @@
 import { createContext, useState, ReactNode } from "react";
 import { Howl } from "howler";
+import { Song } from "../components/MusicQuiz";
 
 type GameState = "initial" | "playing" | "gameOver";
 
@@ -16,6 +17,8 @@ interface AppContextProps {
   setGameHistoryId: (gameHistoryId: number) => void;
   sound: Howl | null;
   setSound: (sound: Howl | null) => void;
+  song:Song|null;
+  setSong: (song: Song|null) => void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -31,6 +34,8 @@ const AppContext = createContext<AppContextProps>({
   setGameHistoryId: () => {},
   sound: null,
   setSound: () => {},
+  song: null,
+  setSong: () => {},
 });
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -40,7 +45,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [score, setScore] = useState<number>(0);
   const [gameHistoryId, setGameHistoryId] = useState(0);
   const [sound, setSound] = useState<Howl | null>(null);
-
+  const [song,setSong] = useState<Song|null>(null);
   return (
     <AppContext.Provider
       value={{
@@ -56,6 +61,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setGameHistoryId,
         sound,
         setSound,
+        song,
+        setSong,
       }}
     >
       {children}

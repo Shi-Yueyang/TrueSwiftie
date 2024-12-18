@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import {
   fetchRandomSong,
   fetchRandomTitles,
@@ -7,9 +7,12 @@ import {
 import { Song } from "../components/MusicQuiz";
 import { Poster } from "../components/MusicPoster";
 import noPicture from "../assets/ts_placeholder.jpg";
+import { AppContext } from "../context/AppContext";
 
-export const useSong = (isToFetch: number) => {
-  const [song, setSong] = useState<Song|null>(null);
+
+export const useRandomSong = (isToFetch: number) => {
+  const context = useContext(AppContext);
+  const {song,setSong} = context;
 
   useEffect(() => {
     const fetchSong = async () => {
