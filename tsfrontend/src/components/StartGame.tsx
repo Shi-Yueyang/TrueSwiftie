@@ -88,7 +88,7 @@ const StartGame = () => {
       }}
       direction={"column"}
     >
-      <video
+      {/* <video
         autoPlay
         loop
         muted
@@ -104,7 +104,7 @@ const StartGame = () => {
       >
         <source src={readyForIt} type="video/mp4" />
         Your browser does not support the video tag.
-      </video>
+      </video> */}
       <Typography
         variant="h2"
         gutterBottom

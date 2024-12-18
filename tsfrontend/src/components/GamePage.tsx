@@ -23,9 +23,7 @@ const GamePage = () => {
   const [nextClickCnt, setNextClickCnt] = useState(1);
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
-
-
-
+  const [hasPlayedFirstSong, setHasPlayedFirstSong] = useState(false);
   const handleNextQuestionClicked = () => {
     setNextClickCnt(nextClickCnt + 1);
     setImgSource(placeholderImg);
@@ -44,7 +42,7 @@ const GamePage = () => {
         },
       })
       .then(() => {
-        poster && setImgSource(poster.image)
+        poster && setImgSource(poster.image);
       });
   };
 
@@ -74,10 +72,10 @@ const GamePage = () => {
 
   const handleSoundOnPlay = () => {
     setIsSoundLoaded(true);
-    if (score >= 30) {
-      setTimeLimit(3);
-    } else if (score >= 20) {
+    if (score >= 35) {
       setTimeLimit(5);
+    } else if (score >= 20) {
+      setTimeLimit(7);
     } else if (score >= 10) {
       setTimeLimit(10);
     } else if (score >= 2) {
@@ -86,24 +84,22 @@ const GamePage = () => {
   };
 
   // fetch song, options, and poster
-  const song  = useSong(nextClickCnt);
+  const song = useSong(nextClickCnt);
   const options = useOptions(song);
   const poster = usePoster(song);
   // console.log('poster',poster,'song',song,'options',options);
-  
+
   // set sound
   useEffect(() => {
     const setNewSound = async () => {
-
       if (sound) {
+        console.log("unload sound before set");
         sound.fade(volume, 0, 1000);
-        setTimeout(() => {
-          sound.stop();
-          sound.unload();
-        }, 1000);
+        sound.stop();
+        sound.unload();
       }
 
-      console.log("song:", song);
+      console.log("set sound:", song);
       if (song) {
         const startTime = Math.floor(Math.random() * 120);
         const arrayBuffer = await fetchRandomSongStartFromTime(
@@ -128,9 +124,19 @@ const GamePage = () => {
   // play sound
   useEffect(() => {
     if (sound) {
+      console.log("play sound");
       sound.play();
       sound.fade(0, volume, 1000);
+      // sound will be set twice during strict mode, so we need this
+      setHasPlayedFirstSong(true); 
     }
+    return () => {
+      if (sound && !hasPlayedFirstSong) {
+        console.log("unload sound during cleanup");
+        sound.stop();
+        sound.unload();
+      }
+    };
   }, [sound]);
 
   return (
