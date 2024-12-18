@@ -32,7 +32,7 @@ def convert_to_mp3(src_path, dest_dir):
     dest_path = os.path.join(dest_dir, filename)
     
     # Convert to mp3
-    ffmpeg.input(src_path).output(dest_path, audio_bitrate='256k').run()
+    ffmpeg.input(src_path).output(dest_path, audio_bitrate='128k').run()
     
     # Copy metadata
     if title or artist:
@@ -56,7 +56,7 @@ def process_directory(src_dir, dest_dir):
                 convert_to_mp3(src_path, dest_dir)
 if __name__ == "__main__":
     src_dir = "/home/syy/dev/TrueSwiftie/music/"
-    dest_dir = "/home/syy/dev/TrueSwiftie/music/b256/"
+    dest_dir = "/home/syy/dev/TrueSwiftie/music/b128/"
     
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)

@@ -1456,5 +1456,437 @@
         "end_time": "2024-12-14T12:23:01.972000Z",
         "correct_choice": "So High School",
         "last_choice": "I Can See You (Taylor's Version) [From The Vault]"
+    },
+    {
+        "id": 166,
+        "player_name": "Cececelia",
+        "score": 2,
+        "start_time": "2024-12-14T13:01:36.347000Z",
+        "end_time": "2024-12-14T13:02:27.766000Z",
+        "correct_choice": "Superman",
+        "last_choice": "Better Than Revenge (Taylor's Version)"
+    },
+    {
+        "id": 167,
+        "player_name": "summerwentaway",
+        "score": 2,
+        "start_time": "2024-12-14T13:23:23.735000Z",
+        "end_time": "2024-12-14T13:27:12.677000Z",
+        "correct_choice": "evermore",
+        "last_choice": "The Last Time"
+    },
+    {
+        "id": 168,
+        "player_name": "summerwentaway",
+        "score": 32,
+        "start_time": "2024-12-14T13:27:00.749000Z",
+        "end_time": "2024-12-14T13:29:53.351000Z",
+        "correct_choice": "dorothea",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 169,
+        "player_name": "yuan",
+        "score": 8,
+        "start_time": "2024-12-14T15:24:46.866000Z",
+        "end_time": "2024-12-14T15:25:34.746000Z",
+        "correct_choice": "Robin",
+        "last_choice": "I'm Only Me When I'm With You"
+    },
+    {
+        "id": 170,
+        "player_name": "folklorist",
+        "score": 8,
+        "start_time": "2024-12-14T15:25:42.220000Z",
+        "end_time": "2024-12-14T15:27:05.749000Z",
+        "correct_choice": "State Of Grace (Acoustic Version) [Taylor's Version]",
+        "last_choice": "Better Man (Taylor's Version) [From The Vault]"
+    },
+    {
+        "id": 171,
+        "player_name": "Arrietty",
+        "score": 29,
+        "start_time": "2024-12-14T17:32:43.451000Z",
+        "end_time": "2024-12-14T17:35:09.764000Z",
+        "correct_choice": "Silent Night",
+        "last_choice": "Come Back...Be Here (Taylor's Version)"
+    },
+    {
+        "id": 172,
+        "player_name": "Arrietty",
+        "score": 5,
+        "start_time": "2024-12-14T17:32:50.025000Z",
+        "end_time": "2024-12-14T17:36:35.667000Z",
+        "correct_choice": "22 (Taylor's Version)",
+        "last_choice": "Haunted (Taylor's Version)"
+    },
+    {
+        "id": 173,
+        "player_name": "syy",
+        "score": 21,
+        "start_time": "2024-12-14T23:24:09.777000Z",
+        "end_time": "2024-12-14T23:45:31.880000Z",
+        "correct_choice": "Dress",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 174,
+        "player_name": "44488",
+        "score": 2,
+        "start_time": "2024-12-15T02:50:48.058000Z",
+        "end_time": "2024-12-15T02:51:48.703000Z",
+        "correct_choice": "But Daddy I Love Him",
+        "last_choice": "seven"
+    },
+    {
+        "id": 175,
+        "player_name": "098765",
+        "score": 1,
+        "start_time": "2024-12-15T02:52:14.485000Z",
+        "end_time": "2024-12-15T02:52:57.148000Z",
+        "correct_choice": "If This Was A Movie",
+        "last_choice": "Ronan"
+    },
+    {
+        "id": 176,
+        "player_name": "098765",
+        "score": 3,
+        "start_time": "2024-12-15T02:52:18.982000Z",
+        "end_time": "2024-12-15T02:53:48.575000Z",
+        "correct_choice": "Should've Said No",
+        "last_choice": "\"Slut!\" (Taylor's Version) [From The Vault]"
+    },
+    {
+        "id": 177,
+        "player_name": "白水",
+        "score": 1,
+        "start_time": "2024-12-15T08:17:46.062000Z",
+        "end_time": "2024-12-15T08:17:46.062000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 178,
+        "player_name": "白水",
+        "score": 31,
+        "start_time": "2024-12-15T08:18:07.385000Z",
+        "end_time": "2024-12-15T08:21:04.454000Z",
+        "correct_choice": "loml",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 179,
+        "player_name": "白水",
+        "score": 11,
+        "start_time": "2024-12-15T08:23:29.372000Z",
+        "end_time": "2024-12-15T08:24:32.884000Z",
+        "correct_choice": "Everything Has Changed (Taylor's Version)",
+        "last_choice": "So Long, London"
+    },
+    {
+        "id": 180,
+        "player_name": "白水",
+        "score": 0,
+        "start_time": "2024-12-15T08:23:33.883000Z",
+        "end_time": "2024-12-15T08:23:33.883000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 181,
+        "player_name": "白水",
+        "score": 0,
+        "start_time": "2024-12-15T08:24:48.268000Z",
+        "end_time": "2024-12-15T08:24:48.268000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 182,
+        "player_name": "。",
+        "score": 1,
+        "start_time": "2024-12-15T08:36:10.244000Z",
+        "end_time": "2024-12-15T08:36:40.789000Z",
+        "correct_choice": "The Other Side of the Door (Taylor's Version)",
+        "last_choice": "coney island"
+    },
+    {
+        "id": 183,
+        "player_name": "。",
+        "score": 1,
+        "start_time": "2024-12-15T08:36:43.642000Z",
+        "end_time": "2024-12-15T08:37:24.719000Z",
+        "correct_choice": "White Horse (Taylor's Version)",
+        "last_choice": "Come Back...Be Here (Taylor's Version)"
+    },
+    {
+        "id": 184,
+        "player_name": "。",
+        "score": 4,
+        "start_time": "2024-12-15T08:37:26.659000Z",
+        "end_time": "2024-12-15T08:38:09.561000Z",
+        "correct_choice": "Haunted",
+        "last_choice": "Nothing New (Taylor's Version) [From The Vault]"
+    },
+    {
+        "id": 185,
+        "player_name": "AA",
+        "score": 12,
+        "start_time": "2024-12-15T09:02:51.457000Z",
+        "end_time": "2024-12-15T09:05:39.009000Z",
+        "correct_choice": "Robin",
+        "last_choice": "The Prophecy"
+    },
+    {
+        "id": 186,
+        "player_name": "AA",
+        "score": 1,
+        "start_time": "2024-12-15T09:02:57.601000Z",
+        "end_time": "2024-12-15T09:02:57.601000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 187,
+        "player_name": "fyx",
+        "score": 0,
+        "start_time": "2024-12-15T09:08:30.069000Z",
+        "end_time": "2024-12-15T09:08:30.069000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 188,
+        "player_name": "西梅子",
+        "score": 15,
+        "start_time": "2024-12-15T09:47:21.189000Z",
+        "end_time": "2024-12-15T09:49:13.265000Z",
+        "correct_choice": "We Were Happy (Taylor's Version) [From the Vault]",
+        "last_choice": "Untouchable"
+    },
+    {
+        "id": 189,
+        "player_name": "tt",
+        "score": 1,
+        "start_time": "2024-12-15T09:49:35.674000Z",
+        "end_time": "2024-12-15T09:50:31.608000Z",
+        "correct_choice": "A Place In This World",
+        "last_choice": "It's Nice To Have A Friend"
+    },
+    {
+        "id": 190,
+        "player_name": "tt",
+        "score": 2,
+        "start_time": "2024-12-15T09:49:40.476000Z",
+        "end_time": "2024-12-15T09:51:41.874000Z",
+        "correct_choice": "Change (Taylor's Version)",
+        "last_choice": "Hey Stephen"
+    },
+    {
+        "id": 191,
+        "player_name": "jack",
+        "score": 11,
+        "start_time": "2024-12-15T10:33:17.257000Z",
+        "end_time": "2024-12-15T10:34:51.337000Z",
+        "correct_choice": "Don't You (Taylor's Version) [From the Vault]",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 192,
+        "player_name": "jack",
+        "score": 23,
+        "start_time": "2024-12-15T10:33:21.631000Z",
+        "end_time": "2024-12-15T10:38:07.552000Z",
+        "correct_choice": "Guilty as Sin?",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 193,
+        "player_name": "qqq",
+        "score": 0,
+        "start_time": "2024-12-15T11:54:24.292000Z",
+        "end_time": "2024-12-15T11:54:24.292000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 194,
+        "player_name": "qqqq",
+        "score": 1,
+        "start_time": "2024-12-15T11:55:41.252000Z",
+        "end_time": "2024-12-15T11:55:56.122000Z",
+        "correct_choice": "Maroon",
+        "last_choice": "Babe"
+    },
+    {
+        "id": 195,
+        "player_name": "qqqq",
+        "score": 3,
+        "start_time": "2024-12-15T11:55:44.880000Z",
+        "end_time": "2024-12-15T11:56:29.370000Z",
+        "correct_choice": "happiness",
+        "last_choice": "You're On Your Own, Kid (Strings Remix)"
+    },
+    {
+        "id": 196,
+        "player_name": "yesyes",
+        "score": 1,
+        "start_time": "2024-12-15T11:56:21.955000Z",
+        "end_time": "2024-12-15T11:57:11.911000Z",
+        "correct_choice": "My Boy Only Breaks His Favorite Toys",
+        "last_choice": "Begin Again"
+    },
+    {
+        "id": 197,
+        "player_name": "qqqq",
+        "score": 2,
+        "start_time": "2024-12-15T11:56:03.545000Z",
+        "end_time": "2024-12-15T11:56:57.561000Z",
+        "correct_choice": "Forever & Always (Taylor's Version)",
+        "last_choice": "Dear Reader"
+    },
+    {
+        "id": 198,
+        "player_name": "qqqq",
+        "score": 0,
+        "start_time": "2024-12-15T11:56:32.053000Z",
+        "end_time": "2024-12-15T11:56:32.053000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 199,
+        "player_name": "carol",
+        "score": 0,
+        "start_time": "2024-12-15T11:59:35.208000Z",
+        "end_time": "2024-12-15T11:59:35.208000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 200,
+        "player_name": "yy",
+        "score": 22,
+        "start_time": "2024-12-15T12:02:07.508000Z",
+        "end_time": "2024-12-15T12:06:04.794000Z",
+        "correct_choice": "peace",
+        "last_choice": "Carolina"
+    },
+    {
+        "id": 201,
+        "player_name": "yy",
+        "score": 19,
+        "start_time": "2024-12-15T12:02:16.368000Z",
+        "end_time": "2024-12-15T12:09:13.684000Z",
+        "correct_choice": "But Daddy I Love Him",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 202,
+        "player_name": "yy",
+        "score": 5,
+        "start_time": "2024-12-15T12:06:15.364000Z",
+        "end_time": "2024-12-15T12:10:43.947000Z",
+        "correct_choice": "Tied Together with a Smile",
+        "last_choice": "When Emma Falls in Love (Taylor's Version) [From The Vault]"
+    },
+    {
+        "id": 203,
+        "player_name": "yy",
+        "score": 2,
+        "start_time": "2024-12-15T12:10:05.259000Z",
+        "end_time": "2024-12-15T12:11:01.256000Z",
+        "correct_choice": "Welcome To New York",
+        "last_choice": "Blank Space"
+    },
+    {
+        "id": 204,
+        "player_name": "yy",
+        "score": 22,
+        "start_time": "2024-12-15T12:10:46.911000Z",
+        "end_time": "2024-12-15T12:14:18.967000Z",
+        "correct_choice": "Untouchable (Taylor's Version)",
+        "last_choice": "Time's up"
+    },
+    {
+        "id": 205,
+        "player_name": "yy",
+        "score": 19,
+        "start_time": "2024-12-15T12:15:01.201000Z",
+        "end_time": "2024-12-15T12:18:03.447000Z",
+        "correct_choice": "The Moment I Knew (Taylor's Version)",
+        "last_choice": "You're Not Sorry (Taylor's Version)"
+    },
+    {
+        "id": 206,
+        "player_name": "yy",
+        "score": 9,
+        "start_time": "2024-12-15T12:15:03.951000Z",
+        "end_time": "2024-12-15T12:20:40.244000Z",
+        "correct_choice": "peace",
+        "last_choice": "Robin"
+    },
+    {
+        "id": 207,
+        "player_name": "yy",
+        "score": 7,
+        "start_time": "2024-12-15T12:19:23.508000Z",
+        "end_time": "2024-12-15T12:21:40.626000Z",
+        "correct_choice": "Today Was a Fairytale (Taylor's Version)",
+        "last_choice": "The Best Day (Taylor's Version)"
+    },
+    {
+        "id": 208,
+        "player_name": "Test",
+        "score": 0,
+        "start_time": "2024-12-15T12:42:53.420000Z",
+        "end_time": "2024-12-15T12:42:53.420000Z",
+        "correct_choice": "null",
+        "last_choice": "null"
+    },
+    {
+        "id": 209,
+        "player_name": "bb",
+        "score": 2,
+        "start_time": "2024-12-17T08:10:26.650000Z",
+        "end_time": "2024-12-17T08:10:45.304000Z",
+        "correct_choice": "epiphany",
+        "last_choice": "This Love (Taylor's Version)"
+    },
+    {
+        "id": 210,
+        "player_name": "bb",
+        "score": 1,
+        "start_time": "2024-12-17T08:10:29.045000Z",
+        "end_time": "2024-12-17T08:11:09.424000Z",
+        "correct_choice": "Dear Reader",
+        "last_choice": "I Heart ?"
+    },
+    {
+        "id": 211,
+        "player_name": "bb",
+        "score": 1,
+        "start_time": "2024-12-17T08:10:48.660000Z",
+        "end_time": "2024-12-17T08:11:26.481000Z",
+        "correct_choice": "That's When (Taylor's Version) [From the Vault]",
+        "last_choice": "Castles Crumbling (Taylor's Version) [From The Vault]"
+    },
+    {
+        "id": 212,
+        "player_name": "bb",
+        "score": 6,
+        "start_time": "2024-12-17T08:11:12.301000Z",
+        "end_time": "2024-12-17T08:12:37.754000Z",
+        "correct_choice": "Style",
+        "last_choice": "Style (Taylor's Version)"
+    },
+    {
+        "id": 213,
+        "player_name": "bb",
+        "score": 3,
+        "start_time": "2024-12-17T08:11:28.509000Z",
+        "end_time": "2024-12-17T08:13:09.721000Z",
+        "correct_choice": "Untouchable (Taylor's Version)",
+        "last_choice": "Innocent"
     }
 ]

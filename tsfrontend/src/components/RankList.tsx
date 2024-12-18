@@ -18,7 +18,7 @@ interface Props {
 
 const RankList = ({ scoreRank }: Props) => {
   const [page, setPage] = useState(0);
-  const rowsPerPage = 3;
+  const rowsPerPage = 5;
   const paginatedScoreRank = scoreRank.slice(
     page * rowsPerPage,
     page * rowsPerPage + rowsPerPage
@@ -39,7 +39,7 @@ const RankList = ({ scoreRank }: Props) => {
       sx={{
         backgroundColor: "rgba(255, 255, 255, 0.9)",
         marginTop: "2rem",
-        maxWidth: 600,
+        maxWidth: 800,
         borderRadius: "16px",
         padding: "1rem",
         boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
@@ -81,18 +81,18 @@ const RankList = ({ scoreRank }: Props) => {
                   sx={{
                     fontWeight: "bold",
                     color:
-                      index === 0
+                      index === 0 && page === 0
                         ? "#EFD700"
-                        : index === 1
+                        : index === 1 &&  page === 0
                         ? "#C0C0C0"
-                        : index === 2
+                        : index === 2 &&  page === 0
                         ? "#CD7F32"
                         : "#333",
                     fontSize: "1.2rem",
                     marginRight: "10px",
                   }}
                 >
-                  {index + 1}.
+                  {index + 1 + page*rowsPerPage}.
                 </Typography>
                 <Typography
                   sx={{
@@ -132,6 +132,9 @@ const RankList = ({ scoreRank }: Props) => {
               borderRadius: "50%",
               backgroundColor: "#1976d2",
               color: "#fff",
+              '&:hover': {
+                backgroundColor: "#1565c0", 
+              },
             }}
           >
             <IoArrowBack />
@@ -141,8 +144,11 @@ const RankList = ({ scoreRank }: Props) => {
             disabled={(page + 1) * rowsPerPage >= scoreRank.length}
             sx={{
               borderRadius: "50%",
-              backgroundColor: "#1976d2",
+              backgroundColor: "#1976a2",
               color: "#fff",
+              '&:hover': {
+                backgroundColor: "#1565c0", 
+              },
             }}
           >
             <IoArrowForward />

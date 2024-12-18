@@ -5,6 +5,8 @@ from .serializers import SongSerializer, SongTitleSerializer,PosterSerializer,Ga
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import random
+from django.utils import timezone
+from datetime import timedelta
 
 class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
@@ -31,7 +33,9 @@ class GameHistoryViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'],url_path='top-scores')
     def top_scores(self, request):
-        top_scores = GameHistory.objects.order_by('-score')
+        now = timezone.now()
+        start_of_week = now - timedelta(days=now.weekday())
+        top_scores = GameHistory.objects.filter(start_time__gte=start_of_week).order_by('-score','pk')
         page = self.paginate_queryset(top_scores)
         if page is not None:
             serializer = self.get_serializer(page, many=True)

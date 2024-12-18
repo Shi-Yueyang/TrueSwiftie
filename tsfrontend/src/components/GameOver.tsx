@@ -30,7 +30,7 @@ const GameOver = () => {
         const response = await axios.get(
           `${backendIp}/ts/game-histories/top-scores/`
         );
-        setGameHistory(response.data);
+        setGameHistory(response.data.results);
       } catch (error) {
         console.error("Error fetching top scores:", error);
       }

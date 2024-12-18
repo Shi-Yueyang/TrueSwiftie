@@ -1,16 +1,18 @@
 import json
-import matplotlib.pyplot as plt
+import csv
 
-# Load JSON data from file
-with open('/home/syy/dev/TrueSwiftie/analyse_data/scores.json', 'r') as file:
+# Load JSON data
+with open('/home/syy/dev/TrueSwiftie/analyse_data/scores.json', 'r',encoding='utf-8') as file:
     data = json.load(file)
 
-# Extract scores
-scores = [entry['score'] for entry in data]
+# Extract relevant fields and sort the data
+sorted_data = sorted(data, key=lambda x: (-x['score'], x['id']))
 
-# Create histogram
-plt.hist(scores, bins=range(min(scores), max(scores) + 2), edgecolor='black')
-plt.xlabel('Scores')
-plt.ylabel('Frequency')
-plt.title('Histogram of Scores')
-plt.show()
+# Write to CSV
+with open('sorted_scores.csv', 'w', newline='',encoding='utf-8-sig') as csvfile:
+    fieldnames = ['player_name', 'score']
+    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+
+    writer.writeheader()
+    for record in sorted_data:
+        writer.writerow({'player_name': record['player_name'], 'score': record['score']})
