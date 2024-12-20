@@ -16,6 +16,7 @@ const StartGame = () => {
     sound,
     setSound,
     setScore,
+    setSong,
   } = context;
 
   const [error, setError] = useState<string>("");
@@ -73,6 +74,7 @@ const StartGame = () => {
 
   useEffect(() => {
     setScore(0);
+    setSong(null);
   }, []);
 
   return (
@@ -88,10 +90,10 @@ const StartGame = () => {
       }}
       direction={"column"}
     >
-      {/* <video
+      <video
         autoPlay
         loop
-        muted
+        // muted
         style={{
           position: "absolute",
           top: 0,
@@ -104,14 +106,14 @@ const StartGame = () => {
       >
         <source src={readyForIt} type="video/mp4" />
         Your browser does not support the video tag.
-      </video> */}
+      </video>
       <Typography
         variant="h2"
         gutterBottom
         style={{
           fontFamily: "'Poppins', sans-serif",
           fontWeight: "bold",
-          color: "#fff",
+          color: "#111",
           letterSpacing: "2px",
           zIndex: 1, // Ensure the text is above the overlay
         }}

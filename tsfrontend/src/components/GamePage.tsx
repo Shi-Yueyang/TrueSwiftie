@@ -92,13 +92,13 @@ const GamePage = () => {
   useEffect(() => {
     const setNewSound = async () => {
       if (sound) {
-        console.log("unload sound before set");
+        // console.log("unload sound before set");
         sound.fade(volume, 0, 1000);
         sound.stop();
         sound.unload();
       }
 
-      console.log("set sound:", song);
+      // console.log("set sound:", song);
       if (song) {
         const startTime = Math.floor(Math.random() * 120);
         const arrayBuffer = await fetchRandomSongStartFromTime(
@@ -123,7 +123,7 @@ const GamePage = () => {
   // play sound
   useEffect(() => {
     if (sound) {
-      console.log("play sound");
+      // console.log("play sound");
       sound.play();
       sound.fade(0, volume, 1000);
       // sound will be set twice during strict mode, so we need this
@@ -131,7 +131,7 @@ const GamePage = () => {
     }
     return () => {
       if (sound && !hasPlayedFirstSong) {
-        console.log("unload sound during cleanup");
+        // console.log("unload sound during cleanup");
         sound.stop();
         sound.unload();
       }
