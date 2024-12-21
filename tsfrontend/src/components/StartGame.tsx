@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
 import readyForIt from "../assets/Taylor Swift - …Ready For It_.mp4";
+import axios from "axios";
 const StartGame = () => {
   const context = useContext(AppContext);
   const {
@@ -44,18 +45,12 @@ const StartGame = () => {
       last_choice: "null",
     };
     try {
-      const response = await fetch(
+      const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_IP}/ts/game-histories/`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(historyData),
-        }
+        historyData
       );
-      const data = await response.json();
-      setGameHistoryId(data.id);
+      setGameHistoryId(response.data.id);
+
     } catch (error) {
       console.error("Error posting game history:", error);
     }

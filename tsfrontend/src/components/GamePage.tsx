@@ -67,12 +67,16 @@ const GamePage = () => {
         )
         .then(() => {
           setGameState("gameOver");
+        })
+        .catch((error) => {
+          console.error(error);
+          setGameState("gameOver");
         });
     }
   };
 
   const handleSoundOnPlay = () => {
-    console.log('handle on play, is sound loaded is ', isSoundLoaded);
+    console.log("handle on play, is sound loaded is ", isSoundLoaded);
     if (score >= 35) {
       setTimeLimit(5);
     } else if (score >= 20) {
@@ -110,7 +114,7 @@ const GamePage = () => {
           onend: handleNextQuestionClicked,
           onplay: handleSoundOnPlay,
         });
-        score>1 && newSound.seek(startTime);
+        score > 1 && newSound.seek(startTime);
         setSound(newSound);
       }
     };
@@ -122,7 +126,7 @@ const GamePage = () => {
     if (sound) {
       sound.play();
       // sound will be set twice during strict mode, so we need this
-      setHasPlayedFirstSong(true); 
+      setHasPlayedFirstSong(true);
     }
     return () => {
       if (sound && !hasPlayedFirstSong) {
