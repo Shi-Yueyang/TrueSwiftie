@@ -8,7 +8,6 @@ import { AppContext } from "../context/AppContext";
 import MusicQuiz from "./MusicQuiz";
 import MusicPoster from "./MusicPoster";
 import { useRandomSong, useOptions, usePoster } from "../hooks/hooks";
-import { fetchRandomSongStartFromTime, createBlobUrl } from "../services/api";
 import "../styles/App.css";
 import placeholderImg from "../assets/music_mark.png";
 
@@ -24,9 +23,11 @@ const GamePage = () => {
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
   const [hasPlayedFirstSong, setHasPlayedFirstSong] = useState(false);
+
   const handleNextQuestionClicked = () => {
     setNextClickCnt(nextClickCnt + 1);
     setImgSource(placeholderImg);
+    setIsSoundLoaded(false);
   };
 
   const handleSelectIsCorrect = () => {
@@ -71,7 +72,7 @@ const GamePage = () => {
   };
 
   const handleSoundOnPlay = () => {
-    setIsSoundLoaded(true);
+    console.log('handle on play, is sound loaded is ', isSoundLoaded);
     if (score >= 35) {
       setTimeLimit(5);
     } else if (score >= 20) {
@@ -81,6 +82,7 @@ const GamePage = () => {
     } else if (score >= 2) {
       setTimeLimit(13);
     }
+    setIsSoundLoaded(true);
   };
 
   // fetch song, options, and poster
@@ -97,23 +99,18 @@ const GamePage = () => {
         sound.stop();
         sound.unload();
       }
+      const startTime = Math.floor(Math.random() * 120);
 
       // console.log("set sound:", song);
       if (song) {
-        const startTime = Math.floor(Math.random() * 120);
-        const arrayBuffer = await fetchRandomSongStartFromTime(
-          song.file,
-          startTime
-        );
-        const blobUrl = createBlobUrl(arrayBuffer, "audio/mpeg");
-        const songSource = score >= 1 ? blobUrl : song.file;
         const newSound = new Howl({
-          src: [songSource],
+          src: [song.file],
           volume: 1,
-          onend: handleNextQuestionClicked,
           html5: true,
+          onend: handleNextQuestionClicked,
           onplay: handleSoundOnPlay,
         });
+        score>1 && newSound.seek(startTime);
         setSound(newSound);
       }
     };
@@ -123,9 +120,7 @@ const GamePage = () => {
   // play sound
   useEffect(() => {
     if (sound) {
-      // console.log("play sound");
       sound.play();
-      sound.fade(0, volume, 1000);
       // sound will be set twice during strict mode, so we need this
       setHasPlayedFirstSong(true); 
     }

@@ -28,7 +28,7 @@ class PosterViewSet(viewsets.ModelViewSet):
     serializer_class = PosterSerializer
 
 class GameHistoryViewSet(viewsets.ModelViewSet):
-    queryset = GameHistory.objects.all()
+    queryset = GameHistory.objects.all().order_by("id")
     serializer_class = GameHistorySerializer
 
     @action(detail=False, methods=['get'],url_path='top-scores')
