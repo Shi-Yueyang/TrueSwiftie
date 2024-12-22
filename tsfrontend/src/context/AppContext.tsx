@@ -3,7 +3,12 @@ import { Howl } from "howler";
 import { Song } from "../components/MusicQuiz";
 
 type GameState = "initial" | "playing" | "gameOver";
-
+interface SnowfallProps {
+  color?: string;
+  snowflakeCount?: number;
+  snowflakeSize?: number;
+  wind?: number;
+}
 interface AppContextProps {
   gameState: GameState;
   setGameState: (isStarted: GameState) => void;
@@ -19,6 +24,10 @@ interface AppContextProps {
   setSound: (sound: Howl | null) => void;
   song:Song|null;
   setSong: (song: Song|null) => void;
+  csrfToken: string;
+  setCsrfToken: (csrfToken: string) => void;
+  snowfallProps?: SnowfallProps|null;
+  setSnowfallProps?: (snowfallProps: SnowfallProps|null) => void;
 }
 
 const AppContext = createContext<AppContextProps>({
@@ -36,6 +45,10 @@ const AppContext = createContext<AppContextProps>({
   setSound: () => {},
   song: null,
   setSong: () => {},
+  csrfToken: "",
+  setCsrfToken: () => {},
+  snowfallProps: null,
+  setSnowfallProps: () => {},
 });
 
 const AppProvider = ({ children }: { children: ReactNode }) => {
@@ -46,6 +59,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [gameHistoryId, setGameHistoryId] = useState(0);
   const [sound, setSound] = useState<Howl | null>(null);
   const [song,setSong] = useState<Song|null>(null);
+  const [csrfToken, setCsrfToken] = useState("")
+  const [snowfallProps, setSnowfallProps] = useState<SnowfallProps|null>(null);
   return (
     <AppContext.Provider
       value={{
@@ -63,6 +78,10 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setSound,
         song,
         setSong,
+        csrfToken,
+        setCsrfToken,
+        snowfallProps,
+        setSnowfallProps,
       }}
     >
       {children}

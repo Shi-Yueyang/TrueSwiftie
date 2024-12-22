@@ -3,7 +3,6 @@ import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
-import readyForIt from "../assets/Taylor Swift - …Ready For It_.mp4";
 import axios from "axios";
 const StartGame = () => {
   const context = useContext(AppContext);
@@ -18,6 +17,7 @@ const StartGame = () => {
     setSound,
     setScore,
     setSong,
+
   } = context;
 
   const [error, setError] = useState<string>("");
@@ -35,6 +35,7 @@ const StartGame = () => {
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setUsername(event.target.value);
   };
+
   const postGameHistory = async () => {
     const historyData = {
       player_name: username,
@@ -45,6 +46,11 @@ const StartGame = () => {
       last_choice: "null",
     };
     try {
+      const csrfTokenResponse = await axios.get(
+        `${import.meta.env.VITE_BACKEND_IP}/core/csrf/`
+      );
+      const csrfToken = csrfTokenResponse.data.csrfToken;
+      axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
       const response = await axios.post(
         `${import.meta.env.VITE_BACKEND_IP}/ts/game-histories/`,
         historyData
@@ -85,23 +91,7 @@ const StartGame = () => {
       }}
       direction={"column"}
     >
-      <video
-        autoPlay
-        loop
-        // muted
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-          objectFit: "cover",
-          zIndex: -1,
-        }}
-      >
-        <source src={readyForIt} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+
       <Typography
         variant="h2"
         gutterBottom

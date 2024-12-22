@@ -5,14 +5,16 @@ import GamePage from "./components/GamePage";
 import StartGame from "./components/StartGame";
 import { AppContext } from "./context/AppContext";
 import GameOver from "./components/GameOver";
+import Snowfall from "react-snowfall";
 
 function App() {
   const context = useContext(AppContext);
-  const { gameState } = context;
+  const { gameState,snowfallProps } = context;
 
 
   return (
     <>
+    <Snowfall color={snowfallProps?.color} />
       {gameState === "initial" && <StartGame />}
       {gameState === "playing" && <GamePage />}
       {gameState === "gameOver" && <GameOver/>}
