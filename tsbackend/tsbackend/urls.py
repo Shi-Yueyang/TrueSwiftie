@@ -4,7 +4,8 @@ from django.urls import path,include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('ts/',include('ts.urls'))
+    path('ts/',include('ts.urls')),
+    path('core/',include('core.urls')),
 ]
 
 from django.conf import settings
