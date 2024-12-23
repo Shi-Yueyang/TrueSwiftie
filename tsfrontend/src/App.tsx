@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import './styles/App.css';
+import "./styles/App.css";
 
 import GamePage from "./components/GamePage";
 import StartGame from "./components/StartGame";
@@ -9,15 +9,15 @@ import Snowfall from "react-snowfall";
 
 function App() {
   const context = useContext(AppContext);
-  const { gameState,snowfallProps } = context;
+  const { gameState, snowfallProps } = context;
 
-
+  console.log(snowfallProps)
   return (
     <>
-    <Snowfall color={snowfallProps?.color} />
+      <Snowfall {...snowfallProps}/>
       {gameState === "initial" && <StartGame />}
       {gameState === "playing" && <GamePage />}
-      {gameState === "gameOver" && <GameOver/>}
+      {gameState === "gameOver" && <GameOver />}
     </>
   );
 }

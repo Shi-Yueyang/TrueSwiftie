@@ -13,7 +13,7 @@ import placeholderImg from "../assets/music_mark.png";
 
 const GamePage = () => {
   const context = useContext(AppContext);
-  const { setGameState, score, setScore, gameHistoryId, sound, setSound } =
+  const { setGameState, score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps } =
     context;
 
   const backendIp = import.meta.env.VITE_BACKEND_IP;
@@ -32,6 +32,7 @@ const GamePage = () => {
 
   const handleSelectIsCorrect = () => {
     setScore(score + 1);
+    setSnowfallProps({...snowfallProps,snowflakeCount:150+score*5,wind:[-0.5-score,2.0+score]});
     const historyData = {
       id: gameHistoryId,
       score: score + 1,
