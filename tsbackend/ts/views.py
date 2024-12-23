@@ -34,7 +34,9 @@ class GameHistoryViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'],url_path='top-scores')
     def top_scores(self, request):
         now = timezone.now()
-        start_of_week = now - timedelta(days=now.weekday())
+        start_of_week = now - timedelta(days=now.weekday()+1)
+        print(now)
+        print(start_of_week)
         top_scores = GameHistory.objects.filter(start_time__gte=start_of_week).order_by('-score','pk')
         page = self.paginate_queryset(top_scores)
         if page is not None:
