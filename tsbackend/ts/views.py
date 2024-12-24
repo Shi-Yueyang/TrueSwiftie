@@ -14,10 +14,19 @@ class SongViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'])
     def random_song(self, request):
-        songs = list(Song.objects.all())
+        album = request.query_params.get('album', None)
+        songs = Song.objects.all()
+        if album:
+            songs = songs.filter(song_title__album=album)
+        if not songs.exists():
+            songs = Song.objects.all()
+        
+        songs = list(songs)
         random_song = random.choice(songs)
         serializer = self.get_serializer(random_song)
         return Response(serializer.data)
+    
+
 
 class SongTitleViewSet(viewsets.ModelViewSet):
     queryset = SongTitle.objects.all().prefetch_related('poster_pics')

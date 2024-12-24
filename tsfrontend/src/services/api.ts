@@ -2,13 +2,15 @@ import axios from "axios";
 
 const backendIp = import.meta.env.VITE_BACKEND_IP;
 
-export const fetchRandomSong = async () => {
-  const response = await axios.get(`${backendIp}/ts/songs/random_song/`);
+export const fetchRandomSong = async (album?: string) => {
+  const response = await axios.get(`${backendIp}/ts/songs/random_song/`, {
+    params: { album },
+  });
   return response.data;
 };
 
 export const fetchRandomSongStartFromTime = async (
-  url:string,
+  url: string,
   startTimeInSeconds: number
 ) => {
   const startByte = (startTimeInSeconds * 128 * 1024) / 8;

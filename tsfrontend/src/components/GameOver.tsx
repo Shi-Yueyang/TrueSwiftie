@@ -15,11 +15,13 @@ export interface GameHistory {
 const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const context = useContext(AppContext);
+  // const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
   const { setGameState, score, song } = context;
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const [showRankList, setShowRankList] = useState(false);
   const poster = usePoster(song);
-
+  // const open = Boolean(anchorEl);
   const handleRestart = () => {
     setGameState("initial");
   };
@@ -73,6 +75,29 @@ const GameOver = () => {
       >
         Your Swiftiness: {score}
       </Typography>
+      {/* <Button
+        variant="contained"
+        sx={{ marginTop: "1rem" }}
+        onClick={(event) => {
+          setAnchorEl(event.currentTarget);
+        }}
+      >
+        <Popover
+          open={open}
+          anchorEl={anchorEl}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        >
+          <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
+          <Button
+            onClick={() => {
+              setAnchorEl(null);
+            }}
+          >
+            Set
+          </Button>
+        </Popover>
+        Your Wishes
+      </Button> */}
       {showRankList ? (
         <RankList scoreRank={GameHistory} />
       ) : (

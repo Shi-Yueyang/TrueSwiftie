@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
-import { IoMusicalNotes, IoArrowForwardOutline } from "react-icons/io5";
+import {  IoArrowForwardOutline } from "react-icons/io5"; //IoMusicalNotes
+import { TbChristmasTree } from "react-icons/tb";
 import "../styles/App.css";
 
 interface SongTitle {
@@ -72,9 +73,9 @@ const MusicQuiz = ({
         <Grid key={index}>
           <StyledButton
             variant="contained"
-            color="primary"
+            color="secondary"
             aria-label={`Select option ${option}`}
-            startIcon={<IoMusicalNotes />}
+            startIcon={<TbChristmasTree  />}
             onClick={() => onChoose(option)}
             disabled={isPosterRevealed}
           >

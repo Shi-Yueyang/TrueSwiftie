@@ -91,7 +91,8 @@ const GamePage = () => {
   };
 
   // fetch song, options, and poster
-  const song = useRandomSong(nextClickCnt);
+  const album = score < 3? "The Taylor Swift Holiday Collection" : undefined;
+  const song = useRandomSong(nextClickCnt, album);
   const options = useOptions(song);
   const poster = usePoster(song);
 

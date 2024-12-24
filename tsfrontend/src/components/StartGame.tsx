@@ -127,7 +127,7 @@ const StartGame = () => {
       {/* Start Button */}
       <Button
         variant="contained"
-        color="secondary" // Using a Swiftie-inspired pink shade
+        color="primary"
         onClick={handleStartGame}
         style={{
           fontSize: "1.25rem",

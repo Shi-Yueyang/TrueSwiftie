@@ -10,14 +10,14 @@ import noPicture from "../assets/ts_placeholder.jpg";
 import { AppContext } from "../context/AppContext";
 
 
-export const useRandomSong = (isToFetch: number) => {
+export const useRandomSong = (isToFetch: number,album?:string) => {
   const context = useContext(AppContext);
   const {song,setSong} = context;
 
   useEffect(() => {
     const fetchSong = async () => {
       try {
-        const data = await fetchRandomSong();
+        const data = await fetchRandomSong(album);
         if (data.song_title) {
           setSong(data);
         } else {
