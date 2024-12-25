@@ -5,6 +5,7 @@ import RankList from "./RankList";
 import axios from "axios";
 import MusicDisplay from "./MusicDisplay";
 import { usePoster } from "../hooks/hooks";
+import CommentPopover from "./CommentPopover";
 
 export interface GameHistory {
   id: number;
@@ -15,16 +16,30 @@ export interface GameHistory {
 const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const context = useContext(AppContext);
-  // const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
-  const { setGameState, score, song } = context;
+  const { setGameState, score, song,username } = context;
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const [showRankList, setShowRankList] = useState(false);
   const poster = usePoster(song);
-  // const open = Boolean(anchorEl);
+
+  // popover state
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null); 
+  const open = Boolean(anchorEl);
+
   const handleRestart = () => {
     setGameState("initial");
   };
+  const handleSubmit = async (comment: string) => {
+    try {
+      console.log('post')
+      await axios.post(`${backendIp}/ts/comments/`, {
+        user: username,
+        comment,
+      });
+    } catch (error) {
+      console.error("Error submitting comment:", error);
+    }
+  }
 
   useEffect(() => {
     const fetchTopScores = async () => {
@@ -62,7 +77,24 @@ const GameOver = () => {
           zIndex: -1,
         }}
       />
-
+      <Button
+        variant="contained"
+        color="secondary"
+        
+        onClick={(event) => {
+          setAnchorEl(event.currentTarget);
+        }}
+      >
+        Leave a Comment
+      </Button>
+      <CommentPopover
+        anchorEl={anchorEl}
+        open={open}
+        onClose={() => {
+          setAnchorEl(null);
+        }}
+        onSubmit={handleSubmit}
+      />
       <Typography
         variant="h4"
         sx={{
@@ -75,29 +107,7 @@ const GameOver = () => {
       >
         Your Swiftiness: {score}
       </Typography>
-      {/* <Button
-        variant="contained"
-        sx={{ marginTop: "1rem" }}
-        onClick={(event) => {
-          setAnchorEl(event.currentTarget);
-        }}
-      >
-        <Popover
-          open={open}
-          anchorEl={anchorEl}
-          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-        >
-          <Typography sx={{ p: 2 }}>The content of the Popover.</Typography>
-          <Button
-            onClick={() => {
-              setAnchorEl(null);
-            }}
-          >
-            Set
-          </Button>
-        </Popover>
-        Your Wishes
-      </Button> */}
+
       {showRankList ? (
         <RankList scoreRank={GameHistory} />
       ) : (

@@ -29,6 +29,6 @@ class GameHistory(models.Model):
     correct_choice = models.CharField(max_length=255,default='null')
     last_choice = models.CharField(max_length=255,default='null')
 
-# class Comment(models.Model):
-#     user = models.CharField(max_length=255)
-#     comment = models.TextField()
+class Comment(models.Model):
+    user = models.CharField(max_length=255)
+    comment = models.TextField()

@@ -16,9 +16,9 @@ const christmasTheme = createTheme({
       secondary: '#dc004e', // Red text
     },
   },
-  typography: {
-    fontFamily: 'Comic Sans MS, cursive, sans-serif',
-  },
+  // typography: {
+  //   fontFamily: 'Comic Sans MS, cursive, sans-serif',
+  // },
 });
 
 export default christmasTheme;
