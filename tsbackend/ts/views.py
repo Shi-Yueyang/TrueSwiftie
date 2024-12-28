@@ -27,7 +27,6 @@ class SongViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 
-
 class SongTitleViewSet(viewsets.ModelViewSet):
     queryset = SongTitle.objects.all().prefetch_related('poster_pics')
     serializer_class = SongTitleSerializer
@@ -40,12 +39,20 @@ class GameHistoryViewSet(viewsets.ModelViewSet):
     queryset = GameHistory.objects.all().order_by("id")
     serializer_class = GameHistorySerializer
 
+    def get_queryset(self):
+        start_time = self.request.query_params.get('start_time', None)
+        end_time = self.request.query_params.get('end_time', None)
+        query = self.queryset
+        if start_time:
+            query = query.filter(start_time__gte=start_time)
+        if end_time:
+            query = query.filter(end_time__lte=end_time)
+        return query
+    
     @action(detail=False, methods=['get'],url_path='top-scores')
     def top_scores(self, request):
         now = timezone.now()
         start_of_week = now - timedelta(days=now.weekday()+1)
-        print(now)
-        print(start_of_week)
         top_scores = GameHistory.objects.filter(start_time__gte=start_of_week).order_by('-score','pk')
         page = self.paginate_queryset(top_scores)
         if page is not None:
