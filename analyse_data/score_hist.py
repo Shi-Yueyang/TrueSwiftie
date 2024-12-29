@@ -1,7 +1,7 @@
 import json
 import csv
 
-# Load JSON data
+
 with open('/home/syy/dev/TrueSwiftie/analyse_data/scores.json', 'r',encoding='utf-8') as file:
     data = json.load(file)
 

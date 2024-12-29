@@ -140,6 +140,9 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',  # Or use any specific permissions
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
     'PAGE_SIZE': 30,
 }
 

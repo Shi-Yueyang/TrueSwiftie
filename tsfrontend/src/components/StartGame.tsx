@@ -21,7 +21,8 @@ const StartGame = () => {
   } = context;
 
   const [error, setError] = useState<string>("");
-
+  const accessToken = localStorage.getItem('accessToken');
+  
   if (sound) {
     if (sound) {
       sound.fade(1, 0, 1000);
@@ -63,6 +64,7 @@ const StartGame = () => {
   };
 
   const handleStartGame = () => {
+    
     if (username.trim()) {
       setUsername(username.trim());
       setStartTime(new Date());

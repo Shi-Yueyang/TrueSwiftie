@@ -15,6 +15,7 @@ mutagen = "*"
 gunicorn = "*"
 matplotlib = "*"
 python-dotenv = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
