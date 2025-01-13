@@ -1,7 +1,7 @@
 from django.urls import path
-from .views import CsrfTokenView, AnonymousLoginView
+from .views import CsrfTokenView, TemporaryUserLoginView
 
 urlpatterns = [
     path('csrf/', CsrfTokenView.as_view(), name='csrf_token'),
-    path('anonymous-login/', AnonymousLoginView.as_view(), name='anonymous_login'),
+    path('temporary-login/', TemporaryUserLoginView.as_view(), name='temporary_login'),
 ]

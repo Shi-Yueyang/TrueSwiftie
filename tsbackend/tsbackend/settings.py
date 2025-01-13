@@ -28,7 +28,6 @@ SECRET_KEY = 'django-insecure-&mux1zsoc#l+wr0ia%u4=gwd_esr2#!a6xeasme*p1qtyfxq2^
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-print(ALLOWED_HOSTS)
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'ts',
+    'core',
 ]
 
 MIDDLEWARE = [
@@ -110,7 +110,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+AUTH_USER_MODEL = 'core.CustomUser'
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 

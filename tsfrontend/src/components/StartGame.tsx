@@ -1,15 +1,13 @@
 import { useContext, useEffect, useState } from "react";
-import { Typography, Button, TextField } from "@mui/material";
+import { Typography, Button, TextField, Box } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
+import { AuthContext } from "../context/AuthContex";
 const StartGame = () => {
-  const context = useContext(AppContext);
   const {
     setGameState,
-    setUsername,
-    username,
     setStartTime,
     startTime,
     setGameHistoryId,
@@ -17,12 +15,12 @@ const StartGame = () => {
     setSound,
     setScore,
     setSong,
-
-  } = context;
+  } = useContext(AppContext);
 
   const [error, setError] = useState<string>("");
-  const accessToken = localStorage.getItem('accessToken');
-  
+  const [temporaryName, setTemporaryName] = useState<string>("");
+  const { userId, userName, login, logout } = useContext(AuthContext);
+
   if (sound) {
     if (sound) {
       sound.fade(1, 0, 1000);
@@ -34,47 +32,60 @@ const StartGame = () => {
   }
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(event.target.value);
+    setTemporaryName(event.target.value);
   };
 
-  const postGameHistory = async () => {
-    const historyData = {
-      player_name: username,
-      score: 0,
-      start_time: startTime,
-      end_time: startTime,
-      correct_choice: "null",
-      last_choice: "null",
-    };
-    try {
-      const csrfTokenResponse = await axios.get(
-        `${import.meta.env.VITE_BACKEND_IP}/core/csrf/`
-      );
-      const csrfToken = csrfTokenResponse.data.csrfToken;
-      axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+  const handleTemporaryLogin = async () => {
+    if (!userName) {
       const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_IP}/ts/game-histories/`,
-        historyData
+        `${import.meta.env.VITE_BACKEND_IP}/core/temporary-login/`,
+        { temporary_name: temporaryName }
       );
-      setGameHistoryId(response.data.id);
-
-    } catch (error) {
-      console.error("Error posting game history:", error);
+      console.log(response.data);
+      login(
+        response.data.userId,
+        response.data.temporary_name,
+        response.data.accessToken,
+        response.data.refreshToken
+      );
     }
   };
 
-  const handleStartGame = () => {
-    
-    if (username.trim()) {
-      setUsername(username.trim());
+  const handleStartGame = async () => {
+    if (userName) {
+      console.log("logged in");
       setStartTime(new Date());
-      postGameHistory();
-      setGameState("playing");
+      const historyData = {
+        player_name: userName,
+        score: 0,
+        start_time: startTime,
+        end_time: startTime,
+        correct_choice: "null",
+        last_choice: "null",
+      };
+      try {
+        // create CSRF token
+        const csrfTokenResponse = await axios.get(
+          `${import.meta.env.VITE_BACKEND_IP}/core/csrf/`
+        );
+        const csrfToken = csrfTokenResponse.data.csrfToken;
+        axios.defaults.headers.common["X-CSRFToken"] = csrfToken;
+
+        // post game history
+        const response = await axios.post(
+          `${import.meta.env.VITE_BACKEND_IP}/ts/game-histories/`,
+          historyData
+        );
+        setGameHistoryId(response.data.id);
+        setGameState("playing");
+      } catch (error) {
+        console.error("Error posting game history:", error);
+        setError("Failed to start the game. Please try again.");
+      }
     } else {
       setError("Please enter your name!");
     }
   };
-
   useEffect(() => {
     setScore(0);
     setSong(null);
@@ -93,7 +104,6 @@ const StartGame = () => {
       }}
       direction={"column"}
     >
-
       <Typography
         variant="h2"
         gutterBottom
@@ -109,22 +119,68 @@ const StartGame = () => {
       </Typography>
 
       {/* Name Input */}
-      <TextField
-        variant="outlined"
-        placeholder="Enter your name"
-        value={username}
-        onChange={handleInputChange}
-        error={!!error}
-        helperText={error}
-        style={{
-          marginBottom: "1.5rem",
-          backgroundColor: "#fff",
-          borderRadius: "50px",
-          width: "80%",
-          maxWidth: "400px",
-          fontFamily: "'Poppins', sans-serif",
-        }}
-      />
+
+      {userName ? (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          style={{ marginBottom: "1.5rem" }}
+        >
+          <Typography
+            variant="h4"
+            gutterBottom
+            style={{
+              fontFamily: "'Poppins', sans-serif",
+              color: "#111",
+              letterSpacing: "2px",
+              zIndex: 1,
+              marginBottom: "1.5rem",
+            }}
+          >
+            Welcome back, {userName}!
+          </Typography>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={logout}
+            style={{ marginLeft: "1rem" }}
+          >
+            Guest Logout
+          </Button>
+        </Box>
+      ) : (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          style={{ marginBottom: "1.5rem" }}
+        >
+          <TextField
+            variant="outlined"
+            placeholder="Enter your name"
+            value={temporaryName}
+            onChange={handleInputChange}
+            error={!!error}
+            helperText={error}
+            style={{
+              backgroundColor: "#fff",
+              borderRadius: "50px",
+              width: "80%",
+              maxWidth: "400px",
+              fontFamily: "'Poppins', sans-serif",
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleTemporaryLogin}
+            style={{ marginLeft: "1rem" }}
+          >
+            Guest Login
+          </Button>
+        </Box>
+      )}
 
       {/* Start Button */}
       <Button
@@ -140,6 +196,7 @@ const StartGame = () => {
           letterSpacing: "1.5px",
           boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
         }}
+        disabled={!userName}
       >
         Let the Game Begins
       </Button>

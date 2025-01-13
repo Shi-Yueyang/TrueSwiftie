@@ -4,14 +4,17 @@ import "./styles/index.css";
 import App from "./App.tsx";
 import { AppProvider } from "./context/AppContext.tsx";
 import christmasTheme from "./themes/christmasTheme";
-import { ThemeProvider } from'@mui/material/styles';
+import { ThemeProvider } from "@mui/material/styles";
+import { AuthProvider } from "./context/AuthContex.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider theme={christmasTheme}>
-      <AppProvider>
-        <App />
-      </AppProvider>
+      <AuthProvider>
+        <AppProvider>
+          <App />
+        </AppProvider>
+      </AuthProvider>
     </ThemeProvider>
   </StrictMode>
 );
