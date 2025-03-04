@@ -6,6 +6,7 @@ import axios from "axios";
 import MusicDisplay from "./MusicDisplay";
 import { usePoster } from "../hooks/hooks";
 import CommentPopover from "./CommentPopover";
+import { useNavigate } from "react-router-dom";
 
 export interface GameHistory {
   id: number;
@@ -16,8 +17,8 @@ export interface GameHistory {
 const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const context = useContext(AppContext);
-
-  const { setGameState, score, song,username } = context;
+  const navigate = useNavigate();
+  const { score, song,username } = context;
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const [showRankList, setShowRankList] = useState(false);
   const poster = usePoster(song);
@@ -27,7 +28,7 @@ const GameOver = () => {
   const open = Boolean(anchorEl);
 
   const handleRestart = () => {
-    setGameState("initial");
+    navigate("/");
   };
   const handleSubmit = async (comment: string) => {
     try {
@@ -80,7 +81,6 @@ const GameOver = () => {
       <Button
         variant="contained"
         color="secondary"
-        
         onClick={(event) => {
           setAnchorEl(event.currentTarget);
         }}

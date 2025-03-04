@@ -10,12 +10,12 @@ import MusicPoster from "./MusicPoster";
 import { useRandomSong, useOptions, usePoster } from "../hooks/hooks";
 import "../styles/App.css";
 import placeholderImg from "../assets/music_mark.png";
+import { useNavigate } from "react-router-dom";
 
 const GamePage = () => {
+  const navigate = useNavigate();
   const context = useContext(AppContext);
-  const { setGameState, score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps } =
-    context;
-
+  const {  score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps } = context;
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [imgSource, setImgSource] = useState(placeholderImg);
@@ -67,11 +67,11 @@ const GamePage = () => {
           }
         )
         .then(() => {
-          setGameState("gameOver");
+          navigate("/game-over");
         })
         .catch((error) => {
           console.error(error);
-          setGameState("gameOver");
+          navigate("/game-over");
         });
     }
   };
@@ -91,7 +91,7 @@ const GamePage = () => {
   };
 
   // fetch song, options, and poster
-  const album = score < 3? "The Taylor Swift Holiday Collection" : undefined;
+  const album = score < 3 ? "The Taylor Swift Holiday Collection" : undefined;
   const song = useRandomSong(nextClickCnt, album);
   const options = useOptions(song);
   const poster = usePoster(song);

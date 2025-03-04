@@ -6,13 +6,16 @@ import { AppProvider } from "./context/AppContext.tsx";
 import christmasTheme from "./themes/christmasTheme";
 import { ThemeProvider } from "@mui/material/styles";
 import { AuthProvider } from "./context/AuthContex.tsx";
+import { BrowserRouter as Router } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <ThemeProvider theme={christmasTheme}>
       <AuthProvider>
         <AppProvider>
-          <App />
+          <Router>
+            <App />
+          </Router>
         </AppProvider>
       </AuthProvider>
     </ThemeProvider>

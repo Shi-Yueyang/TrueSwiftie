@@ -1,13 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import { Typography, Button, TextField, Box } from "@mui/material";
+import { Typography, Button, TextField } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContex";
+import { useNavigate } from "react-router-dom";
+
 const StartGame = () => {
+  const navigate = useNavigate();
   const {
-    setGameState,
     setStartTime,
     startTime,
     setGameHistoryId,
@@ -19,7 +21,18 @@ const StartGame = () => {
 
   const [error, setError] = useState<string>("");
   const [temporaryName, setTemporaryName] = useState<string>("");
-  const { userId, userName, login, logout } = useContext(AuthContext);
+  const {userName, isStaff,groups,login, logout } = useContext(AuthContext);
+  const [isGuest, setIsGuest] = useState<boolean>(false);
+
+  useEffect(() => {
+    if(isStaff || groups?.includes("formal")){
+      setIsGuest(false);
+    }
+    else{
+      setIsGuest(true);
+    }
+  }
+  , [isStaff,groups]);
 
   if (sound) {
     if (sound) {
@@ -41,12 +54,13 @@ const StartGame = () => {
         `${import.meta.env.VITE_BACKEND_IP}/core/temporary-login/`,
         { temporary_name: temporaryName }
       );
-      console.log(response.data);
       login(
         response.data.userId,
         response.data.temporary_name,
         response.data.accessToken,
-        response.data.refreshToken
+        response.data.refreshToken,
+        response.data.is_staff,
+        response.data.groups
       );
     }
   };
@@ -77,7 +91,7 @@ const StartGame = () => {
           historyData
         );
         setGameHistoryId(response.data.id);
-        setGameState("playing");
+        navigate("/game");
       } catch (error) {
         console.error("Error posting game history:", error);
         setError("Failed to start the game. Please try again.");
@@ -112,7 +126,7 @@ const StartGame = () => {
           fontWeight: "bold",
           color: "#111",
           letterSpacing: "2px",
-          zIndex: 1, // Ensure the text is above the overlay
+          zIndex: 1, 
         }}
       >
         ...Ready For It?
@@ -121,85 +135,107 @@ const StartGame = () => {
       {/* Name Input */}
 
       {userName ? (
-        <Box
-          display="flex"
+        <Grid
+          container
+          direction="column"
           alignItems="center"
-          justifyContent="center"
-          style={{ marginBottom: "1.5rem" }}
+          spacing={3}
+          style={{ marginBottom: "2rem" }}
         >
-          <Typography
-            variant="h4"
-            gutterBottom
-            style={{
-              fontFamily: "'Poppins', sans-serif",
-              color: "#111",
-              letterSpacing: "2px",
-              zIndex: 1,
-              marginBottom: "1.5rem",
-            }}
-          >
-            Welcome back, {userName}!
-          </Typography>
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={logout}
-            style={{ marginLeft: "1rem" }}
-          >
-            Guest Logout
-          </Button>
-        </Box>
+          <Grid container justifyContent="center" spacing={2}>
+            <Grid>
+              <Typography
+                variant="h4"
+                gutterBottom
+                style={{
+                  fontFamily: "'Poppins', sans-serif",
+                  color: "#111",
+                  letterSpacing: "2px",
+                  textAlign: "center",
+                  marginBottom: "1rem",
+                }}
+              >
+                Oh Hi, {userName}!
+              </Typography>
+            </Grid>
+          {isGuest  && 
+            <Grid>
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={logout}
+                style={{
+                  padding: "1rem 2rem",
+                  borderRadius: "30px",
+                  fontFamily: "'Poppins', sans-serif",
+                  letterSpacing: "1px",
+                }}
+              >
+                Guest Logout
+              </Button>
+            </Grid>
+          }
+          </Grid>
+
+          <Grid>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleStartGame}
+              style={{
+                padding: "1rem 3rem",
+                borderRadius: "30px",
+                fontFamily: "'Poppins', sans-serif",
+                letterSpacing: "1.5px",
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+                minWidth: "250px",
+              }}
+              disabled={!userName}
+            >
+              Let the Game Begin
+            </Button>
+          </Grid>
+        </Grid>
       ) : (
-        <Box
-          display="flex"
+        <Grid
+          container
+          spacing={2}
           alignItems="center"
           justifyContent="center"
-          style={{ marginBottom: "1.5rem" }}
+          style={{ marginBottom: "1.5rem", padding: "0 16px" }}
         >
-          <TextField
-            variant="outlined"
-            placeholder="Enter your name"
-            value={temporaryName}
-            onChange={handleInputChange}
-            error={!!error}
-            helperText={error}
-            style={{
-              backgroundColor: "#fff",
-              borderRadius: "50px",
-              width: "80%",
-              maxWidth: "400px",
-              fontFamily: "'Poppins', sans-serif",
-            }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleTemporaryLogin}
-            style={{ marginLeft: "1rem" }}
-          >
-            Guest Login
-          </Button>
-        </Box>
+          <Grid size={{ xs: 6, md: 8 }}>
+            <TextField
+              fullWidth
+              variant="outlined"
+              placeholder="Enter your name"
+              value={temporaryName}
+              onChange={handleInputChange}
+              error={!!error}
+              helperText={error}
+              style={{
+                backgroundColor: "#fff",
+                borderRadius: "50px",
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            />
+          </Grid>
+          <Grid>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleTemporaryLogin}
+              style={{
+                borderRadius: "30px",
+                padding: "0.8rem 2rem",
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              Guest Login
+            </Button>
+          </Grid>
+        </Grid>
       )}
-
-      {/* Start Button */}
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleStartGame}
-        style={{
-          fontSize: "1.25rem",
-          padding: "1rem 3rem",
-          borderRadius: "30px",
-
-          fontFamily: "'Poppins', sans-serif",
-          letterSpacing: "1.5px",
-          boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
-        }}
-        disabled={!userName}
-      >
-        Let the Game Begins
-      </Button>
     </Grid>
   );
 };

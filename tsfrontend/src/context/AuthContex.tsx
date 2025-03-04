@@ -1,19 +1,30 @@
 import React, { createContext, useState } from "react";
 
 interface AuthContextProps {
-  userId:string|null;
+  userId: string | null;
   userName: string | null;
   accessToken: string | null;
   refreshToken: string | null;
-  login: (userId:string, userName: string, accessToken: string, refreshToken: string) => void;
+  isStaff: boolean;
+  groups: string[];
+  login: (
+    userId: string,
+    userName: string,
+    accessToken: string,
+    refreshToken: string,
+    isStaff: boolean,
+    groups: string[]
+  ) => void;
   logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
-  userId:null,
+  userId: null,
   userName: null,
   accessToken: null,
   refreshToken: null,
+  isStaff: false,
+  groups: [],
   login: () => {},
   logout: () => {},
 });
@@ -21,29 +32,27 @@ export const AuthContext = createContext<AuthContextProps>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [userId, setUserId] = useState<string | null>(
-      localStorage.getItem("userId")
-  );  const [userName, setUserName] = useState<string | null>(
-    localStorage.getItem("userName")
-  );
-  const [accessToken, setAccessToken] = useState<string | null>(
-    localStorage.getItem("accessToken")
-  );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
-    localStorage.getItem("refreshToken")
-  );
+  const [userId, setUserId] = useState<string | null>(null);
+  const [userName, setUserName] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(localStorage.getItem("accessToken"));
+  const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem("refreshToken"));
+  const [isStaff, setIsStaff] = useState<boolean>(false);
+  const [groups, setGroups] = useState<string[]>([]);
 
   const login = (
-    userId:string,
+    userId: string,
     userName: string,
     accessToken: string,
-    refreshToken: string
+    refreshToken: string,
+    isStaff: boolean,
+    groups: string[]
   ) => {
     setUserId(userId);
     setUserName(userName);
     setAccessToken(accessToken);
     setRefreshToken(refreshToken);
-    localStorage.setItem("userName", userName);
+    setIsStaff(isStaff);
+    setGroups(groups);
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
   };
@@ -52,14 +61,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setUserName(null);
     setAccessToken(null);
     setRefreshToken(null);
-    localStorage.removeItem("userName");
+    setIsStaff(false);
+    setGroups([]);
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   };
 
   return (
     <AuthContext.Provider
-      value={{ userId,userName, accessToken, refreshToken, login, logout }}
+      value={{ userId, userName, accessToken, refreshToken, isStaff, groups, login, logout }}
     >
       {children}
     </AuthContext.Provider>

@@ -30,3 +30,11 @@
   opacity: 1;
   transition: opacity 500ms;
 }
+
+@font-face {
+  font-family: "PlaywriteIN";
+  src: url("../assets/fonts/PlaywriteIN-VariableFont_wght.ttf")
+    format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
