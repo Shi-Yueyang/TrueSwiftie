@@ -21,7 +21,7 @@ class SongSerializer(serializers.ModelSerializer):
 class GameHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = GameHistory
-        fields = ['id','player_name','score','start_time','end_time','correct_choice','last_choice']
+        fields = ['id','user','score','start_time','end_time','correct_choice','last_choice']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

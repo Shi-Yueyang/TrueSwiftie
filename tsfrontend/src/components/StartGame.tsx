@@ -21,7 +21,7 @@ const StartGame = () => {
 
   const [error, setError] = useState<string>("");
   const [temporaryName, setTemporaryName] = useState<string>("");
-  const {userName, isStaff,groups,login, logout } = useContext(AuthContext);
+  const {userName,userId, isStaff,groups,login, logout } = useContext(AuthContext);
   const [isGuest, setIsGuest] = useState<boolean>(false);
 
   useEffect(() => {
@@ -67,10 +67,9 @@ const StartGame = () => {
 
   const handleStartGame = async () => {
     if (userName) {
-      console.log("logged in");
       setStartTime(new Date());
       const historyData = {
-        player_name: userName,
+        user: userId,
         score: 0,
         start_time: startTime,
         end_time: startTime,

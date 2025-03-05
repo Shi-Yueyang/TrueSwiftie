@@ -1,10 +1,12 @@
+import base64
 import os
+from random import randint
 import shutil
 from django.core.management.base import BaseCommand
 from ts.models import Song, SongTitle
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
-from mutagen.id3 import ID3, TIT2
+from mutagen.id3 import ID3
 import tsbackend.settings as settings
 def clean_song_title(title):
     if title.endswith('1') and not title.endswith(' 1'):
@@ -15,6 +17,20 @@ def clean_song_title(title):
     title = title.replace("(Piano Version) (Taylor's Version)","(Piano Version) [Taylor's Version]")
     title = title.replace("(Acoustic Version) (Taylor's Version)","(Acoustic Version) [Taylor's Version]")
     return title
+
+def encrypt_filename(filename):
+    # Separate the filename and extension
+    name, ext = os.path.splitext(filename)
+    key = randint(1, 255)
+    name_bytes = name.encode('utf-8')
+    xored_bytes = bytes(b ^ key for b in name_bytes)
+    # Encode with base64 and decode to string
+    encrypted = base64.urlsafe_b64encode(xored_bytes).decode('utf-8')
+    encrypted = encrypted.rstrip('=')
+    if len(encrypted) > 20:
+        encrypted = encrypted[:20]
+    
+    return f"{encrypted}{ext}"
 
 class Command(BaseCommand):
     help = 'Automatically dump Song models from a bunch of audio files'
@@ -32,7 +48,8 @@ class Command(BaseCommand):
             for filename in files:
                 if filename.endswith(('.mp3', '.wav', '.flac')):  # Add more audio file extensions if needed
                     file_path_on_system = os.path.join(root, filename)
-                    relative_path_to_project = os.path.join('songs', filename)
+                    encrypted_filename = encrypt_filename(filename)
+                    relative_path_to_project = os.path.join('songs', encrypted_filename)
                     file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
                     song_title = None
 
@@ -54,16 +71,17 @@ class Command(BaseCommand):
                                 song_title = SongTitle.objects.filter(title=song_title_str).first()
                         except Exception as e:
                             self.stderr.write(self.style.ERROR(f'Error reading {file_path_on_system}: {e}'))
-                    song = Song.objects.filter(file=relative_path_to_project).first()
+                    song = Song.objects.filter(song_title__title=song_title_str).first()
 
                     if song:
                         if song_title and song.song_title != song_title:
                             song.song_title = song_title
                             song.save()
                             self.stdout.write(self.style.SUCCESS(f'updated Song {song}'))
+                        else:
+                            self.stdout.write(self.style.WARNING(f'[{song_title.title}] already exists'))
                     else:
                         song = Song.objects.create(file=relative_path_to_project, song_title=song_title)
                         if not os.path.exists(file_path_to_project):
                             shutil.copyfile(file_path_on_system, file_path_to_project)
                         self.stdout.write(self.style.SUCCESS(f'created Song {song}'))
-                        

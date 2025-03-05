@@ -7,6 +7,7 @@ import MusicDisplay from "./MusicDisplay";
 import { usePoster } from "../hooks/hooks";
 import CommentPopover from "./CommentPopover";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContex";
 
 export interface GameHistory {
   id: number;
@@ -18,7 +19,9 @@ const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const context = useContext(AppContext);
   const navigate = useNavigate();
-  const { score, song,username } = context;
+  const { score, song } = context;
+  const {userName } = useContext(AuthContext);
+
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
   const [showRankList, setShowRankList] = useState(false);
   const poster = usePoster(song);
@@ -34,7 +37,7 @@ const GameOver = () => {
     try {
       console.log('post')
       await axios.post(`${backendIp}/ts/comments/`, {
-        user: username,
+        user: userName,
         comment,
       });
     } catch (error) {
