@@ -7,11 +7,11 @@ import MusicDisplay from "./MusicDisplay";
 import { usePoster } from "../hooks/hooks";
 import CommentPopover from "./CommentPopover";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContex";
+import { AuthContext, User } from "../context/AuthContex";
 
 export interface GameHistory {
   id: number;
-  player_name: string;
+  user: User;
   score: number;
 }
 
@@ -112,7 +112,7 @@ const GameOver = () => {
       </Typography>
 
       {showRankList ? (
-        <RankList scoreRank={GameHistory} />
+        <RankList gamehistories={GameHistory} />
       ) : (
         poster && (
           <MusicDisplay

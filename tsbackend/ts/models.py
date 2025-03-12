@@ -22,7 +22,6 @@ class SongTitle(models.Model):
         return self.title
     
 class GameHistory(models.Model):
-    player_name = models.CharField(max_length=255,default='null')
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True)
     score = models.IntegerField()
     start_time = models.DateTimeField(auto_now=False)

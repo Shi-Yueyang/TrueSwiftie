@@ -1,7 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets
 from .models import Song, SongTitle,Poster,GameHistory, Comment
-from .serializers import SongSerializer, SongTitleSerializer,PosterSerializer,GameHistorySerializer, CommentSerializer
+from .serializers import GameHistoryReadSerializer, SongSerializer, SongTitleSerializer,PosterSerializer,GameHistoryWriteSerializer, CommentSerializer
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import random
@@ -37,8 +37,13 @@ class PosterViewSet(viewsets.ModelViewSet):
 
 class GameHistoryViewSet(viewsets.ModelViewSet):
     queryset = GameHistory.objects.all().order_by("id")
-    serializer_class = GameHistorySerializer
+    serializer_class = GameHistoryWriteSerializer
 
+    def get_serializer(self, *args, **kwargs):
+        if self.action == 'top_scores':
+            return GameHistoryReadSerializer(*args, **kwargs)
+        return super().get_serializer(*args, **kwargs)
+    
     def get_queryset(self):
         start_time = self.request.query_params.get('start_time', None)
         end_time = self.request.query_params.get('end_time', None)

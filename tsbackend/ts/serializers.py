@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import Song, SongTitle, GameHistory, Poster, Comment
+from core.serializer import UserSerializer
 
 class PosterSerializer(serializers.ModelSerializer):
     class Meta:
@@ -18,10 +20,17 @@ class SongSerializer(serializers.ModelSerializer):
         model = Song
         fields = ['id','file', 'song_title']
 
-class GameHistorySerializer(serializers.ModelSerializer):
+class GameHistoryWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameHistory
         fields = ['id','user','score','start_time','end_time','correct_choice','last_choice']
+
+class GameHistoryReadSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+    class Meta:
+        model = GameHistory
+        fields = ['id','user','score']
+
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

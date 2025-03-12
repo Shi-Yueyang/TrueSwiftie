@@ -13,18 +13,31 @@ import { useState } from "react";
 import { IoArrowBack, IoArrowForward } from "react-icons/io5";
 
 interface Props {
-  scoreRank: GameHistory[];
+  gamehistories: GameHistory[];
 }
 
-const RankList = ({ scoreRank }: Props) => {
+const RankList = ({ gamehistories }: Props) => {
   const [page, setPage] = useState(0);
   const rowsPerPage = 5;
-  const paginatedScoreRank = scoreRank.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  const gameRank = gamehistories.map(gamehistory=>{
+    if(gamehistory.user.groups.length > 0 && gamehistory.user.groups.includes('formal')){
+      return {
+        name: gamehistory.user.username,
+        score:gamehistory.score
+      }
+      
+    }
+    else{
+      return {
+        name: gamehistory.user.temporary_name+' (游客)',
+        score:gamehistory.score
+      }
+    }
+  })
+
+
   const handleNextPage = () => {
-    if ((page + 1) * rowsPerPage < scoreRank.length) {
+    if ((page + 1) * rowsPerPage < gamehistories.length) {
       setPage(page + 1);
     }
   };
@@ -39,7 +52,7 @@ const RankList = ({ scoreRank }: Props) => {
       sx={{
         backgroundColor: "rgba(255, 255, 255, 0.9)",
         marginTop: "2rem",
-        maxWidth: 800,
+        maxWidth: 1200,
         borderRadius: "16px",
         padding: "1rem",
         boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
@@ -63,60 +76,59 @@ const RankList = ({ scoreRank }: Props) => {
       />
       <CardContent>
         <List sx={{ padding: 0 }}>
-          {paginatedScoreRank.map((rank, index) => (
-            <ListItem
-              key={index}
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                padding: "10px 0",
-                borderBottom:
-                  index === paginatedScoreRank.length - 1
-                    ? "none"
-                    : "1px solid #ddd",
-              }}
-            >
-              <Box sx={{ display: "flex", alignItems: "center" }}>
-                <Typography
-                  sx={{
-                    fontWeight: "bold",
-                    color:
-                      index === 0 && page === 0
-                        ? "#EFD700"
-                        : index === 1 &&  page === 0
-                        ? "#C0C0C0"
-                        : index === 2 &&  page === 0
-                        ? "#CD7F32"
-                        : "#333",
-                    fontSize: "1.2rem",
-                    marginRight: "10px",
-                  }}
-                >
-                  {index + 1 + page*rowsPerPage}.
-                </Typography>
+          {gameRank
+            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+            .map((rank, index) => (
+              <ListItem
+                key={index}
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  padding: "10px 0",
+
+                }}
+              >
+                <Box sx={{ display: "flex", alignItems: "center" }}>
+                  <Typography
+                    sx={{
+                      fontWeight: "bold",
+                      color:
+                        index === 0 && page === 0
+                          ? "#EFD700"
+                          : index === 1 && page === 0
+                          ? "#C0C0C0"
+                          : index === 2 && page === 0
+                          ? "#CD7F32"
+                          : "#333",
+                      fontSize: "1.2rem",
+                      marginRight: "10px",
+                    }}
+                  >
+                    {index + 1 + page * rowsPerPage}.
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontWeight: "500",
+                      color: "#333",
+                      fontSize: "1.1rem",
+                      marginRight: "20px", // Add margin to create space
+                    }}
+                  >
+                    {rank.name}
+                  </Typography>
+                </Box>
                 <Typography
                   sx={{
                     fontWeight: "500",
                     color: "#333",
                     fontSize: "1.1rem",
-                    marginRight: "20px", // Add margin to create space
+                    marginLeft: "20px", // Add margin to create space
                   }}
                 >
-                  {rank.player_name}
+                  {rank.score}
                 </Typography>
-              </Box>
-              <Typography
-                sx={{
-                  fontWeight: "500",
-                  color: "#333",
-                  fontSize: "1.1rem",
-                  marginLeft: "20px", // Add margin to create space
-                }}
-              >
-                {rank.score}
-              </Typography>
-            </ListItem>
-          ))}
+              </ListItem>
+            ))}
         </List>
         <Box
           sx={{
@@ -132,8 +144,8 @@ const RankList = ({ scoreRank }: Props) => {
               borderRadius: "50%",
               backgroundColor: "#1976d2",
               color: "#fff",
-              '&:hover': {
-                backgroundColor: "#1565c0", 
+              "&:hover": {
+                backgroundColor: "#1565c0",
               },
             }}
           >
@@ -141,13 +153,13 @@ const RankList = ({ scoreRank }: Props) => {
           </IconButton>
           <IconButton
             onClick={handleNextPage}
-            disabled={(page + 1) * rowsPerPage >= scoreRank.length}
+            disabled={(page + 1) * rowsPerPage >= gamehistories.length}
             sx={{
               borderRadius: "50%",
               backgroundColor: "#1976a2",
               color: "#fff",
-              '&:hover': {
-                backgroundColor: "#1565c0", 
+              "&:hover": {
+                backgroundColor: "#1565c0",
               },
             }}
           >

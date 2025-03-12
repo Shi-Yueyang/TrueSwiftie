@@ -1,5 +1,13 @@
 import React, { createContext, useState } from "react";
 
+export interface User{
+  id: number;
+  username: string;
+  temporary_name: string;
+  is_staff: boolean;
+  groups: string[];
+}
+
 interface AuthContextProps {
   userId: string | null;
   userName: string | null;
