@@ -48,9 +48,7 @@ class Command(BaseCommand):
             for filename in files:
                 if filename.endswith(('.mp3', '.wav', '.flac')):  # Add more audio file extensions if needed
                     file_path_on_system = os.path.join(root, filename)
-                    encrypted_filename = encrypt_filename(filename)
-                    relative_path_to_project = os.path.join('songs', encrypted_filename)
-                    file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
+
                     song_title = None
 
                     if filename.endswith('.mp3'):
@@ -81,7 +79,16 @@ class Command(BaseCommand):
                         else:
                             self.stdout.write(self.style.WARNING(f'[{song_title.title}] already exists'))
                     else:
-                        song = Song.objects.create(file=relative_path_to_project, song_title=song_title)
-                        if not os.path.exists(file_path_to_project):
-                            shutil.copyfile(file_path_on_system, file_path_to_project)
+                        encrypted_filename = encrypt_filename(filename)
+                        relative_path_to_project = os.path.join('songs', encrypted_filename)
+                        file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
+                        counter = 1
+                        while os.path.exists(file_path_to_project):
+                            encrypted_filename = encrypted_filename+str(counter)
+                            relative_path_to_project = os.path.join('songs', encrypted_filename)
+                            file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
+                            counter += 1              
+                                      
+                        song = Song.objects.create(file=relative_path_to_project, song_title=song_title,original_file_name=filename)
+                        shutil.copyfile(file_path_on_system, file_path_to_project)
                         self.stdout.write(self.style.SUCCESS(f'created Song {song}'))

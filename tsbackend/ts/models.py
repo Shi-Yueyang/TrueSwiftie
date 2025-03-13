@@ -4,6 +4,7 @@ from core.models import CustomUser as User
 class Song(models.Model):
     file = models.FileField(upload_to='songs/', unique=True)
     song_title = models.ForeignKey('SongTitle', on_delete=models.SET_NULL,default=1,null=True)
+    original_file_name = models.CharField(max_length=255,null=True)
     def __str__(self):
         return self.file.name
     

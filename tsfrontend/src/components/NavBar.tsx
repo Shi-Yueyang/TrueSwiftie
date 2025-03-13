@@ -20,19 +20,17 @@ import {
 
 const NavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const {isStaff,groups,logout } = useContext(AuthContext);
+  const { isStaff, groups, logout } = useContext(AuthContext);
   const [isGuest, setIsGuest] = useState<boolean>(false);
 
   useEffect(() => {
-    if(isStaff || groups?.includes("formal")){
+    if (isStaff || groups?.includes("formal")) {
       setIsGuest(false);
-    }
-    else{
+    } else {
       setIsGuest(true);
     }
-  }
-  , [isStaff,groups]);
-  
+  }, [isStaff, groups]);
+
   const navigate = useNavigate();
 
   const toggleDrawer =
@@ -61,14 +59,22 @@ const NavBar = () => {
           alt="Logo"
           style={{ width: 40, height: 40, marginRight: 10 }}
         />
-        <Typography variant="h6" sx={{ flexGrow: 1, fontFamily: 'PlaywriteIN, cursive' }}>
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1, fontFamily: "PlaywriteIN, cursive" }}
+        >
           True Swiftie
         </Typography>
       </Box>
       <List>
+      <ListItem key={1}>
+          <ListItemButton>
+            <ListItemText primary={"Home"} onClick={()=>{navigate('/')}} />
+          </ListItemButton>
+        </ListItem>
         <ListItem key={1}>
           <ListItemButton>
-            <ListItemText primary={"Game History"} />
+            <ListItemText primary={"Game History"} onClick={()=>{navigate('/game-history')}} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -91,11 +97,22 @@ const NavBar = () => {
           <Box sx={{ flexGrow: 1 }} />
           {isGuest ? (
             <>
-              <Button color="inherit" onClick={() => navigate("/login")}>Login</Button>
-              <Button color="inherit" onClick={() => navigate("/signup")}>Signup</Button>
+              <Button color="inherit" onClick={() => navigate("/login")}>
+                Login
+              </Button>
+              <Button color="inherit" onClick={() => navigate("/signup")}>
+                Signup
+              </Button>
             </>
           ) : (
-            <Button color="inherit" onClick={()=>{logout();}}>Logout</Button>
+            <Button
+              color="inherit"
+              onClick={() => {
+                logout();
+              }}
+            >
+              Logout
+            </Button>
           )}
         </Toolbar>
       </AppBar>
@@ -107,4 +124,3 @@ const NavBar = () => {
 };
 
 export default NavBar;
-

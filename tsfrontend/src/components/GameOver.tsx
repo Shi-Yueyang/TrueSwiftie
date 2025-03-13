@@ -13,6 +13,8 @@ export interface GameHistory {
   id: number;
   user: User;
   score: number;
+  start_time:string;
+  correct_choice:string
 }
 
 const GameOver = () => {

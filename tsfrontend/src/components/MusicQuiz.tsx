@@ -3,8 +3,9 @@ import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
 import {  IoArrowForwardOutline } from "react-icons/io5"; //IoMusicalNotes
-import { TbChristmasTree } from "react-icons/tb";
+// import { TbChristmasTree } from "react-icons/tb";
 import "../styles/App.css";
+import { WiRaindrop } from "react-icons/wi";
 
 interface SongTitle {
   title: string;
@@ -75,7 +76,7 @@ const MusicQuiz = ({
             variant="contained"
             color="secondary"
             aria-label={`Select option ${option}`}
-            startIcon={<TbChristmasTree  />}
+            startIcon={<WiRaindrop />}
             onClick={() => onChoose(option)}
             disabled={isPosterRevealed}
           >
