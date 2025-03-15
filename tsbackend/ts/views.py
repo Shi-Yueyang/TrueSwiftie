@@ -25,7 +25,7 @@ class SongViewSet(viewsets.ModelViewSet):
         random_song = random.choice(songs)
         serializer = self.get_serializer(random_song)
         return Response(serializer.data)
-
+    
 
 class SongTitleViewSet(viewsets.ModelViewSet):
     queryset = SongTitle.objects.all().prefetch_related('poster_pics')
@@ -36,7 +36,7 @@ class PosterViewSet(viewsets.ModelViewSet):
     serializer_class = PosterSerializer
 
 class GameHistoryViewSet(viewsets.ModelViewSet):
-    queryset = GameHistory.objects.all().order_by("id")
+    queryset = GameHistory.objects.all().order_by("-id")
     serializer_class = GameHistoryWriteSerializer
 
     def get_serializer(self, *args, **kwargs):
@@ -50,7 +50,8 @@ class GameHistoryViewSet(viewsets.ModelViewSet):
         user_id = self.request.query_params.get('user_id', None)
         query = self.queryset
         if user_id:
-            query = self.queryset.filter(user=user_id)
+            query = query.filter(score__gt=0)
+            query = query.filter(user=user_id)
         if start_time:
             query = query.filter(start_time__gte=start_time)
         if end_time:

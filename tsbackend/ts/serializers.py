@@ -23,13 +23,13 @@ class SongSerializer(serializers.ModelSerializer):
 class GameHistoryWriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = GameHistory
-        fields = ['id','user','score','start_time','end_time','correct_choice','last_choice']
+        fields = ['id','user','score','start_time','end_time','correct_choice','last_choice','likes']
 
 class GameHistoryReadSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     class Meta:
         model = GameHistory
-        fields = ['id','user','score']
+        fields = ['id','user','score','likes']
 
 
 class CommentSerializer(serializers.ModelSerializer):
