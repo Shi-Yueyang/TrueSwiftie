@@ -1,4 +1,5 @@
-import React, { createContext, useState } from "react";
+import axios from "axios";
+import React, { createContext, useEffect, useState } from "react";
 
 export interface User{
   id: number;
@@ -64,7 +65,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
   };
-
   const logout = () => {
     setUserName(null);
     setAccessToken(null);
@@ -74,6 +74,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   };
+
+  const fetchUserData = async ()=>{
+    try{
+      const token = localStorage.getItem("accessToken");
+      if(!token){
+        return;
+      }
+      console.log('kkkk',token);
+      const responseMe = await axios.get(
+        `${import.meta.env.VITE_BACKEND_IP}/core/users/me/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setUserId(responseMe.data.id);
+      setUserName(responseMe.data.username);
+      setIsStaff(responseMe.data.is_staff);
+      setIsStaff(responseMe.data.groups);
+      
+    }catch(err){
+      console.error('Error fetching user data:', err);
+      logout();
+    }
+  }
+
+  useEffect(()=>{
+    fetchUserData();
+  },[]);
 
   return (
     <AuthContext.Provider

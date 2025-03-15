@@ -15,6 +15,7 @@ export interface GameHistory {
   score: number;
   start_time:string;
   correct_choice:string
+  likes:number;
 }
 
 const GameOver = () => {
@@ -35,6 +36,7 @@ const GameOver = () => {
   const handleRestart = () => {
     navigate("/");
   };
+
   const handleSubmit = async (comment: string) => {
     try {
       console.log('post')

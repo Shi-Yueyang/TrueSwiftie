@@ -67,14 +67,24 @@ const NavBar = () => {
         </Typography>
       </Box>
       <List>
-      <ListItem key={1}>
+        <ListItem key={1}>
           <ListItemButton>
-            <ListItemText primary={"Home"} onClick={()=>{navigate('/')}} />
+            <ListItemText
+              primary={"Home"}
+              onClick={() => {
+                navigate("/");
+              }}
+            />
           </ListItemButton>
         </ListItem>
         <ListItem key={1}>
           <ListItemButton>
-            <ListItemText primary={"Game History"} onClick={()=>{navigate('/game-history')}} />
+            <ListItemText
+              primary={"Game History"}
+              onClick={() => {
+                navigate("/game-history");
+              }}
+            />
           </ListItemButton>
         </ListItem>
       </List>

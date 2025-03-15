@@ -9,32 +9,68 @@ import {
   IconButton,
 } from "@mui/material";
 import { GameHistory } from "./GameOver";
-import { useState } from "react";
-import { IoArrowBack, IoArrowForward } from "react-icons/io5";
+import { useEffect, useState } from "react";
+import {
+  IoArrowBack,
+  IoArrowForward,
+  IoHeart,
+  IoHeartOutline,
+} from "react-icons/io5";
+import axios from "axios";
 
 interface Props {
   gamehistories: GameHistory[];
 }
 
+interface GameRank {
+  id:number;
+  name: string;
+  score: number;
+  likes: number;
+  isLiked: boolean;
+}
 const RankList = ({ gamehistories }: Props) => {
   const [page, setPage] = useState(0);
+  const [gameRanks, setGameRanks] = useState<GameRank[]>([]);
   const rowsPerPage = 5;
-  const gameRank = gamehistories.map(gamehistory=>{
-    if(gamehistory.user.groups.length > 0 && gamehistory.user.groups.includes('formal')){
-      return {
-        name: gamehistory.user.username,
-        score:gamehistory.score
-      }
-      
-    }
-    else{
-      return {
-        name: gamehistory.user.temporary_name+' (游客)',
-        score:gamehistory.score
-      }
-    }
-  })
+  const backendIp = import.meta.env.VITE_BACKEND_IP;
 
+  useEffect(() => {
+    setGameRanks(gamehistories.map(gamehistory => ({
+      id: gamehistory.id,
+      name: gamehistory.user.groups.length > 0 && gamehistory.user.groups.includes("formal")
+        ? gamehistory.user.username
+        : gamehistory.user.temporary_name + " (游客)",
+      score: gamehistory.score,
+      likes: gamehistory.likes,
+      isLiked: false,
+    })));
+  }, [gamehistories]);
+
+  const handleLike = async (id: number) => {
+    const oldLikes = gameRanks.find(rank=>rank.id===id)?.likes || 0
+    setGameRanks((prev) =>
+      prev.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            likes: item.likes + 1,
+            isLiked: true,
+          };
+        }
+        return item;
+      })
+    );
+  try{
+    await axios.patch(`${backendIp}/ts/game-histories/${id}/`,{
+      id,
+      likes:oldLikes+1
+    })
+  }catch(err){
+    console.log(err);
+  }
+
+  };
 
   const handleNextPage = () => {
     if ((page + 1) * rowsPerPage < gamehistories.length) {
@@ -76,7 +112,7 @@ const RankList = ({ gamehistories }: Props) => {
       />
       <CardContent>
         <List sx={{ padding: 0 }}>
-          {gameRank
+          {gameRanks
             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
             .map((rank, index) => (
               <ListItem
@@ -85,7 +121,6 @@ const RankList = ({ gamehistories }: Props) => {
                   display: "flex",
                   justifyContent: "space-between",
                   padding: "10px 0",
-
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -127,6 +162,35 @@ const RankList = ({ gamehistories }: Props) => {
                 >
                   {rank.score}
                 </Typography>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    marginLeft: "20px",
+                  }}
+                >
+                  <IconButton
+                    size="small"
+                    sx={{
+                      padding: "2px",
+                    }}
+                    onClick={() => handleLike(rank.id)}
+                    disabled={rank.isLiked}
+                  >
+                    {rank.isLiked ? <IoHeart /> : <IoHeartOutline />}
+                  </IconButton>
+                  <Typography
+                    sx={{
+                      fontWeight: "500",
+                      color: "#333",
+                      fontSize: "0.9rem",
+                      marginRight: "5px",
+                    }}
+                  >
+                    {rank.likes}
+                  </Typography>
+                </Box>
               </ListItem>
             ))}
         </List>

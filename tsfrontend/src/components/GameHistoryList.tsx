@@ -16,6 +16,7 @@ import Grid from "@mui/material/Grid2";
 import { GameHistory } from "./GameOver";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContex";
+import { IoHeart } from "react-icons/io5";
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -74,11 +75,9 @@ const GameHistoryList: React.FC = () => {
     }
   };
 
-
-
   useEffect(() => {
     fetchTopScores(currentPage);
-  }, [currentPage]);
+  }, [currentPage, userId]);
 
   // Format the date string to a more readable format
   const formatDate = (dateString: string) => {
@@ -117,13 +116,21 @@ const GameHistoryList: React.FC = () => {
                         </Typography>
                       </Grid>
                       <Grid size={{ xs: 12, sm: 3 }}>
+                        <Typography variant="body1">
+                          <strong>Last Song:</strong> {record.correct_choice}
+                        </Typography>
+                      </Grid>
+                      <Grid size={{ xs: 6, sm: 3 }}>
                         <ScoreBox score={record.score}>
                           Score: {record.score}
                         </ScoreBox>
                       </Grid>
-                      <Grid size={{ xs: 12, sm: 3 }}>
-                        <Typography variant="body1">
-                          <strong>Final Song:</strong> {record.correct_choice}
+                      <Grid size={{ xs: 6, sm: 3 }}>
+                        <Typography
+                          variant="body1"
+                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                        >
+                          <IoHeart /> <strong>{record.likes || 0}</strong>
                         </Typography>
                       </Grid>
                     </Grid>
