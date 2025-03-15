@@ -1,6 +1,7 @@
 import { useState, useEffect, useContext } from "react";
 import {
   fetchRandomSong,
+  fetchSongWithName,
   fetchRandomTitles,
   fetchPosterById,
 } from "../services/api";
@@ -9,10 +10,9 @@ import { Poster } from "../components/MusicPoster";
 import noPicture from "../assets/ts_placeholder.jpg";
 import { AppContext } from "../context/AppContext";
 
-
-export const useRandomSong = (isToFetch: number,album?:string) => {
+export const useRandomSong = (isToFetch: number, album?: string) => {
   const context = useContext(AppContext);
-  const {song,setSong} = context;
+  const { song, setSong } = context;
 
   useEffect(() => {
     const fetchSong = async () => {
@@ -30,18 +30,41 @@ export const useRandomSong = (isToFetch: number,album?:string) => {
 
     if (isToFetch) {
       fetchSong();
-      
     }
   }, [isToFetch]);
 
-  return song ;
+  return song;
 };
 
-export const useOptions = (song: Song|null) => {
+export const useSong = (songName: string) => {
+  const context = useContext(AppContext);
+  const { song, setSong } = context;
+  useEffect(() => {
+    try {
+      const fetchSong = async () => {
+        try {
+          const response = await fetchSongWithName(songName);
+          if(response){
+            setSong(response.results[0]);
+          }
+        } catch (error) {
+          console.error("Error fetching song data:", error);
+        }
+      };
+      fetchSong();
+    } catch (error) {
+      console.error("Error fetching song data:", error);
+    }
+  }, [songName]);
+
+  return song;
+};
+
+export const useOptions = (song: Song | null) => {
   const [options, setOptions] = useState<string[]>();
 
   useEffect(() => {
-    if(!song) return;
+    if (!song) return;
     const fetchOptions = async () => {
       try {
         const randOptions: string[] = await fetchRandomTitles();
@@ -63,7 +86,7 @@ export const useOptions = (song: Song|null) => {
   return options;
 };
 
-export const usePoster = (song: Song|null) => {
+export const usePoster = (song: Song | null) => {
   const [poster, setPoster] = useState<Poster>();
 
   useEffect(() => {
@@ -91,4 +114,3 @@ export const usePoster = (song: Song|null) => {
 
   return poster;
 };
-

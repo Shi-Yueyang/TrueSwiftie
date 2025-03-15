@@ -8,6 +8,7 @@ import {
   CardHeader,
   IconButton,
 } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { GameHistory } from "./GameOver";
 import { useEffect, useState } from "react";
 import {
@@ -23,7 +24,7 @@ interface Props {
 }
 
 interface GameRank {
-  id:number;
+  id: number;
   name: string;
   score: number;
   likes: number;
@@ -36,19 +37,23 @@ const RankList = ({ gamehistories }: Props) => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
 
   useEffect(() => {
-    setGameRanks(gamehistories.map(gamehistory => ({
-      id: gamehistory.id,
-      name: gamehistory.user.groups.length > 0 && gamehistory.user.groups.includes("formal")
-        ? gamehistory.user.username
-        : gamehistory.user.temporary_name + " (游客)",
-      score: gamehistory.score,
-      likes: gamehistory.likes,
-      isLiked: false,
-    })));
+    setGameRanks(
+      gamehistories.map((gamehistory) => ({
+        id: gamehistory.id,
+        name:
+          gamehistory.user.groups.length > 0 &&
+          gamehistory.user.groups.includes("formal")
+            ? gamehistory.user.username
+            : gamehistory.user.temporary_name + " (游客)",
+        score: gamehistory.score,
+        likes: gamehistory.likes,
+        isLiked: false,
+      }))
+    );
   }, [gamehistories]);
 
   const handleLike = async (id: number) => {
-    const oldLikes = gameRanks.find(rank=>rank.id===id)?.likes || 0
+    const oldLikes = gameRanks.find((rank) => rank.id === id)?.likes || 0;
     setGameRanks((prev) =>
       prev.map((item) => {
         if (item.id === id) {
@@ -61,15 +66,14 @@ const RankList = ({ gamehistories }: Props) => {
         return item;
       })
     );
-  try{
-    await axios.patch(`${backendIp}/ts/game-histories/${id}/`,{
-      id,
-      likes:oldLikes+1
-    })
-  }catch(err){
-    console.log(err);
-  }
-
+    try {
+      await axios.patch(`${backendIp}/ts/game-histories/${id}/`, {
+        id,
+        likes: oldLikes + 1,
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const handleNextPage = () => {
@@ -123,74 +127,87 @@ const RankList = ({ gamehistories }: Props) => {
                   padding: "10px 0",
                 }}
               >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <Typography
-                    sx={{
-                      fontWeight: "bold",
-                      color:
-                        index === 0 && page === 0
-                          ? "#EFD700"
-                          : index === 1 && page === 0
-                          ? "#C0C0C0"
-                          : index === 2 && page === 0
-                          ? "#CD7F32"
-                          : "#333",
-                      fontSize: "1.2rem",
-                      marginRight: "10px",
-                    }}
-                  >
-                    {index + 1 + page * rowsPerPage}.
-                  </Typography>
-                  <Typography
-                    sx={{
-                      fontWeight: "500",
-                      color: "#333",
-                      fontSize: "1.1rem",
-                      marginRight: "20px", // Add margin to create space
-                    }}
-                  >
-                    {rank.name}
-                  </Typography>
-                </Box>
-                <Typography
-                  sx={{
-                    fontWeight: "500",
-                    color: "#333",
-                    fontSize: "1.1rem",
-                    marginLeft: "20px", // Add margin to create space
-                  }}
+                <Grid
+                  container
+                  alignItems="center"
+                  spacing={2}
+                  sx={{ width: "100%" }}
                 >
-                  {rank.score}
-                </Typography>
+                  <Grid size={{ xs: 1 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: "bold",
+                        color:
+                          index === 0 && page === 0
+                            ? "#EFD700"
+                            : index === 1 && page === 0
+                            ? "#C0C0C0"
+                            : index === 2 && page === 0
+                            ? "#CD7F32"
+                            : "#333",
+                        fontSize: "1.2rem",
+                        marginRight: "20px",
+                      }}
+                    >
+                      {index + 1 + page * rowsPerPage}.
+                    </Typography>
+                  </Grid>
 
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    marginLeft: "20px",
-                  }}
-                >
-                  <IconButton
-                    size="small"
-                    sx={{
-                      padding: "2px",
-                    }}
-                    onClick={() => handleLike(rank.id)}
-                    disabled={rank.isLiked}
-                  >
-                    {rank.isLiked ? <IoHeart /> : <IoHeartOutline />}
-                  </IconButton>
-                  <Typography
-                    sx={{
-                      fontWeight: "500",
-                      color: "#333",
-                      fontSize: "0.9rem",
-                      marginRight: "5px",
-                    }}
-                  >
-                    {rank.likes}
-                  </Typography>
-                </Box>
+                  <Grid size={{ xs: 6 }} margin={{ xs: "0 0 0 10px" }}>
+                    <Typography
+                      sx={{
+                        fontWeight: "500",
+                        color: "#333",
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {rank.name}
+                    </Typography>
+                  </Grid>
+
+                  <Grid size={{ xs: 2 }}>
+                    <Typography
+                      sx={{
+                        fontWeight: "500",
+                        color: "#333",
+                        fontSize: "1.1rem",
+                      }}
+                    >
+                      {rank.score}
+                    </Typography>
+                  </Grid>
+
+                  <Grid size={{ xs: 2 }}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        sx={{
+                          padding: "2px",
+                        }}
+                        onClick={() => handleLike(rank.id)}
+                        disabled={rank.isLiked}
+                      >
+                        {rank.isLiked ? <IoHeart color="#fe4444"/> : <IoHeartOutline />}
+                      </IconButton>
+                      <Typography
+                        sx={{
+                          fontWeight: "500",
+                          color: "#333",
+                          fontSize: "0.9rem",
+                          marginRight: "5px",
+                        }}
+                      >
+                        {rank.likes}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                </Grid>
               </ListItem>
             ))}
         </List>

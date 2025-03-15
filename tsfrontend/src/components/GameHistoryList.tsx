@@ -17,6 +17,8 @@ import { GameHistory } from "./GameOver";
 import axios from "axios";
 import { AuthContext } from "../context/AuthContex";
 import { IoHeart } from "react-icons/io5";
+import MusicPlayer from "./MusicPlayer";
+
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -50,13 +52,15 @@ const ScoreBox = styled(Box, {
 
 const GameHistoryList: React.FC = () => {
   const pageSize = 13;
-  const [gameHistory, setGameHistory] = useState<GameHistory[]>([]);
+  const backendIp = import.meta.env.VITE_BACKEND_IP;
   const { userId } = useContext(AuthContext);
+  const [gameHistory, setGameHistory] = useState<GameHistory[]>([]);
+  const [selectedSong, setSelectedSong] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const backendIp = import.meta.env.VITE_BACKEND_IP;
+
 
   const fetchTopScores = async (page: number) => {
     setLoading(true);
@@ -79,6 +83,8 @@ const GameHistoryList: React.FC = () => {
     fetchTopScores(currentPage);
   }, [currentPage, userId]);
 
+
+
   // Format the date string to a more readable format
   const formatDate = (dateString: string) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -88,6 +94,7 @@ const GameHistoryList: React.FC = () => {
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
+
 
   return (
     <Container maxWidth="md">
@@ -107,7 +114,10 @@ const GameHistoryList: React.FC = () => {
           <>
             <List>
               {gameHistory.map((record) => (
-                <StyledCard key={record.id}>
+                <StyledCard
+                  key={record.id}
+                  onClick={() => setSelectedSong(record.correct_choice)}
+                >
                   <CardContent>
                     <Grid container spacing={2} alignItems="center">
                       <Grid size={{ xs: 12, sm: 3 }}>
@@ -153,6 +163,11 @@ const GameHistoryList: React.FC = () => {
           </>
         )}
       </Box>
+      {selectedSong && (
+        <MusicPlayer 
+          songTitle={selectedSong} 
+        />
+      )}
     </Container>
   );
 };

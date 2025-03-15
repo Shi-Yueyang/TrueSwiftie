@@ -12,6 +12,13 @@ class SongViewSet(viewsets.ModelViewSet):
     queryset = Song.objects.all()
     serializer_class = SongSerializer
 
+    def get_queryset(self):
+        song_name = self.request.query_params.get('song_name', None)
+        query = self.queryset
+        if song_name:
+            query = query.filter(song_title__title=song_name)
+        return query
+    
     @action(detail=False, methods=['get'])
     def random_song(self, request):
         album = request.query_params.get('album', None)

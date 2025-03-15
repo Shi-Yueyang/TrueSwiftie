@@ -6,7 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import { IoMenu } from "react-icons/io5";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../public/taylor-swift.svg";
+import logo from "../assets/taylor-swift.svg";
 import { AuthContext } from "../context/AuthContex";
 
 import {
@@ -77,7 +77,7 @@ const NavBar = () => {
             />
           </ListItemButton>
         </ListItem>
-        <ListItem key={1}>
+        <ListItem key={2}>
           <ListItemButton>
             <ListItemText
               primary={"Game History"}

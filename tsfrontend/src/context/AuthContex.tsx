@@ -66,6 +66,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("refreshToken", refreshToken);
   };
   const logout = () => {
+    setUserId(null);
     setUserName(null);
     setAccessToken(null);
     setRefreshToken(null);
@@ -81,7 +82,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if(!token){
         return;
       }
-      console.log('kkkk',token);
       const responseMe = await axios.get(
         `${import.meta.env.VITE_BACKEND_IP}/core/users/me/`,
         {

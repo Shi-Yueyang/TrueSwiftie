@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 const GamePage = () => {
   const navigate = useNavigate();
   const context = useContext(AppContext);
-  const {  score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps } = context;
+  const { score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps } = context;
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [imgSource, setImgSource] = useState(placeholderImg);
@@ -107,7 +107,6 @@ const GamePage = () => {
       }
       const startTime = Math.floor(Math.random() * 120);
 
-      // console.log("set sound:", song);
       if (song) {
         const newSound = new Howl({
           src: [song.file],
