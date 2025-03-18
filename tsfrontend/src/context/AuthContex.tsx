@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { createContext, useEffect, useState } from "react";
 
-export interface User{
+export interface User {
   id: number;
   username: string;
   temporary_name: string;
@@ -43,8 +43,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(localStorage.getItem("accessToken"));
-  const [refreshToken, setRefreshToken] = useState<string | null>(localStorage.getItem("refreshToken"));
+  const [accessToken, setAccessToken] = useState<string | null>(
+    localStorage.getItem("accessToken")
+  );
+  const [refreshToken, setRefreshToken] = useState<string | null>(
+    localStorage.getItem("refreshToken")
+  );
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [groups, setGroups] = useState<string[]>([]);
 
@@ -76,13 +80,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.removeItem("refreshToken");
   };
 
-  const fetchUserData = async ()=>{
-    try{
+  const fetchUserData = async () => {
+    try {
       const token = localStorage.getItem("accessToken");
-      if(!token){
+      if (!token) {
         return;
       }
-      const responseMe = await axios.get(
+      const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_IP}/core/users/me/`,
         {
           headers: {
@@ -90,25 +94,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           },
         }
       );
-
-      setUserId(responseMe.data.id);
-      setUserName(responseMe.data.username);
-      setIsStaff(responseMe.data.is_staff);
-      setIsStaff(responseMe.data.groups);
-      
-    }catch(err){
-      console.error('Error fetching user data:', err);
+      if (response.data.groups.includes("formal")) {
+        setUserName(response.data.username);
+      } else {
+        setUserName(response.data.temporary_name);
+      }
+      setUserId(response.data.id);
+      setIsStaff(response.data.is_staff);
+      setGroups(response.data.groups);
+    } catch (err) {
+      console.error("Error fetching user data:", err);
       logout();
     }
-  }
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchUserData();
-  },[]);
+  }, []);
 
   return (
     <AuthContext.Provider
-      value={{ userId, userName, accessToken, refreshToken, isStaff, groups, login, logout }}
+      value={{
+        userId,
+        userName,
+        accessToken,
+        refreshToken,
+        isStaff,
+        groups,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -1,6 +1,3 @@
-// import { useContext } from "react";
-// import { AppContext } from "./context/AppContext";
-// import Snowfall from "react-snowfall";
 
 import GamePage from "./components/GamePage";
 import { Route, Routes } from "react-router-dom";
@@ -14,13 +11,21 @@ import "./styles/App.css";
 import GameHistoryList from "./components/GameHistoryList";
 import ProtectedRoute from "./components/ProtectedRoute ";
 
+// animations
+// import { useContext } from "react";
+// import { AppContext } from "./context/AppContext";
+// import Snowfall from "react-snowfall";
+
+
+
 function App() {
   // const {  snowfallProps } = useContext(AppContext);
 
   return (
     <>
       {/* <Snowfall {...snowfallProps} /> */}
-      <Stack direction={"column"}>
+
+      <Stack direction={"column"} sx={{ mt: "64px" }}>
         <NavBar />
         <Routes>
           <Route path="/" element={<StartGame />} />

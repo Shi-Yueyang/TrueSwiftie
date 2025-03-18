@@ -57,8 +57,8 @@ const StartGame = () => {
       login(
         response.data.userId,
         response.data.temporary_name,
-        response.data.accessToken,
-        response.data.refreshToken,
+        response.data.access,
+        response.data.refresh,
         response.data.is_staff,
         response.data.groups
       );

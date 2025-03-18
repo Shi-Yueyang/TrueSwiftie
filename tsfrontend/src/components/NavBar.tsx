@@ -93,7 +93,7 @@ const NavBar = () => {
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar position="fixed" sx={{ top: 0, zIndex: 1100 }}>
         <Toolbar>
           <IconButton
             edge="start"
