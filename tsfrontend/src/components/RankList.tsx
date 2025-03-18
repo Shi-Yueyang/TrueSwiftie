@@ -41,6 +41,7 @@ const RankList = ({ gamehistories }: Props) => {
       gamehistories.map((gamehistory) => ({
         id: gamehistory.id,
         name:
+          gamehistory.user.groups &&
           gamehistory.user.groups.length > 0 &&
           gamehistory.user.groups.includes("formal")
             ? gamehistory.user.username
@@ -193,7 +194,11 @@ const RankList = ({ gamehistories }: Props) => {
                         onClick={() => handleLike(rank.id)}
                         disabled={rank.isLiked}
                       >
-                        {rank.isLiked ? <IoHeart color="#fe4444"/> : <IoHeartOutline />}
+                        {rank.isLiked ? (
+                          <IoHeart color="#fe4444" />
+                        ) : (
+                          <IoHeartOutline />
+                        )}
                       </IconButton>
                       <Typography
                         sx={{
