@@ -1,6 +1,5 @@
 import os
 from urllib.request import urlretrieve
-import urllib.parse
 
 def download_image(url, dest_folder, image_name):
     if not os.path.exists(dest_folder):

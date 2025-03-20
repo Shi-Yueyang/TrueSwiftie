@@ -16,8 +16,6 @@ gunicorn = "*"
 matplotlib = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
-imagehash = "*"
-selenium = "*"
 
 [dev-packages]
 

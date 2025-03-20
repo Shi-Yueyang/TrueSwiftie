@@ -1,7 +1,5 @@
 import os
 import requests
-import json
-import sqlite3
 from config import load_config
 from db import create_db_connection, create_table
 from image_utils import calculate_image_hash

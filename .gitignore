@@ -25,3 +25,4 @@ db.sqlite3
 .env**
 # Ignore Python cache files
 __pycache__/
+posters_by_eras

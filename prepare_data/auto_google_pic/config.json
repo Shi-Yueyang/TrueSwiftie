@@ -1,22 +1,14 @@
 {
   "topics": [
-    "Taylor Swift",
-    "Fearless",
-    "Speak Now",
-    "Red",
-    "1989",
-    "Reputation",
-    "Lover",
-    "Folklore",
-    "Evermore",
-    "Midnights",
-    "The Tortured Poets Department"
+
+    "Evermore"
+
   ],
   "num_images": 10,
   "frequency": "0 0 * * *",
   "destination_folder": "taylor_swift_images",
-  "api_key": "AIzaSyCJCbxHx0IAERm_ROJKuncepglq3SUMU2Y",
-  "cse_id": "e1d08201bd2c947e8",
+  "api_key": "API_KEY",
+  "cse_id": "CSE_ID",
   "max_retries": 3,
   "delay": 1
 }

@@ -1,8 +1,8 @@
 import os
 from django.core.management.base import BaseCommand
-from django.core.files.storage import default_storage
 from django.core.files import File
 from ts.models import Poster, SongTitle
+import tsbackend.settings as settings
 
 class Command(BaseCommand):
     help = 'Import a folder of CD cover images and add them to the Poster model'
@@ -28,9 +28,13 @@ class Command(BaseCommand):
 
         for file_path in files:
             filename = os.path.basename(file_path)
+            target_filename = os.path.join(settings.MEDIA_ROOT, 'posters', filename)
+            if os.path.exists(target_filename):
+                self.stdout.write(self.style.WARNING(f'{filename} already exists'))
+                continue
             cd_name = filename.split('.')[0]
             song_titles = SongTitle.objects.filter(album__iexact=cd_name)
-            if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
                 with open(file_path, 'rb') as f:
                     poster = Poster(poster_name=filename.split('.')[0])
                     poster.image.save(filename, File(f), save=True)
