@@ -64,6 +64,7 @@ class Command(BaseCommand):
                                 song_title = SongTitle.objects.annotate(
                                     normalized_title=Lower(Replace(Replace('title', Value(' '), Value('')), Value('\t'), Value('')))
                                 ).filter(normalized_title=normalized_input).first()
+
                         except Exception as e:
                             self.stderr.write(self.style.ERROR(f'Error reading {file_path_on_system}: {e}'))
                     elif filename.endswith('.flac'):
@@ -89,12 +90,12 @@ class Command(BaseCommand):
                         relative_path_to_project = os.path.join('songs', encrypted_filename)
                         file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
                         counter = 1
-                        while os.path.exists(file_path_to_project):
+                        while os.path.exists(file_path_to_project) or Song.objects.filter(file=relative_path_to_project).exists():
                             encrypted_filename = encrypted_filename+str(counter)
                             relative_path_to_project = os.path.join('songs', encrypted_filename)
                             file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
-                            counter += 1              
-                                      
+                            counter += 1
+                        
                         song = Song.objects.create(file=relative_path_to_project, song_title=song_title,original_file_name=filename)
                         shutil.copyfile(file_path_on_system, file_path_to_project)
-                        self.stdout.write(self.style.SUCCESS(f'created Song {song}'))
+                        self.stdout.write(self.style.SUCCESS(f'created Song {song.song_title}'))
