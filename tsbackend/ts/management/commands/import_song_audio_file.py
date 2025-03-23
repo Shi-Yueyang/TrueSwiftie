@@ -3,11 +3,14 @@ import os
 from random import randint
 import shutil
 from django.core.management.base import BaseCommand
+from django.db.models import Value
+from django.db.models.functions import Replace, Lower
 from ts.models import Song, SongTitle
 from mutagen.mp3 import MP3
 from mutagen.flac import FLAC
 from mutagen.id3 import ID3
 import tsbackend.settings as settings
+
 def clean_song_title(title):
     if title.endswith('1') and not title.endswith(' 1'):
         return title[:-1]
@@ -57,7 +60,10 @@ class Command(BaseCommand):
                             if 'TIT2' in audio:
                                 song_title_str = audio['TIT2'].text[0]
                                 song_title_str = clean_song_title(song_title_str)
-                                song_title = SongTitle.objects.filter(title=song_title_str).first()
+                                normalized_input = ''.join(song_title_str.split()).lower()
+                                song_title = SongTitle.objects.annotate(
+                                    normalized_title=Lower(Replace(Replace('title', Value(' '), Value('')), Value('\t'), Value('')))
+                                ).filter(normalized_title=normalized_input).first()
                         except Exception as e:
                             self.stderr.write(self.style.ERROR(f'Error reading {file_path_on_system}: {e}'))
                     elif filename.endswith('.flac'):
