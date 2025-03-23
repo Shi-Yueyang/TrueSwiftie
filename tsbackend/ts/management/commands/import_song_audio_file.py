@@ -91,7 +91,7 @@ class Command(BaseCommand):
                         file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
                         counter = 1
                         while os.path.exists(file_path_to_project) or Song.objects.filter(file=relative_path_to_project).exists():
-                            encrypted_filename = encrypted_filename+str(counter)
+                            encrypted_filename = str(counter)+encrypted_filename
                             relative_path_to_project = os.path.join('songs', encrypted_filename)
                             file_path_to_project = os.path.join(settings.MEDIA_ROOT, relative_path_to_project)
                             counter += 1

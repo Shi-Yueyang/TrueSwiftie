@@ -31,7 +31,7 @@ class Command(BaseCommand):
                         except Exception as e:
                             self.stderr.write(self.style.ERROR(f'Error deleting file {file_path}: {e}'))
         
-        # delete song without song file
+        # # delete song whose song file doesn't exist
         songs = Song.objects.all()
         for song in songs:
             if song.file:
@@ -49,7 +49,8 @@ class Command(BaseCommand):
         song_dir = os.path.join(settings.MEDIA_ROOT, 'songs')
         for root, _, files in os.walk(song_dir):
             for filename in files:
-                if filename not in song_files:
+                file_path_to_project = os.path.join('songs', filename)
+                if file_path_to_project not in song_files:
                     file_path_on_system = os.path.join(root, filename)
                     os.remove(file_path_on_system)
                     self.stdout.write(self.style.SUCCESS(f'Deleted {file_path_on_system}'))
