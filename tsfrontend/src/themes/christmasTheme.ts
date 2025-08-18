@@ -21,9 +21,9 @@ export const christmasTheme = createTheme({
 export const springTheme = createTheme({
   palette: {
     primary: {
-      main: '#98c379', // Fresh spring green
-      light: '#c3e88d',
-      dark: '#6b8e4e',
+  main: '#EB7636', // Primary orange
+  light: '#F09A68',
+  dark: '#B55222',
       contrastText: '#ffffff',
     },
     secondary: {
@@ -82,7 +82,7 @@ export const springTheme = createTheme({
         contained: {
           boxShadow: 'none',
           '&:hover': {
-            boxShadow: '0 2px 4px rgba(152, 195, 121, 0.2)',
+            boxShadow: '0 2px 4px rgba(235, 118, 54, 0.2)',
           },
         },
       },
@@ -90,7 +90,7 @@ export const springTheme = createTheme({
     MuiCard: {
       styleOverrides: {
         root: {
-          boxShadow: '0 2px 8px rgba(152, 195, 121, 0.15)',
+          boxShadow: '0 2px 8px rgba(235, 118, 54, 0.15)',
         },
       },
     },

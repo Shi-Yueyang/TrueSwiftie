@@ -64,10 +64,11 @@ const togglePlay = () => {
         sx={{
           position: "fixed",
           bottom: 0,
-          left: 0,
+          left: { xs: 0, md: 260 },
           right: 0,
+          width: { xs: "100%", md: "calc(100% - 260px)" },
           py: 2,
-          borderTopLeftRadius: 16,
+          borderTopLeftRadius: { xs: 16, md: 0 },
           borderTopRightRadius: 16,
           backgroundColor: (theme) => theme.palette.background.paper,
           zIndex: 1000,

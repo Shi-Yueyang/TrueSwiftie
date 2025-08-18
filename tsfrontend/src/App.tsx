@@ -1,9 +1,10 @@
-
 import GamePage from "./components/GamePage";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
 import GameOver from "./components/GameOver";
 import StartGame from "./components/StartGame";
 import { Stack } from "@mui/material";
+import { useContext } from "react";
+import { AuthContext } from "./context/AuthContex";
 import NavBar from "./components/NavBar";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
@@ -16,19 +17,30 @@ import ProtectedRoute from "./components/ProtectedRoute ";
 // import { AppContext } from "./context/AppContext";
 // import Snowfall from "react-snowfall";
 
-
-
 function App() {
   // const {  snowfallProps } = useContext(AppContext);
+  const { userId } = useContext(AuthContext);
+  const location = useLocation();
+  const isAuthRoute = location.pathname === "/login";
 
   return (
     <>
       {/* <Snowfall {...snowfallProps} /> */}
 
-      <Stack direction={"column"} sx={{ mt: "64px" }}>
-        <NavBar />
+      <Stack
+        direction={"column"}
+        sx={{ mt: userId && !isAuthRoute ? "64px" : 0, ml: userId && !isAuthRoute ? { md: "260px" } : 0 }}
+      >
+        {userId && !isAuthRoute ? <NavBar /> : null}
         <Routes>
-          <Route path="/" element={<StartGame />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <StartGame />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/game"
             element={

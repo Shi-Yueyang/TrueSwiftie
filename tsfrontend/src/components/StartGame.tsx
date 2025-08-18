@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Typography, Button, TextField } from "@mui/material";
+import { Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
@@ -17,53 +17,33 @@ const StartGame = () => {
     setSound,
     setScore,
     setSong,
+    setGameState,
   } = useContext(AppContext);
 
-  const [error, setError] = useState<string>("");
-  const [temporaryName, setTemporaryName] = useState<string>("");
-  const {userName,userId, isStaff,groups,login, logout } = useContext(AuthContext);
+  const { userName, userId, isStaff, groups, logout } =
+    useContext(AuthContext);
   const [isGuest, setIsGuest] = useState<boolean>(false);
 
   useEffect(() => {
-    if(isStaff || groups?.includes("formal")){
+    if (isStaff || groups?.includes("formal")) {
       setIsGuest(false);
-    }
-    else{
+    } else {
       setIsGuest(true);
     }
-  }
-  , [isStaff,groups]);
+  }, [isStaff, groups]);
 
   if (sound) {
     if (sound) {
       sound.fade(1, 0, 1000);
       setTimeout(() => {
         sound.stop();
+        sound.unload();
       }, 1000);
     }
     setSound(null);
   }
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setTemporaryName(event.target.value);
-  };
-
-  const handleTemporaryLogin = async () => {
-    if (!userName) {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_IP}/core/temporary-login/`,
-        { temporary_name: temporaryName }
-      );
-      login(
-        response.data.userId,
-        response.data.temporary_name,
-        response.data.access,
-        response.data.refresh,
-        response.data.is_staff,
-        response.data.groups
-      );
-    }
-  };
+  // Guest login removed; this page requires authentication
 
   const handleStartGame = async () => {
     if (userName) {
@@ -90,13 +70,14 @@ const StartGame = () => {
           historyData
         );
         setGameHistoryId(response.data.id);
+        setGameState("playing");
         navigate("/game");
       } catch (error) {
         console.error("Error posting game history:", error);
-        setError("Failed to start the game. Please try again.");
       }
     } else {
-      setError("Please enter your name!");
+      // Not logged in; redirect to login
+      navigate("/login", { replace: true });
     }
   };
   useEffect(() => {
@@ -125,15 +106,13 @@ const StartGame = () => {
           fontWeight: "bold",
           color: "#111",
           letterSpacing: "2px",
-          zIndex: 1, 
+          zIndex: 1,
         }}
       >
         ...Ready For It?
       </Typography>
 
-      {/* Name Input */}
-
-      {userName ? (
+  {userName ? (
         <Grid
           container
           direction="column"
@@ -157,23 +136,23 @@ const StartGame = () => {
                 Oh Hi, {userName}!
               </Typography>
             </Grid>
-          {isGuest  && 
-            <Grid>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={logout}
-                style={{
-                  padding: "1rem 2rem",
-                  borderRadius: "30px",
-                  fontFamily: "'Poppins', sans-serif",
-                  letterSpacing: "1px",
-                }}
-              >
-                Guest Logout
-              </Button>
-            </Grid>
-          }
+            {isGuest && (
+              <Grid>
+                <Button
+                  variant="outlined"
+                  color="secondary"
+                  onClick={logout}
+                  style={{
+                    padding: "1rem 2rem",
+                    borderRadius: "30px",
+                    fontFamily: "'Poppins', sans-serif",
+                    letterSpacing: "1px",
+                  }}
+                >
+                  Guest Logout
+                </Button>
+              </Grid>
+            )}
           </Grid>
 
           <Grid>
@@ -195,46 +174,7 @@ const StartGame = () => {
             </Button>
           </Grid>
         </Grid>
-      ) : (
-        <Grid
-          container
-          spacing={2}
-          alignItems="center"
-          justifyContent="center"
-          style={{ marginBottom: "1.5rem", padding: "0 16px" }}
-        >
-          <Grid size={{ xs: 6, md: 8 }}>
-            <TextField
-              fullWidth
-              variant="outlined"
-              placeholder="Enter your name"
-              value={temporaryName}
-              onChange={handleInputChange}
-              error={!!error}
-              helperText={error}
-              style={{
-                backgroundColor: "#fff",
-                borderRadius: "50px",
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            />
-          </Grid>
-          <Grid>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleTemporaryLogin}
-              style={{
-                borderRadius: "30px",
-                padding: "0.8rem 2rem",
-                fontFamily: "'Poppins', sans-serif",
-              }}
-            >
-              Guest Login
-            </Button>
-          </Grid>
-        </Grid>
-      )}
+      ) : null}
     </Grid>
   );
 };

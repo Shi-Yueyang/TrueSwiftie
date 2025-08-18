@@ -16,6 +16,7 @@ interface AuthContextProps {
   refreshToken: string | null;
   isStaff: boolean;
   groups: string[];
+  isLoading: boolean;
   login: (
     userId: string,
     userName: string,
@@ -34,6 +35,7 @@ export const AuthContext = createContext<AuthContextProps>({
   refreshToken: null,
   isStaff: false,
   groups: [],
+  isLoading: true,
   login: () => {},
   logout: () => {},
 });
@@ -51,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   );
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [groups, setGroups] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const login = (
     userId: string,
@@ -109,7 +112,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   useEffect(() => {
-    fetchUserData();
+    const token = localStorage.getItem("accessToken");
+    if (!token) {
+      setIsLoading(false);
+      return;
+    }
+    fetchUserData()
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
   }, []);
 
   return (
@@ -121,6 +131,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshToken,
         isStaff,
         groups,
+        isLoading,
         login,
         logout,
       }}

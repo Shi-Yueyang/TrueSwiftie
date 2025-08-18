@@ -22,7 +22,7 @@ const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const context = useContext(AppContext);
   const navigate = useNavigate();
-  const { score, song } = context;
+  const { score, song, setGameState } = context;
   const {userName } = useContext(AuthContext);
 
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
@@ -50,6 +50,8 @@ const GameOver = () => {
   }
 
   useEffect(() => {
+    // ensure we are in gameOver state; keep audio playing
+    setGameState("gameOver");
     const fetchTopScores = async () => {
       try {
         const response = await axios.get(

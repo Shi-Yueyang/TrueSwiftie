@@ -22,6 +22,7 @@ const NavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { isStaff, groups, logout } = useContext(AuthContext);
   const [isGuest, setIsGuest] = useState<boolean>(false);
+  const drawerWidth = 260;
 
   useEffect(() => {
     if (isStaff || groups?.includes("formal")) {
@@ -45,13 +46,14 @@ const NavBar = () => {
       setDrawerOpen(open);
     };
   const list = () => (
-    <Box
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
+    <Box role="presentation">
       <Box display="flex" alignItems="center" p={2}>
-        <IconButton edge="end" color="inherit" aria-label="menu" sx={{ mr: 1 }}>
+        <IconButton
+          edge="end"
+          color="inherit"
+          aria-label="menu"
+          sx={{ mr: 1, display: { xs: "inline-flex", md: "none" } }}
+        >
           <IoMenu />
         </IconButton>
         <img
@@ -67,24 +69,24 @@ const NavBar = () => {
         </Typography>
       </Box>
       <List>
-        <ListItem key={1}>
-          <ListItemButton>
-            <ListItemText
-              primary={"Home"}
-              onClick={() => {
-                navigate("/");
-              }}
-            />
+        <ListItem key={1} disablePadding>
+          <ListItemButton
+            onClick={() => {
+              navigate("/");
+              setDrawerOpen(false);
+            }}
+          >
+            <ListItemText primary={"Home"} />
           </ListItemButton>
         </ListItem>
-        <ListItem key={2}>
-          <ListItemButton>
-            <ListItemText
-              primary={"Game History"}
-              onClick={() => {
-                navigate("/game-history");
-              }}
-            />
+        <ListItem key={2} disablePadding>
+          <ListItemButton
+            onClick={() => {
+              navigate("/game-history");
+              setDrawerOpen(false);
+            }}
+          >
+            <ListItemText primary={"Game History"} />
           </ListItemButton>
         </ListItem>
       </List>
@@ -93,13 +95,21 @@ const NavBar = () => {
 
   return (
     <>
-      <AppBar position="fixed" sx={{ top: 0, zIndex: 1100 }}>
+      <AppBar
+        position="fixed"
+        sx={{
+          top: 0,
+          zIndex: 1100,
+          width: { md: `calc(100% - ${drawerWidth}px)` },
+          ml: { md: `${drawerWidth}px` },
+        }}
+      >
         <Toolbar>
           <IconButton
             edge="start"
             color="inherit"
             aria-label="menu"
-            sx={{ mr: 2 }}
+            sx={{ mr: 2, display: { md: "none" } }}
             onClick={toggleDrawer(true)}
           >
             <IoMenu />
@@ -126,7 +136,31 @@ const NavBar = () => {
           )}
         </Toolbar>
       </AppBar>
-      <Drawer anchor="left" open={drawerOpen} onClose={toggleDrawer(false)}>
+      {/* Mobile: temporary drawer */}
+      <Drawer
+        anchor="left"
+        variant="temporary"
+        open={drawerOpen}
+        onClose={toggleDrawer(false)}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: "block", md: "none" },
+          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
+        }}
+      >
+        {list()}
+      </Drawer>
+
+      {/* Desktop: permanent sidebar */}
+      <Drawer
+        anchor="left"
+        variant="permanent"
+        open
+        sx={{
+          display: { xs: "none", md: "block" },
+          "& .MuiDrawer-paper": { width: drawerWidth, boxSizing: "border-box" },
+        }}
+      >
         {list()}
       </Drawer>
     </>

@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 const GamePage = () => {
   const navigate = useNavigate();
   const context = useContext(AppContext);
-  const { score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps } = context;
+  const { score, setScore, gameHistoryId, sound, setSound,snowfallProps,setSnowfallProps, setGameState, gameState } = context;
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [imgSource, setImgSource] = useState(placeholderImg);
@@ -67,11 +67,13 @@ const GamePage = () => {
           }
         )
         .then(() => {
-          navigate("/game-over");
+          setGameState("gameOver");
+          navigate("/game-over", { replace: true });
         })
         .catch((error) => {
           console.error(error);
-          navigate("/game-over");
+          setGameState("gameOver");
+          navigate("/game-over", { replace: true });
         });
     }
   };
@@ -124,6 +126,11 @@ const GamePage = () => {
 
   // play sound
   useEffect(() => {
+    // guard: if not actively playing, redirect home
+    if (gameState !== "playing") {
+      navigate("/", { replace: true });
+      return;
+    }
     if (sound) {
       sound.play();
       // sound will be set twice during strict mode, so we need this
