@@ -89,8 +89,8 @@ const Signup = () => {
           <Typography variant="overline" sx={{ color: "text.secondary" }}>
             Start your journey
           </Typography>
-          <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
-            Sign up to TrueSwiftie
+          <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
+            Sign up to be a TrueSwiftie
           </Typography>
 
           {/* Form */}
@@ -203,8 +203,7 @@ const Signup = () => {
         sx={{
           display: { xs: "none", md: "block" },
           width: "50%",
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?q=80&w=1887&auto=format&fit=crop')",
+          backgroundImage: "url('/login.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

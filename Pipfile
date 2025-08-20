@@ -16,6 +16,7 @@ gunicorn = "*"
 matplotlib = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
+google-auth = "*"
 
 [dev-packages]
 

@@ -1,11 +1,20 @@
-import { TextField, Button, Typography, Box, Alert, InputAdornment, IconButton, Divider } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Alert,
+  InputAdornment,
+  IconButton,
+  Divider,
+} from "@mui/material";
 import axios from "axios";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContex";
 import { FiMail, FiEye, FiEyeOff } from "react-icons/fi";
 import { FaFacebookF, FaApple } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -51,11 +60,46 @@ const Login = () => {
         responseMe.data.groups
       );
 
-  navigate("/", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       setError("Invalid username or password");
       if (formRef.current) formRef.current.reset();
     }
+  };
+
+  const handleGoogleSuccess = async (credResp: CredentialResponse) => {
+    try {
+      setError("");
+      const credential = credResp.credential;
+      if (!credential) {
+        setError("Google sign-in failed: no credential received.");
+        return;
+      }
+
+      // Exchange Google ID token (credential) with your backend for your app's JWT
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_IP}/core/users/google-login/`,
+        { credential }
+      );
+
+      // Expecting: { access, refresh, user: { id, username, is_staff, groups } }
+      const { access, refresh, user } = res.data;
+
+      login(
+        user.id,
+        user.username,
+        access,
+        refresh,
+        user.is_staff,
+        user.groups ?? []
+      );
+      navigate("/", { replace: true });
+    } catch (err) {
+      setError("Google sign-in failed. Please try again.");
+    }
+  };
+  const handleGoogleError = () => {
+    setError("Google sign-in was cancelled or failed.");
   };
   return (
     <Box display="flex" minHeight="100vh">
@@ -82,7 +126,7 @@ const Login = () => {
             Welcome back
           </Typography>
           <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
-            Sign in to TrueSwiftie
+            Sign in as a TrueSwiftie
           </Typography>
 
           {/* Form */}
@@ -145,11 +189,22 @@ const Login = () => {
             {/* Divider and social sign-in placeholders */}
             <Divider sx={{ my: 3 }}>or sign in with</Divider>
             <Box display="flex" gap={2} justifyContent="center">
-              <IconButton size="large" disabled aria-label="Sign in with Facebook">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="outline"
+                size="large"
+                text="signin_with"
+                shape="rectangular"
+                ux_mode="popup"
+                useOneTap={false}
+              />
+              <IconButton
+                size="large"
+                disabled
+                aria-label="Sign in with Facebook"
+              >
                 <FaFacebookF />
-              </IconButton>
-              <IconButton size="large" disabled aria-label="Sign in with Google">
-                <FcGoogle />
               </IconButton>
               <IconButton size="large" disabled aria-label="Sign in with Apple">
                 <FaApple />
@@ -172,8 +227,7 @@ const Login = () => {
         sx={{
           display: { xs: "none", md: "block" },
           width: "50%",
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1517816743773-6e0fd518b4a6?q=80&w=1887&auto=format&fit=crop')",
+          backgroundImage: "url('/login.jpg')",
           backgroundSize: "cover",
           backgroundPosition: "center",
         }}

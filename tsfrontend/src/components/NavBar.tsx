@@ -4,7 +4,7 @@ import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import { IoMenu } from "react-icons/io5";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/taylor-swift.svg";
 import { AuthContext } from "../context/AuthContex";
@@ -20,17 +20,9 @@ import {
 
 const NavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { isStaff, groups, logout } = useContext(AuthContext);
-  const [isGuest, setIsGuest] = useState<boolean>(false);
+  const { logout } = useContext(AuthContext);
   const drawerWidth = 260;
-
-  useEffect(() => {
-    if (isStaff || groups?.includes("formal")) {
-      setIsGuest(false);
-    } else {
-      setIsGuest(true);
-    }
-  }, [isStaff, groups]);
+  // All users are treated as normal users; remove guest mode branching
 
   const navigate = useNavigate();
 
@@ -115,25 +107,14 @@ const NavBar = () => {
             <IoMenu />
           </IconButton>
           <Box sx={{ flexGrow: 1 }} />
-          {isGuest ? (
-            <>
-              <Button color="inherit" onClick={() => navigate("/login")}>
-                Login
-              </Button>
-              <Button color="inherit" onClick={() => navigate("/signup")}>
-                Signup
-              </Button>
-            </>
-          ) : (
-            <Button
-              color="inherit"
-              onClick={() => {
-                logout();
-              }}
-            >
-              Logout
-            </Button>
-          )}
+          <Button
+            color="inherit"
+            onClick={() => {
+              logout();
+            }}
+          >
+            Logout
+          </Button>
         </Toolbar>
       </AppBar>
       {/* Mobile: temporary drawer */}

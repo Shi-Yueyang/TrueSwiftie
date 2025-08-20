@@ -2,7 +2,6 @@ from django.urls import path,include
 from .views import CsrfTokenView, TemporaryUserLoginView, UserViewSet
 from rest_framework.routers import DefaultRouter
 
-
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 urlpatterns = [

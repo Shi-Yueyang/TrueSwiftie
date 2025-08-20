@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { Typography, Button } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
@@ -20,17 +20,9 @@ const StartGame = () => {
     setGameState,
   } = useContext(AppContext);
 
-  const { userName, userId, isStaff, groups, logout } =
-    useContext(AuthContext);
-  const [isGuest, setIsGuest] = useState<boolean>(false);
+  const { userName, userId } = useContext(AuthContext);
 
-  useEffect(() => {
-    if (isStaff || groups?.includes("formal")) {
-      setIsGuest(false);
-    } else {
-      setIsGuest(true);
-    }
-  }, [isStaff, groups]);
+  // All users are treated as normal users; no guest mode
 
   if (sound) {
     if (sound) {
@@ -136,23 +128,7 @@ const StartGame = () => {
                 Oh Hi, {userName}!
               </Typography>
             </Grid>
-            {isGuest && (
-              <Grid>
-                <Button
-                  variant="outlined"
-                  color="secondary"
-                  onClick={logout}
-                  style={{
-                    padding: "1rem 2rem",
-                    borderRadius: "30px",
-                    fontFamily: "'Poppins', sans-serif",
-                    letterSpacing: "1px",
-                  }}
-                >
-                  Guest Logout
-                </Button>
-              </Grid>
-            )}
+            {/* Guest Logout removed */}
           </Grid>
 
           <Grid>
