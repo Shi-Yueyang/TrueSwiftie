@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
-import {  IoArrowForwardOutline } from "react-icons/io5"; //IoMusicalNotes
+import {  IoArrowForwardOutline, IoCheckmarkCircle } from "react-icons/io5"; //IoMusicalNotes
 // import { TbChristmasTree } from "react-icons/tb";
 import "../styles/App.css";
 import { WiRaindrop } from "react-icons/wi";
@@ -74,11 +74,12 @@ const MusicQuiz = ({
         <Grid key={index}>
           <StyledButton
             variant="contained"
-            color="secondary"
+            color={isPosterRevealed && option === correctOption ? "success" : "secondary"}
             aria-label={`Select option ${option}`}
-            startIcon={<WiRaindrop />}
+            startIcon={isPosterRevealed && option === correctOption ? <IoCheckmarkCircle /> : <WiRaindrop />}
             onClick={() => onChoose(option)}
             disabled={isPosterRevealed}
+            $highlight={isPosterRevealed && option === correctOption}
           >
             {option}
           </StyledButton>
@@ -87,15 +88,20 @@ const MusicQuiz = ({
 
       {isPosterRevealed && (
         <Button
-          variant="outlined"
-          color="primary"
-          style={{
-            borderRadius: "50%",
-            minWidth: "50px",
-            minHeight: "50px",
-            padding: "10px",
-          }}
+          aria-label="Next"
+          variant="contained"
           onClick={onClickNext}
+          sx={{
+            borderRadius: "999px",
+            minWidth: 56,
+            minHeight: 56,
+            p: 1,
+            backgroundColor: "rgba(255,255,255,0.78)",
+            color: "#111",
+            backdropFilter: "blur(6px)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
+            "&:hover": { backgroundColor: "rgba(255,255,255,0.9)" },
+          }}
         >
           <IoArrowForwardOutline />
         </Button>
@@ -110,7 +116,9 @@ const MusicQuiz = ({
   );
 };
 
-const StyledButton = styled(Button)({
+const StyledButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "$highlight",
+})<{ $highlight?: boolean }>(({ theme, $highlight }) => ({
   borderRadius: "25px",
   padding: "12px",
   fontSize: "1rem",
@@ -119,6 +127,13 @@ const StyledButton = styled(Button)({
     transform: "translateY(-2px)",
     boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
   },
-});
+  "&.Mui-disabled": {
+    transform: "none",
+    boxShadow: $highlight ? "0 0 0 3px rgba(76,175,80,0.35), 0 6px 14px rgba(0,0,0,0.3)" : "none",
+    opacity: $highlight ? 1 : 0.6,
+    backgroundColor: $highlight ? theme.palette.success.main : undefined,
+    color: $highlight ? theme.palette.success.contrastText : undefined,
+  },
+}));
 
 export default MusicQuiz;

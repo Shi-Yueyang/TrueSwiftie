@@ -1,12 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
-import { LinearProgress } from "@mui/material";
+import { LinearProgress, Box, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
 import axios from "axios";
 import { AppContext } from "../context/AppContext";
 import MusicQuiz from "./MusicQuiz";
-import MusicPoster from "./MusicPoster";
 import { useRandomSong, useOptions, usePoster } from "../hooks/hooks";
 import "../styles/App.css";
 import placeholderImg from "../assets/music_mark.png";
@@ -19,6 +18,7 @@ const GamePage = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const volume = 1;
   const [imgSource, setImgSource] = useState(placeholderImg);
+  const [isRevealed, setIsRevealed] = useState(false);
   const [nextClickCnt, setNextClickCnt] = useState(1);
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
@@ -28,24 +28,32 @@ const GamePage = () => {
     setNextClickCnt(nextClickCnt + 1);
     setImgSource(placeholderImg);
     setIsSoundLoaded(false);
+  setIsRevealed(false);
   };
 
   const handleSelectIsCorrect = () => {
     setScore(score + 1);
-    setSnowfallProps({...snowfallProps,snowflakeCount:150+score*5,wind:[-0.5-score,2.0+score]});
+    setSnowfallProps({
+      ...snowfallProps,
+      snowflakeCount: 150 + score * 5,
+      wind: [-0.5 - score, 2.0 + score],
+    });
+
+    // Reveal poster in background immediately
+    if (poster?.image) {
+      setImgSource(poster.image);
+      setIsRevealed(true);
+    }
+
     const historyData = {
       id: gameHistoryId,
       score: score + 1,
     };
-    axios
-      .patch(`${backendIp}/ts/game-histories/${gameHistoryId}/`, historyData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then(() => {
-        poster && setImgSource(poster.image);
-      });
+    axios.patch(
+      `${backendIp}/ts/game-histories/${gameHistoryId}/`,
+      historyData,
+      { headers: { "Content-Type": "application/json" } }
+    ).catch(() => {});
   };
 
   const handleSelectIsWrong = (lastChoice: string, correctOption: string) => {
@@ -145,25 +153,52 @@ const GamePage = () => {
     };
   }, [sound]);
 
+  
+  // Full-page background styles (fixed layer under content)
+  const bgStyle: React.CSSProperties = {
+    position: "fixed",
+    inset: 0,
+    backgroundImage: isRevealed && imgSource ? `url(${imgSource})` : "none",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    transition: "background-image 300ms ease-in-out",
+    zIndex: 0,
+    pointerEvents: "none",
+  };
+  const bgOverlayStyle: React.CSSProperties = {
+    position: "fixed",
+    inset: 0,
+    background: isRevealed ? "rgba(0,0,0,0.35)" : "transparent",
+    zIndex: 0,
+    pointerEvents: "none",
+  };
+
   return (
     <>
+      {/* Full-viewport background under content */}
+      <div style={bgStyle} />
+      <div style={bgOverlayStyle} />
+
+      {/* Score overlay (fixed) */}
+      <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 2 }}>
+        <Chip color="primary" label={`Score: ${score}`} />
+      </Box>
+
+      {/* Foreground content */}
       <Grid
         container
         justifyContent="center"
         alignItems="center"
-        spacing={3}
-        style={{ height: "95vh" }}
+        style={{ minHeight: "100vh", position: "relative", zIndex: 1, padding: "1rem" }}
       >
-        <Grid size={{ xs: 12, md: 6 }}>
-          <MusicPoster imgSource={imgSource} score={score} />
-        </Grid>
-        <Grid size={{ xs: 12, md: 6 }}>
+        <Grid size={{ xs: 12, md: 8, lg: 6 }}>
           <motion.div
             key={song?.song_title?.title || ""}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 1 }}
+            transition={{ duration: 0.6 }}
           >
             {isSoundLoaded && song && options ? (
               <MusicQuiz
