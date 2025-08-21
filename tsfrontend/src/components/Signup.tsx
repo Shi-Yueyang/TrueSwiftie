@@ -1,11 +1,10 @@
-import { TextField, Button, Typography, Box, Alert, InputAdornment, IconButton, Divider } from "@mui/material";
+import { TextField, Button, Typography, Box, Alert, InputAdornment, IconButton } from "@mui/material";
 import axios from "axios";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContex";
 import { FiEye, FiEyeOff, FiUser } from "react-icons/fi";
-import { FaFacebookF, FaApple } from "react-icons/fa";
-import { FcGoogle } from "react-icons/fc";
+
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -174,19 +173,7 @@ const Signup = () => {
             </Alert>
           )}
 
-          {/* Divider and social sign-up placeholders */}
-          <Divider sx={{ my: 3 }}>or sign up with</Divider>
-          <Box display="flex" gap={2} justifyContent="center">
-            <IconButton size="large" disabled aria-label="Sign up with Facebook">
-              <FaFacebookF />
-            </IconButton>
-            <IconButton size="large" disabled aria-label="Sign up with Google">
-              <FcGoogle />
-            </IconButton>
-            <IconButton size="large" disabled aria-label="Sign up with Apple">
-              <FaApple />
-            </IconButton>
-          </Box>
+
 
           {/* Login link */}
           <Box display="flex" alignItems="center" gap={1} mt={3}>

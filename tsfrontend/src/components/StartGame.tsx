@@ -104,53 +104,51 @@ const StartGame = () => {
         ...Ready For It?
       </Typography>
 
-  {userName ? (
-        <Grid
-          container
-          direction="column"
-          alignItems="center"
-          spacing={3}
-          style={{ marginBottom: "2rem" }}
-        >
-          <Grid container justifyContent="center" spacing={2}>
-            <Grid>
-              <Typography
-                variant="h4"
-                gutterBottom
-                style={{
-                  fontFamily: "'Poppins', sans-serif",
-                  color: "#111",
-                  letterSpacing: "2px",
-                  textAlign: "center",
-                  marginBottom: "1rem",
-                }}
-              >
-                Oh Hi, {userName}!
-              </Typography>
-            </Grid>
-            {/* Guest Logout removed */}
-          </Grid>
-
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        spacing={3}
+        style={{ marginBottom: "2rem" }}
+      >
+        <Grid container justifyContent="center" spacing={2}>
           <Grid>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleStartGame}
+            <Typography
+              variant="h4"
+              gutterBottom
               style={{
-                padding: "1rem 3rem",
-                borderRadius: "30px",
                 fontFamily: "'Poppins', sans-serif",
-                letterSpacing: "1.5px",
-                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
-                minWidth: "250px",
+                color: "#111",
+                letterSpacing: "2px",
+                textAlign: "center",
+                marginBottom: "1rem",
               }}
-              disabled={!userName}
             >
-              Let the Game Begin
-            </Button>
+              Oh Hi, {userName}!
+            </Typography>
           </Grid>
+          {/* Guest Logout removed */}
         </Grid>
-      ) : null}
+
+        <Grid>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleStartGame}
+            style={{
+              padding: "1rem 3rem",
+              borderRadius: "30px",
+              fontFamily: "'Poppins', sans-serif",
+              letterSpacing: "1.5px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              minWidth: "250px",
+            }}
+            disabled={!userName}
+          >
+            Let the Game Begin
+          </Button>
+        </Grid>
+      </Grid>
     </Grid>
   );
 };

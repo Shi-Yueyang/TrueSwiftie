@@ -13,8 +13,8 @@ import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContex";
 import { FiMail, FiEye, FiEyeOff } from "react-icons/fi";
-import { FaFacebookF, FaApple } from "react-icons/fa";
-import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+import { FcGoogle } from "react-icons/fc";
+import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -67,40 +67,38 @@ const Login = () => {
     }
   };
 
-  const handleGoogleSuccess = async (credResp: CredentialResponse) => {
-    try {
-      setError("");
-      const credential = credResp.credential;
-      if (!credential) {
-        setError("Google sign-in failed: no credential received.");
-        return;
+  // Custom Google sign-in via useGoogleLogin; replace default button with an icon trigger
+  const googleLogin = useGoogleLogin({
+    // Use implicit flow to obtain an access_token client-side.
+    // If your backend expects an auth code instead, set flow: 'auth-code'
+    // and send { code: codeResponse.code } below.
+    onSuccess: async (tokenResponse) => {
+      try {
+        setError("");
+        const access_token = (tokenResponse as any).access_token;
+
+        // Exchange Google OAuth token with your backend for your app's JWT
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_IP}/core/users/google-login/`,
+          { access_token }
+        );
+
+        const { access, refresh, user } = res.data;
+        login(
+          user.id,
+          user.username,
+          access,
+          refresh,
+          user.is_staff,
+          user.groups ?? []
+        );
+        navigate("/", { replace: true });
+      } catch (err) {
+        setError("Google sign-in failed. Please try again.");
       }
-
-      // Exchange Google ID token (credential) with your backend for your app's JWT
-      const res = await axios.post(
-        `${import.meta.env.VITE_BACKEND_IP}/core/users/google-login/`,
-        { credential }
-      );
-
-      // Expecting: { access, refresh, user: { id, username, is_staff, groups } }
-      const { access, refresh, user } = res.data;
-
-      login(
-        user.id,
-        user.username,
-        access,
-        refresh,
-        user.is_staff,
-        user.groups ?? []
-      );
-      navigate("/", { replace: true });
-    } catch (err) {
-      setError("Google sign-in failed. Please try again.");
-    }
-  };
-  const handleGoogleError = () => {
-    setError("Google sign-in was cancelled or failed.");
-  };
+    },
+    onError: () => setError("Google sign-in was cancelled or failed."),
+  });
   return (
     <Box display="flex" minHeight="100vh">
       {/* Left: Form panel */}
@@ -189,26 +187,15 @@ const Login = () => {
             {/* Divider and social sign-in placeholders */}
             <Divider sx={{ my: 3 }}>or sign in with</Divider>
             <Box display="flex" gap={2} justifyContent="center">
-              <GoogleLogin
-                onSuccess={handleGoogleSuccess}
-                onError={handleGoogleError}
-                theme="outline"
-                size="large"
-                text="signin_with"
-                shape="rectangular"
-                ux_mode="popup"
-                useOneTap={false}
-              />
               <IconButton
                 size="large"
-                disabled
-                aria-label="Sign in with Facebook"
+                aria-label="Sign in with Google"
+                onClick={() => googleLogin()}
               >
-                <FaFacebookF />
+                <FcGoogle size={28} />
               </IconButton>
-              <IconButton size="large" disabled aria-label="Sign in with Apple">
-                <FaApple />
-              </IconButton>
+
+
             </Box>
 
             {/* Register link */}

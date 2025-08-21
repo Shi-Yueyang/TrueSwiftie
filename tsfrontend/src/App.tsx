@@ -29,7 +29,7 @@ function App() {
 
       <Stack
         direction={"column"}
-        sx={{ mt: userId && !isAuthRoute ? "64px" : 0, ml: userId && !isAuthRoute ? { md: "260px" } : 0 }}
+        sx={{ ml: userId && !isAuthRoute ? { md: "260px" } : 0 }}
       >
         {userId && !isAuthRoute ? <NavBar /> : null}
         <Routes>

@@ -1,5 +1,3 @@
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
@@ -38,16 +36,9 @@ const NavBar = () => {
       setDrawerOpen(open);
     };
   const list = () => (
-    <Box role="presentation">
+    <Box role="presentation" sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Header */}
       <Box display="flex" alignItems="center" p={2}>
-        <IconButton
-          edge="end"
-          color="inherit"
-          aria-label="menu"
-          sx={{ mr: 1, display: { xs: "inline-flex", md: "none" } }}
-        >
-          <IoMenu />
-        </IconButton>
         <img
           src={logo}
           alt="Logo"
@@ -60,63 +51,64 @@ const NavBar = () => {
           True Swiftie
         </Typography>
       </Box>
-      <List>
-        <ListItem key={1} disablePadding>
-          <ListItemButton
-            onClick={() => {
-              navigate("/");
-              setDrawerOpen(false);
-            }}
-          >
-            <ListItemText primary={"Home"} />
-          </ListItemButton>
-        </ListItem>
-        <ListItem key={2} disablePadding>
-          <ListItemButton
-            onClick={() => {
-              navigate("/game-history");
-              setDrawerOpen(false);
-            }}
-          >
-            <ListItemText primary={"Game History"} />
-          </ListItemButton>
-        </ListItem>
-      </List>
+      {/* Nav items */}
+      <Box sx={{ flex: 1, overflowY: "auto" }}>
+        <List>
+          <ListItem key={1} disablePadding>
+            <ListItemButton
+              onClick={() => {
+                navigate("/");
+                setDrawerOpen(false);
+              }}
+            >
+              <ListItemText primary={"Home"} />
+            </ListItemButton>
+          </ListItem>
+          <ListItem key={2} disablePadding>
+            <ListItemButton
+              onClick={() => {
+                navigate("/game-history");
+                setDrawerOpen(false);
+              }}
+            >
+              <ListItemText primary={"Game History"} />
+            </ListItemButton>
+          </ListItem>
+        </List>
+      </Box>
+      {/* Bottom actions */}
+      <Box p={2}>
+        <Button
+          fullWidth
+          variant="outlined"
+          color="inherit"
+          onClick={() => {
+            logout();
+            setDrawerOpen(false);
+          }}
+        >
+          Logout
+        </Button>
+      </Box>
     </Box>
   );
 
   return (
     <>
-      <AppBar
-        position="fixed"
+      {/* Mobile menu opener (since top bar is removed) */}
+      <IconButton
+        aria-label="open menu"
+        onClick={toggleDrawer(true)}
         sx={{
-          top: 0,
-          zIndex: 1100,
-          width: { md: `calc(100% - ${drawerWidth}px)` },
-          ml: { md: `${drawerWidth}px` },
+          position: "fixed",
+          top: 12,
+          left: 12,
+          zIndex: 1300,
+          display: { xs: "inline-flex", md: "none" },
         }}
       >
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2, display: { md: "none" } }}
-            onClick={toggleDrawer(true)}
-          >
-            <IoMenu />
-          </IconButton>
-          <Box sx={{ flexGrow: 1 }} />
-          <Button
-            color="inherit"
-            onClick={() => {
-              logout();
-            }}
-          >
-            Logout
-          </Button>
-        </Toolbar>
-      </AppBar>
+        <IoMenu />
+      </IconButton>
       {/* Mobile: temporary drawer */}
       <Drawer
         anchor="left"
