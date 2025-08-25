@@ -65,7 +65,6 @@ class GameTurnSerializer(serializers.ModelSerializer):
         ]
 
 
-
 class GameSessionSerlizer(serializers.ModelSerializer):
     class Meta:
         model = GameSession
@@ -85,5 +84,6 @@ class GuessSerializer(serializers.Serializer):
     version = serializers.IntegerField()
     elapsed_time_ms = serializers.IntegerField()
 
-class NextTurnSerializer(serializers.Serializer):
+class VersionNumberSerializer(serializers.Serializer):
     version = serializers.IntegerField()
+

@@ -23,7 +23,7 @@ from .exceptions import (
     OptionInvalid,
     TurnAlreadyAnswered,
 )
-
+from core.models import CustomUser as User
 
 def pick_song() -> Song:
     qs = Song.objects.all()
@@ -81,7 +81,7 @@ def start_session(user) -> GameSession:
 
 
 @transaction.atomic
-def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: int):
+def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: int,user:User):
     session = (
         GameSession.objects.select_for_update()
         .select_related("current_turn")
@@ -133,11 +133,11 @@ def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: in
     return poster_url, is_ended
 
 @transaction.atomic
-def create_next_turn(session_id:int, version:int) -> Tuple[GameSession,GameTurn]:
+def create_next_turn(session_id:int, version:int,user:User) -> Tuple[GameSession,GameTurn]:
     session = (
         GameSession.objects.select_for_update()
         .select_related("current_turn")
-        .get(id=session_id)
+        .get(id=session_id,user=user)
     )
 
     if version != session.version:
@@ -155,3 +155,16 @@ def create_next_turn(session_id:int, version:int) -> Tuple[GameSession,GameTurn]
     session.version += 1
     session.save(update_fields=["current_turn", "status", "version"])
     return session,new_turn
+
+@transaction.atomic
+def end_session(session_id:int, version:int,user:User):
+    session = GameSession.objects.select_for_update().get(id=session_id,user=user)
+    if version != session.version:
+        raise VersionConflict(
+            f"Stale version received: {version}, expected: {session.version}"
+        )
+    session.status = GameSessionStatus.ENDED
+    session.ended_at = timezone.now()
+    session.version += 1
+    session.save(update_fields=["status", "ended_at", "version"])
+    return session
