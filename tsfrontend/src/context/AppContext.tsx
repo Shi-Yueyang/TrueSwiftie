@@ -20,6 +20,18 @@ const albumColors = [
   "#C5AC90",
   "#242E47",
 ];
+interface GameTurn {
+  id: number;
+  sequence_index: number;
+  song_id: number;
+  options: string[];
+  snippet_start_sec: number;
+  time_limit_secs: number;
+  outcome: string;
+  selected_option: string | null;
+  correct_option?: string | null;
+}
+
 interface AppContextProps {
   gameState: GameState;
   setGameState: (isStarted: GameState) => void;
@@ -29,8 +41,12 @@ interface AppContextProps {
   setStartTime: (startTime: Date) => void;
   score: number;
   setScore: (score: number) => void;
-  gameHistoryId: number;
-  setGameHistoryId: (gameHistoryId: number) => void;
+  gameSessionId: number;
+  setGameSessionId: (id: number) => void;
+  sessionVersion: number;
+  setSessionVersion: (v: number) => void;
+  currentTurn: GameTurn | null;
+  setCurrentTurn: (t: GameTurn | null) => void;
   sound: Howl | null;
   setSound: (sound: Howl | null) => void;
   song: Song | null;
@@ -50,8 +66,12 @@ const AppContext = createContext<AppContextProps>({
   setStartTime: () => {},
   score: 0,
   setScore: () => {},
-  gameHistoryId: 0,
-  setGameHistoryId: () => {},
+  gameSessionId: 0,
+  setGameSessionId: () => {},
+  sessionVersion: 0,
+  setSessionVersion: () => {},
+  currentTurn: null,
+  setCurrentTurn: () => {},
   sound: null,
   setSound: () => {},
   song: null,
@@ -69,13 +89,15 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [username, setUsername] = useState<string>("");
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [score, setScore] = useState<number>(0);
-  const [gameHistoryId, setGameHistoryId] = useState(0);
+  const [gameSessionId, setGameSessionId] = useState(0);
+  const [sessionVersion, setSessionVersion] = useState(0);
+  const [currentTurn, setCurrentTurn] = useState<GameTurn | null>(null);
   const [sound, setSound] = useState<Howl | null>(null);
   const [song, setSong] = useState<Song | null>(null);
   const [csrfToken, setCsrfToken] = useState("");
-  const [snowfallProps, setSnowfallProps] = useState<SnowfallProps | null>(
-    {color:randomColor}
-  );
+  const [snowfallProps, setSnowfallProps] = useState<SnowfallProps | null>({
+    color: randomColor,
+  });
 
   return (
     <AppContext.Provider
@@ -88,8 +110,12 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setStartTime,
         score,
         setScore,
-        gameHistoryId,
-        setGameHistoryId,
+        gameSessionId,
+        setGameSessionId,
+        sessionVersion,
+        setSessionVersion,
+        currentTurn,
+        setCurrentTurn,
         sound,
         setSound,
         song,

@@ -1,5 +1,5 @@
 from rest_framework.decorators import action
-from rest_framework import viewsets,status
+from rest_framework import viewsets, status
 
 from .services import create_next_turn, end_session, start_session, submit_guess
 from .models import GameSession, Song, SongTitle, Poster, GameHistory, Comment
@@ -13,11 +13,12 @@ from .serializers import (
     GameHistoryWriteSerializer,
     CommentSerializer,
     GameSessionSerlizer,
-    GameTurnSerializer
+    GameTurnSerializer,
 )
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import random
 from django.utils import timezone
 from datetime import timedelta
@@ -112,13 +113,21 @@ def rand_titles(request):
 class GameSessionViewSet(viewsets.ModelViewSet):
     queryset = GameSession.objects.all()
     serializer_class = GameSessionSerlizer
-    def create(self,request, *args, **kwargs):
+    authentication_classes = [JWTAuthentication]  
+    permission_classes = [IsAuthenticated] 
+
+    def create(self, request, *args, **kwargs):
         session = start_session(request.user)
         data = GameSessionSerlizer(session).data
-        return Response(data, status=status.HTTP_201_CREATED)
+        return Response({'session':data}, status=status.HTTP_201_CREATED)
 
-    @action(detail=True, methods=["POST"], permission_classes=[IsAuthenticated],url_path="guess")
-    def guess(self,request,pk):
+    @action(
+        detail=True,
+        methods=["POST"],
+        permission_classes=[IsAuthenticated],
+        url_path="guess",
+    )
+    def guess(self, request, pk):
         user = request.user
         serializer = GuessSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -131,45 +140,44 @@ class GameSessionViewSet(viewsets.ModelViewSet):
             option=option,
             elapsed_time_ms=elapsed_time_ms,
             version=version,
-            user=user
+            user=user,
         )
-        payload = {
-            'is_ended': is_ended,
-            'poster_url': poster_url
-        }
+        payload = {"is_ended": is_ended, "poster_url": poster_url}
         return Response(payload, status=status.HTTP_200_OK)
-    
-    @action(detail=True, methods=['post'],permission_classes=[IsAuthenticated],url_path='next-turn')
-    def next_turn(self,request,pk):
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsAuthenticated],
+        url_path="next-turn",
+    )
+    def next_turn(self, request, pk):
         user = request.user
         serializer = VersionNumberSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session_id = int(pk)
         version = serializer.validated_data["version"]
-        session,new_turn = create_next_turn(
-            session_id=session_id,
-            version=version,
-            user=user
+        session, new_turn = create_next_turn(
+            session_id=session_id, version=version, user=user
         )
         payload = {
-            'session': GameSessionSerlizer(session).data,
-            'new_turn': GameTurnSerializer(new_turn).data
+            "session": GameSessionSerlizer(session).data,
+            "new_turn": GameTurnSerializer(new_turn).data,
         }
         return Response(payload, status=status.HTTP_200_OK)
-    
-    @action(detail=True, methods=['post'],permission_classes=[IsAuthenticated],url_path='end-session')
-    def end_session(self,request,pk):
+
+    @action(
+        detail=True,
+        methods=["post"],
+        permission_classes=[IsAuthenticated],
+        url_path="end-session",
+    )
+    def end_session(self, request, pk):
         user = request.user
         serializer = VersionNumberSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         session_id = int(pk)
         version = serializer.validated_data["version"]
-        session = end_session(
-            session_id=session_id,
-            version=version,
-            user=user
-        )
-        payload = {
-            'session': GameSessionSerlizer(session).data
-        }
+        session = end_session(session_id=session_id, version=version, user=user)
+        payload = {"session": GameSessionSerlizer(session).data}
         return Response(payload, status=status.HTTP_200_OK)

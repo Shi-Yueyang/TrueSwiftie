@@ -4,6 +4,7 @@ import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
+import { startGameSession } from "../services/api";
 import { AuthContext } from "../context/AuthContex";
 import { useNavigate } from "react-router-dom";
 
@@ -11,8 +12,9 @@ const StartGame = () => {
   const navigate = useNavigate();
   const {
     setStartTime,
-    startTime,
-    setGameHistoryId,
+    setGameSessionId,
+    setSessionVersion,
+    setCurrentTurn,
     sound,
     setSound,
     setScore,
@@ -20,7 +22,7 @@ const StartGame = () => {
     setGameState,
   } = useContext(AppContext);
 
-  const { userName, userId } = useContext(AuthContext);
+  const { userName } = useContext(AuthContext);
 
   // All users are treated as normal users; no guest mode
 
@@ -39,15 +41,7 @@ const StartGame = () => {
 
   const handleStartGame = async () => {
     if (userName) {
-      setStartTime(new Date());
-      const historyData = {
-        user: userId,
-        score: 0,
-        start_time: startTime,
-        end_time: startTime,
-        correct_choice: "null",
-        last_choice: "null",
-      };
+      setStartTime(new Date()); // still track locally if needed
       try {
         // create CSRF token
         const csrfTokenResponse = await axios.get(
@@ -55,13 +49,10 @@ const StartGame = () => {
         );
         const csrfToken = csrfTokenResponse.data.csrfToken;
         axios.defaults.headers.common["X-CSRFToken"] = csrfToken;
-
-        // post game history
-        const response = await axios.post(
-          `${import.meta.env.VITE_BACKEND_IP}/ts/game-histories/`,
-          historyData
-        );
-        setGameHistoryId(response.data.id);
+        const session = await startGameSession();
+        setGameSessionId(session.id);
+        setSessionVersion(session.version);
+        setCurrentTurn(session.current_turn || null);
         setGameState("playing");
         navigate("/game");
       } catch (error) {
