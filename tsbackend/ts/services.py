@@ -69,11 +69,13 @@ def _create_turn(session: GameSession, sequence_index: int) -> GameTurn:
 
 @transaction.atomic
 def start_session(user) -> GameSession:
+    print("user",user)
     session = GameSession.objects.create(
         user=user,
         status=GameSessionStatus.IN_PROGRESS,
         score=0,
     )
+    print("session",session)
     first_turn = _create_turn(session, sequence_index=1)
     session.current_turn = first_turn
     session.save(update_fields=["current_turn"])
@@ -85,7 +87,7 @@ def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: in
     session = (
         GameSession.objects.select_for_update()
         .select_related("current_turn")
-        .get(id=session_id)
+        .get(id=session_id,user=user)
     )
 
     if version != session.version:
@@ -112,25 +114,26 @@ def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: in
     turn.selected_option = option
     turn.outcome = outcome
     turn.answered_at = now
-    turn.save(update_fields=["selected_option", "outcome", "answered_at"])
 
     if outcome == GameTurnOutcome.CORRECT:
+        session.version += 1
         session.score += 1
         session.status = GameSessionStatus.REVEALING
         poster_url = (
             turn.song.song_title.poster_pics.all().order_by("?").first().image.url
         )
-        is_ended = False
+        turn.poster_url = poster_url
+    elif session.score == 0:
+        turn.outcome = GameTurnOutcome.PENDING
     else:
-        is_ended = True
+        session.version += 1
         session.status = GameSessionStatus.ENDED
         session.ended_at = now
         poster_url = None
 
-    session.version += 1
+    turn.save(update_fields=["selected_option", "outcome", "answered_at", "poster_url"])
     session.save(update_fields=["score", "status", "ended_at", "version"])
-
-    return poster_url, is_ended
+    return turn, session
 
 @transaction.atomic
 def create_next_turn(session_id:int, version:int,user:User) -> Tuple[GameSession,GameTurn]:
@@ -146,7 +149,7 @@ def create_next_turn(session_id:int, version:int,user:User) -> Tuple[GameSession
         )
 
     if session.status != GameSessionStatus.REVEALING:
-        raise InvalidState(f"Session is not in progress: {session.status}")
+        raise InvalidState(f"Session is not in reavaling: {session.status}")
 
     next_index = session.current_turn.sequence_index + 1
     new_turn = _create_turn(session, sequence_index=next_index)
@@ -166,5 +169,9 @@ def end_session(session_id:int, version:int,user:User):
     session.status = GameSessionStatus.ENDED
     session.ended_at = timezone.now()
     session.version += 1
+
+    turn = session.current_turn
+    turn.outcome = GameTurnOutcome.TIMEOUT
     session.save(update_fields=["status", "ended_at", "version"])
-    return session
+    turn.save(update_fields=["outcome"])
+    return session, turn

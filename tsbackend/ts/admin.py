@@ -187,6 +187,7 @@ class GameTurnAdmin(admin.ModelAdmin):
         "time_limit_secs",
         "created_at",
         "answered_at",
+        "poster_url"
     )
     list_filter = ("outcome", "created_at")
     search_fields = ("session__id", "song__song_title__title", "correct_option")

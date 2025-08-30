@@ -1,11 +1,33 @@
 import axios from "axios";
-
+import { GameTurn,GameSession } from "../context/AppContext";
 const backendIp = import.meta.env.VITE_BACKEND_IP;
 
+interface GuessResponse {
+  isEnded: boolean;
+  turn: GameTurn;
+  session: GameSession;
+}
+
+interface NextResponse{
+  new_turn:GameTurn;
+  session:GameSession
+}
+
+interface EndSessionResponse{
+  turn:GameTurn;
+  session:GameSession
+}
 // Helper to inject Authorization header from stored token
 const authHeaders = () => {
   const token = localStorage.getItem("accessToken");
   return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+export const fetchCsrfToken = async (): Promise<number> => {
+  const csrfTokenResponse = await axios.get(
+    `${import.meta.env.VITE_BACKEND_IP}/core/csrf/`
+  );
+  return csrfTokenResponse.data.csrfToken
 };
 
 export const fetchSongWithName = async (songName: string) => {
@@ -15,6 +37,10 @@ export const fetchSongWithName = async (songName: string) => {
   return response.data;
 };
 
+export const fetchSongWithId = async (id: string) => {
+  const response = await axios.get(`${backendIp}/ts/songs/${id}/`);
+  return response.data;
+};
 export const fetchRandomSong = async (album?: string) => {
   const response = await axios.get(`${backendIp}/ts/songs/random_song/`, {
     params: { album },
@@ -47,11 +73,22 @@ export const fetchPosterById = async (id: string) => {
 };
 
 // Game Session APIs
-export const startGameSession = async () => {
-  const res = await axios.post(`${backendIp}/ts/game-sessions/`, null,{
+export const startGameSession = async ():Promise<GameSession> => {
+  const res = await axios.post(`${backendIp}/ts/game-sessions/`, null, {
     headers: { ...authHeaders() },
   });
   return res.data.session; // expects session with current_turn
+};
+
+
+export const fetchGameSession = async (sessionId: number):Promise<GameSession> => {
+  const response = await axios.get(`${backendIp}/ts/game-sessions/${sessionId}/`);
+  return response.data;
+}
+
+export const fetchGameTurn = async (turnId: number): Promise<GameTurn> => {
+  const response = await axios.get(`${backendIp}/ts/game-turns/${turnId}/`);
+  return response.data;
 };
 
 export const submitGuess = async (
@@ -62,7 +99,7 @@ export const submitGuess = async (
     version: number;
     client_time_left?: number;
   }
-) => {
+):Promise<GuessResponse> => {
   const res = await axios.post(
     `${backendIp}/ts/game-sessions/${sessionId}/guess/`,
     payload,
@@ -74,9 +111,9 @@ export const submitGuess = async (
 export const fetchNextTurn = async (
   sessionId: number,
   payload: { version: number }
-) => {
+):Promise<NextResponse> => {
   const res = await axios.post(
-    `${backendIp}/ts/game-sessions/${sessionId}/next/`,
+    `${backendIp}/ts/game-sessions/${sessionId}/next-turn/`,
     payload,
     { headers: { ...authHeaders() } }
   );
@@ -86,13 +123,13 @@ export const fetchNextTurn = async (
 export const endGameSession = async (
   sessionId: number,
   payload: { version: number }
-) => {
+):Promise<EndSessionResponse> => {
   const res = await axios.post(
-    `${backendIp}/ts/game-sessions/${sessionId}/end/`,
+    `${backendIp}/ts/game-sessions/${sessionId}/end-session/`,
     payload,
     { headers: { ...authHeaders() } }
   );
-  return res.data.session;
+  return res.data;
 };
 
 export const createBlobUrl = (arrayBuffer: ArrayBuffer, mimeType: string) => {

@@ -1,13 +1,13 @@
-import GamePage from "./components/GamePage";
+import GamePage from "./pages/GamePage";
 import { Route, Routes, useLocation } from "react-router-dom";
-import GameOver from "./components/GameOver";
-import StartGame from "./components/StartGame";
+import GameOver from "./pages/GameOver";
+import StartGame from "./pages/StartGame";
 import { Stack } from "@mui/material";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContex";
 import NavBar from "./components/NavBar";
-import Login from "./components/Login";
-import Signup from "./components/Signup";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import "./styles/App.css";
 import GameHistoryList from "./components/GameHistoryList";
 import ProtectedRoute from "./components/ProtectedRoute ";

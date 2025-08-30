@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { AppContext } from "../context/AppContext";
+
 import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
-import {  IoArrowForwardOutline, IoCheckmarkCircle } from "react-icons/io5"; //IoMusicalNotes
+import { IoArrowForwardOutline, IoCheckmarkCircle } from "react-icons/io5"; //IoMusicalNotes
 // import { TbChristmasTree } from "react-icons/tb";
 import "../styles/App.css";
 import { WiRaindrop } from "react-icons/wi";
@@ -21,47 +23,41 @@ export interface Song {
 }
 
 interface Props {
-  correctOption: string;
   options: string[];
   timeLimit: number;
   handleNext: () => void;
-  handleSelectCorrect: () => void;
-  handleSelectWrong: (lastChoice: string, correctOption: string) => void;
+  handleGuess: (userGuess: string) => Promise<string|undefined>; 
+  handleTimeout:()=>void;
 }
 
-const MusicQuiz = ({
-  correctOption,
-  options,
-  handleNext,
-  timeLimit,
-  handleSelectCorrect,
-  handleSelectWrong,
-}: Props) => {
-  const [isPosterRevealed, setRevealed] = useState(false);
+const MusicQuiz = ({ options, handleNext, timeLimit, handleGuess, handleTimeout }: Props) => {
+  const { gameSession, currentTurn } = useContext(AppContext);
   const [timeLeft, setTimeLeft] = useState(1);
+  const [correctOption, setCorrectOption] = useState("");
   const onClickNext = () => {
-    setRevealed(false);
     handleNext();
   };
+  const onClickOption = async (option: string) => {
+    try {
+      const outcome = await handleGuess(option); // Await the async function
+      if (outcome === "correct") {
+        setCorrectOption(option);
+      }
+    } catch (error) {
+      console.error("Error handling guess:", error);
+    } 
+  };
+
   useEffect(() => {
     setTimeLeft(timeLimit);
-  }
-  , [correctOption, timeLimit]);
-  const onChoose = (option: string) => {
-    if (option === correctOption) {
-      handleSelectCorrect();
-      setRevealed(true);
-    } else {
-      handleSelectWrong(option, correctOption);
-    }
-  };
+  }, [options, timeLimit]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (timeLeft > 0 && !isPosterRevealed) {
+      if (timeLeft > 0 && currentTurn?.outcome === "pending") {
         setTimeLeft(timeLeft - 1);
-        if (timeLeft === 1) {
-          handleSelectWrong("Time's up", correctOption);
+        if (timeLeft === 1 && gameSession) {
+          handleTimeout();
         }
       }
     }, 1000);
@@ -74,19 +70,29 @@ const MusicQuiz = ({
         <Grid key={index}>
           <StyledButton
             variant="contained"
-            color={isPosterRevealed && option === correctOption ? "success" : "secondary"}
+            color={
+              currentTurn?.outcome === "correct" && option === correctOption
+                ? "success"
+                : "primary"
+            }
             aria-label={`Select option ${option}`}
-            startIcon={isPosterRevealed && option === correctOption ? <IoCheckmarkCircle /> : <WiRaindrop />}
-            onClick={() => onChoose(option)}
-            disabled={isPosterRevealed}
-            $highlight={isPosterRevealed && option === correctOption}
+            startIcon={
+              currentTurn?.outcome === "correct" && option === correctOption ? (
+                <IoCheckmarkCircle />
+              ) : (
+                <WiRaindrop />
+              )
+            }
+            onClick={() => onClickOption(option)}
+            disabled={currentTurn?.outcome !== "pending"}
+            $highlight={currentTurn?.outcome === "correct" && option === correctOption}
           >
             {option}
           </StyledButton>
         </Grid>
       ))}
 
-      {isPosterRevealed && (
+      {currentTurn?.outcome === "correct" && (
         <Button
           aria-label="Next"
           variant="contained"
@@ -129,7 +135,9 @@ const StyledButton = styled(Button, {
   },
   "&.Mui-disabled": {
     transform: "none",
-    boxShadow: $highlight ? "0 0 0 3px rgba(76,175,80,0.35), 0 6px 14px rgba(0,0,0,0.3)" : "none",
+    boxShadow: $highlight
+      ? "0 0 0 3px rgba(76,175,80,0.35), 0 6px 14px rgba(0,0,0,0.3)"
+      : "none",
     opacity: $highlight ? 1 : 0.6,
     backgroundColor: $highlight ? theme.palette.success.main : undefined,
     color: $highlight ? theme.palette.success.contrastText : undefined,

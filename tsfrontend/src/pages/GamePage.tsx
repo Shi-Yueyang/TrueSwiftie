@@ -3,97 +3,99 @@ import Grid from "@mui/material/Grid2";
 import { LinearProgress, Box, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
-import { fetchNextTurn } from "../services/api";
+import { endGameSession, fetchNextTurn } from "../services/api";
 import { AppContext } from "../context/AppContext";
-import MusicQuiz from "./MusicQuiz";
-import { useRandomSong } from "../hooks/hooks";
-import "../styles/App.css";
-import placeholderImg from "../assets/music_mark.png";
+import MusicQuiz from "../components/MusicQuiz";
+import { useSong } from "../hooks/hooks";
 import { useNavigate } from "react-router-dom";
+const backendIp = import.meta.env.VITE_BACKEND_IP;
+
+import "../styles/App.css";
+
+import { submitGuess } from "../services/api";
 
 const GamePage = () => {
   const navigate = useNavigate();
-  const context = useContext(AppContext);
   const {
-    score,
-    setScore,
-    gameSessionId,
-    sessionVersion,
-    setSessionVersion,
+    gameSession,
+    setGameSession,
     currentTurn,
-    setCurrentTurn,
     sound,
     setSound,
-    snowfallProps,
-    setSnowfallProps,
-    setGameState,
-    gameState,
-  } = context;
+    setCurrentTurn,
+  } = useContext(AppContext);
   const volume = 1;
-  const [imgSource, setImgSource] = useState(placeholderImg);
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [nextClickCnt] = useState(1); // retained for existing hook placeholder
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
   const [hasPlayedFirstSong, setHasPlayedFirstSong] = useState(false);
 
-  const handleNextQuestionClicked = async () => {
-    if (!gameSessionId) return;
+  const handleNext = async () => {
+    if (!gameSession) return;
     try {
-      const data = await fetchNextTurn(gameSessionId, {
-        version: sessionVersion,
+      const data = await fetchNextTurn(gameSession.id, {
+        version: gameSession.version,
       });
-      setSessionVersion(data.session.version);
-      setCurrentTurn(data.turn || null);
-      setImgSource(placeholderImg);
+      setGameSession(data.session);
+      setCurrentTurn(data.new_turn);
       setIsSoundLoaded(false);
-      setIsRevealed(false);
-      if (data.ended) {
-        setGameState("gameOver");
-        navigate("/game-over", { replace: true });
-      }
     } catch (e) {
       console.error("Next turn failed", e);
     }
   };
 
-  const handleSelectIsCorrect = () => {
-    // optimistic UI update; server will confirm via guess response
-    setScore(score + 1);
-    setSnowfallProps({
-      ...snowfallProps,
-      snowflakeCount: 150 + score * 5,
-      wind: [-0.5 - score, 2.0 + score],
-    });
-  };
-
-  const handleSelectIsWrong = (_lastChoice: string, _correctOption: string) => {
-    // handled after guess response when outcome != correct
-  };
-
   const handleSoundOnPlay = () => {
-    console.log("handle on play, is sound loaded is ", isSoundLoaded);
-    if (score >= 35) {
+    if (!gameSession) return;
+    if (gameSession.score >= 35) {
       setTimeLimit(5);
-    } else if (score >= 20) {
+    } else if (gameSession.score >= 20) {
       setTimeLimit(7);
-    } else if (score >= 10) {
+    } else if (gameSession.score >= 10) {
       setTimeLimit(10);
-    } else if (score >= 2) {
+    } else if (gameSession.score >= 2) {
       setTimeLimit(13);
     }
     setIsSoundLoaded(true);
   };
 
+  const handleGuess = async (userGuess: string) => {
+    if (!gameSession || !currentTurn) return;
+
+    const payload = {
+      turn_id: currentTurn.id,
+      option: userGuess,
+      version: gameSession.version,
+      elapsed_time_ms: 0,
+    };
+
+    try {
+      const result = await submitGuess(gameSession.id, payload);
+      setGameSession(result.session);
+      setCurrentTurn(result.turn);
+      if (result.turn.outcome === "wrong") {
+        navigate("/game-over");
+      }
+      return result.turn.outcome;
+    } catch (error) {
+      console.error("Error submitting guess:", error);
+    }
+  };
+
+  const handleTimeout = async()=>{
+    if(gameSession){
+      endGameSession(gameSession.id, { version: gameSession.version });
+      navigate("/game-over")
+    }      
+    
+  }
   // fetch song, options, and poster
   // Using server-provided turn (currentTurn) instead of local random song logic now
-  const song = useRandomSong(nextClickCnt, undefined); // TODO: replace with server-provided song data fetch if needed
+  const song = useSong(currentTurn?.song);
   const options = currentTurn?.options || [];
-
+  console.log("song", song);
   // set sound
   useEffect(() => {
-    // placeholder: original random sound logic retained until backend provides song file via turn
     if (!song) return;
+    // clean up any existing sound instance
     if (sound) {
       sound.fade(volume, 0, 300);
       sound.stop();
@@ -103,17 +105,22 @@ const GamePage = () => {
       src: [song.file],
       volume: 1,
       html5: true,
-      onend: handleNextQuestionClicked,
+      onend: handleNext,
       onplay: handleSoundOnPlay,
     });
     setSound(newSound);
+    // Only re-run when the concrete audio file changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTurn]);
+  }, [song]);
 
   // play sound
   useEffect(() => {
     // guard: if not actively playing, redirect home
-    if (gameState !== "playing") {
+    if (
+      !gameSession ||
+      (gameSession.status !== "in_progress" &&
+        gameSession.status !== "revealing")
+    ) {
       navigate("/", { replace: true });
       return;
     }
@@ -129,13 +136,16 @@ const GamePage = () => {
         sound.unload();
       }
     };
-  }, [sound]);
-
+  }, [sound, navigate, hasPlayedFirstSong]);
+  console.log("currentTurn", currentTurn?.poster_url, currentTurn?.outcome);
   // Full-page background styles (fixed layer under content)
   const bgStyle: React.CSSProperties = {
     position: "fixed",
     inset: 0,
-    backgroundImage: isRevealed && imgSource ? `url(${imgSource})` : "none",
+    backgroundImage:
+      currentTurn?.outcome === "correct"
+        ? `url(${backendIp}/${currentTurn?.poster_url})`
+        : "none",
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
@@ -146,7 +156,8 @@ const GamePage = () => {
   const bgOverlayStyle: React.CSSProperties = {
     position: "fixed",
     inset: 0,
-    background: isRevealed ? "rgba(0,0,0,0.35)" : "transparent",
+    background:
+      currentTurn?.outcome === "correct" ? "rgba(0,0,0,0.35)" : "transparent",
     zIndex: 0,
     pointerEvents: "none",
   };
@@ -159,7 +170,7 @@ const GamePage = () => {
 
       {/* Score overlay (fixed) */}
       <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 2 }}>
-        <Chip color="primary" label={`Score: ${score}`} />
+        <Chip color="primary" label={`Score: ${gameSession?.score}`} />
       </Box>
 
       {/* Foreground content */}
@@ -184,14 +195,11 @@ const GamePage = () => {
           >
             {isSoundLoaded && currentTurn && options.length > 0 ? (
               <MusicQuiz
-                correctOption={
-                  "" /* correct withheld; component uses outcome logic */
-                }
                 options={options}
-                handleNext={handleNextQuestionClicked}
+                handleNext={handleNext}
                 timeLimit={timeLimit}
-                handleSelectCorrect={handleSelectIsCorrect}
-                handleSelectWrong={handleSelectIsWrong}
+                handleGuess={handleGuess}
+                handleTimeout={handleTimeout}
               />
             ) : (
               <div>

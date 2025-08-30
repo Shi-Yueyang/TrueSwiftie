@@ -2,6 +2,7 @@ import { useState, useEffect, useContext } from "react";
 import {
   fetchRandomSong,
   fetchSongWithName,
+  fetchSongWithId,
   fetchRandomTitles,
   fetchPosterById,
 } from "../services/api";
@@ -11,8 +12,7 @@ import noPicture from "../assets/ts_placeholder.jpg";
 import { AppContext } from "../context/AppContext";
 
 export const useRandomSong = (isToFetch: number, album?: string) => {
-  const context = useContext(AppContext);
-  const { song, setSong } = context;
+  const { song, setSong } = useContext(AppContext);
 
   useEffect(() => {
     const fetchSong = async () => {
@@ -36,16 +36,20 @@ export const useRandomSong = (isToFetch: number, album?: string) => {
   return song;
 };
 
-export const useSong = (songName: string) => {
-  const context = useContext(AppContext);
-  const { song, setSong } = context;
+export const useSong = (arg: string | number|undefined) => {
+  const { song, setSong } = useContext(AppContext);
   useEffect(() => {
     try {
       const fetchSong = async () => {
         try {
-          const response = await fetchSongWithName(songName);
-          if(response){
-            setSong(response.results[0]);
+          const response =
+            typeof arg === "string"
+              ? await fetchSongWithName(arg)
+              : typeof arg === "number"
+              ? await fetchSongWithId(arg.toString())
+              : null;
+          if (response) {
+            setSong(response);
           }
         } catch (error) {
           console.error("Error fetching song data:", error);
@@ -55,7 +59,7 @@ export const useSong = (songName: string) => {
     } catch (error) {
       console.error("Error fetching song data:", error);
     }
-  }, [songName]);
+  }, [arg]);
 
   return song;
 };

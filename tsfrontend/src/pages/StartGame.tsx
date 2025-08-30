@@ -4,22 +4,20 @@ import Grid from "@mui/material/Grid2";
 import "@fontsource/poppins";
 import { AppContext } from "../context/AppContext";
 import axios from "axios";
-import { startGameSession } from "../services/api";
+import { fetchGameTurn, startGameSession } from "../services/api";
 import { AuthContext } from "../context/AuthContex";
 import { useNavigate } from "react-router-dom";
-
+import { fetchCsrfToken } from "../services/api";
 const StartGame = () => {
   const navigate = useNavigate();
   const {
     setStartTime,
-    setGameSessionId,
-    setSessionVersion,
+    gameSession,
+    setGameSession,
     setCurrentTurn,
     sound,
     setSound,
-    setScore,
     setSong,
-    setGameState,
   } = useContext(AppContext);
 
   const { userName } = useContext(AuthContext);
@@ -44,29 +42,33 @@ const StartGame = () => {
       setStartTime(new Date()); // still track locally if needed
       try {
         // create CSRF token
-        const csrfTokenResponse = await axios.get(
-          `${import.meta.env.VITE_BACKEND_IP}/core/csrf/`
-        );
-        const csrfToken = csrfTokenResponse.data.csrfToken;
+
+        const csrfToken = await fetchCsrfToken();
         axios.defaults.headers.common["X-CSRFToken"] = csrfToken;
         const session = await startGameSession();
-        setGameSessionId(session.id);
-        setSessionVersion(session.version);
-        setCurrentTurn(session.current_turn || null);
-        setGameState("playing");
+        setGameSession(session);
+        const turn = await fetchGameTurn(session.current_turn);
+        setCurrentTurn(turn);
         navigate("/game");
+        console.log("Game started, session ID:", session.id);
       } catch (error) {
-        console.error("Error posting game history:", error);
+        console.error("Error starg game:", error);
       }
     } else {
       // Not logged in; redirect to login
       navigate("/login", { replace: true });
     }
   };
+  // Initialize/reset score only once per new session to avoid infinite update loop
   useEffect(() => {
-    setScore(0);
+    if (!gameSession) return;
+    // Only reset if score isn't already 0 (fresh session) – prevents creating a new object each render
+    if (gameSession.score !== 0) {
+      setGameSession({ ...gameSession, score: 0 });
+    }
     setSong(null);
-  }, []);
+    // Depend only on session id so this runs once when a new session is created
+  }, [gameSession?.id]);
 
   return (
     <Grid

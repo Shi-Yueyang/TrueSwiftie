@@ -57,10 +57,10 @@ class GameSessionStatus(models.TextChoices):
 
 
 class GameTurnOutcome(models.TextChoices):
-    PENDING = "pending", "Pending"
-    CORRECT = "correct", "Correct"
-    WRONG = "wrong", "Wrong"
-    TIMEOUT = "timeout", "Timeout"
+    PENDING = "pending"
+    CORRECT = "correct"
+    WRONG = "wrong"
+    TIMEOUT = "timeout"
 
 
 class GameSession(models.Model):
@@ -122,6 +122,7 @@ class GameTurn(models.Model):
         default=GameTurnOutcome.PENDING,
         db_index=True,
     )
+    poster_url = models.URLField(max_length=200, blank=True, null=True)
     snippet_start_sec = models.PositiveIntegerField(default=0)
     time_limit_secs = models.PositiveIntegerField(default=10)
     created_at = models.DateTimeField(auto_now_add=True)

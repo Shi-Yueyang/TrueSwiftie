@@ -62,21 +62,21 @@ class GameTurnSerializer(serializers.ModelSerializer):
             "song",
             "options",
             "time_limit_secs",
+            "poster_url",
+            "outcome"
         ]
 
 
-class GameSessionSerlizer(serializers.ModelSerializer):
+class GameSessionSerlaiizer(serializers.ModelSerializer):
     class Meta:
         model = GameSession
         fields = [
             "id",
             "user",
             "score",
-            "status",
             "current_turn",
-            "max_turns",
-            "created_at",
-            "updated_at",
+            "version",
+            "status"
         ]
 
 class GuessSerializer(serializers.Serializer):

@@ -20,16 +20,22 @@ const albumColors = [
   "#C5AC90",
   "#242E47",
 ];
-interface GameTurn {
+export interface GameTurn {
   id: number;
-  sequence_index: number;
-  song_id: number;
+  song: number;
   options: string[];
-  snippet_start_sec: number;
+  poster_url: string;
   time_limit_secs: number;
-  outcome: string;
-  selected_option: string | null;
-  correct_option?: string | null;
+  outcome: "pending" | "correct" | "wrong" | "timeout";
+}
+
+export interface GameSession {
+  id: number;
+  user: number;
+  score: number;
+  version: number;
+  current_turn: number;
+  status: string;
 }
 
 interface AppContextProps {
@@ -39,12 +45,8 @@ interface AppContextProps {
   setUsername: (username: string) => void;
   startTime: Date;
   setStartTime: (startTime: Date) => void;
-  score: number;
-  setScore: (score: number) => void;
-  gameSessionId: number;
-  setGameSessionId: (id: number) => void;
-  sessionVersion: number;
-  setSessionVersion: (v: number) => void;
+  gameSession: GameSession | null;
+  setGameSession: (session: GameSession | null) => void;
   currentTurn: GameTurn | null;
   setCurrentTurn: (t: GameTurn | null) => void;
   sound: Howl | null;
@@ -64,12 +66,8 @@ const AppContext = createContext<AppContextProps>({
   setUsername: () => {},
   startTime: new Date(),
   setStartTime: () => {},
-  score: 0,
-  setScore: () => {},
-  gameSessionId: 0,
-  setGameSessionId: () => {},
-  sessionVersion: 0,
-  setSessionVersion: () => {},
+  gameSession: null,
+  setGameSession: () => {},
   currentTurn: null,
   setCurrentTurn: () => {},
   sound: null,
@@ -88,9 +86,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [gameState, setGameState] = useState<GameState>("initial");
   const [username, setUsername] = useState<string>("");
   const [startTime, setStartTime] = useState<Date>(new Date());
-  const [score, setScore] = useState<number>(0);
-  const [gameSessionId, setGameSessionId] = useState(0);
-  const [sessionVersion, setSessionVersion] = useState(0);
+  const [gameSession, setGameSession] = useState<GameSession | null>(null);
   const [currentTurn, setCurrentTurn] = useState<GameTurn | null>(null);
   const [sound, setSound] = useState<Howl | null>(null);
   const [song, setSong] = useState<Song | null>(null);
@@ -108,12 +104,8 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setUsername,
         startTime,
         setStartTime,
-        score,
-        setScore,
-        gameSessionId,
-        setGameSessionId,
-        sessionVersion,
-        setSessionVersion,
+        gameSession,
+        setGameSession,
         currentTurn,
         setCurrentTurn,
         sound,

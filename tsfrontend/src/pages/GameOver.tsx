@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { Typography, Button, Box, Stack } from "@mui/material";
 import { AppContext } from "../context/AppContext";
-import RankList from "./RankList";
+import RankList from "../components/RankList";
 import axios from "axios";
-import MusicDisplay from "./MusicDisplay";
+import MusicDisplay from "../components/MusicDisplay";
 import { usePoster } from "../hooks/hooks";
-import CommentPopover from "./CommentPopover";
+import CommentPopover from "../components/CommentPopover";
 import { useNavigate } from "react-router-dom";
 import { AuthContext, User } from "../context/AuthContex";
 
@@ -22,7 +22,7 @@ const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
   const context = useContext(AppContext);
   const navigate = useNavigate();
-  const { score, song, setGameState } = context;
+  const {  song, setGameState } = context;
   const {userName } = useContext(AuthContext);
 
   const [GameHistory, setGameHistory] = useState<GameHistory[]>([]);
@@ -114,7 +114,7 @@ const GameOver = () => {
           textShadow: "1px 1px 3px rgba(0, 0, 0, 0.5)",
         }}
       >
-        Your Swiftiness: {score}
+        Your Swiftiness: {1}
       </Typography>
 
       {showRankList ? (

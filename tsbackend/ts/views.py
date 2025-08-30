@@ -2,7 +2,7 @@ from rest_framework.decorators import action
 from rest_framework import viewsets, status
 
 from .services import create_next_turn, end_session, start_session, submit_guess
-from .models import GameSession, Song, SongTitle, Poster, GameHistory, Comment
+from .models import GameSession, GameTurn, Song, SongTitle, Poster, GameHistory, Comment
 from .serializers import (
     GameHistoryReadSerializer,
     GuessSerializer,
@@ -12,7 +12,7 @@ from .serializers import (
     PosterSerializer,
     GameHistoryWriteSerializer,
     CommentSerializer,
-    GameSessionSerlizer,
+    GameSessionSerlaiizer,
     GameTurnSerializer,
 )
 from rest_framework.decorators import api_view
@@ -112,14 +112,14 @@ def rand_titles(request):
 
 class GameSessionViewSet(viewsets.ModelViewSet):
     queryset = GameSession.objects.all()
-    serializer_class = GameSessionSerlizer
-    authentication_classes = [JWTAuthentication]  
-    permission_classes = [IsAuthenticated] 
+    serializer_class = GameSessionSerlaiizer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         session = start_session(request.user)
-        data = GameSessionSerlizer(session).data
-        return Response({'session':data}, status=status.HTTP_201_CREATED)
+        data = GameSessionSerlaiizer(session).data
+        return Response({"session": data}, status=status.HTTP_201_CREATED)
 
     @action(
         detail=True,
@@ -135,14 +135,17 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         option = serializer.validated_data["option"]
         version = serializer.validated_data["version"]
         elapsed_time_ms = serializer.validated_data["elapsed_time_ms"]
-        poster_url, is_ended = submit_guess(
+        turn, session = submit_guess(
             session_id=session_id,
             option=option,
             elapsed_time_ms=elapsed_time_ms,
             version=version,
             user=user,
         )
-        payload = {"is_ended": is_ended, "poster_url": poster_url}
+        payload = {
+            "turn": GameTurnSerializer(turn).data,
+            "session": GameSessionSerlaiizer(session).data,
+        }
         return Response(payload, status=status.HTTP_200_OK)
 
     @action(
@@ -161,7 +164,7 @@ class GameSessionViewSet(viewsets.ModelViewSet):
             session_id=session_id, version=version, user=user
         )
         payload = {
-            "session": GameSessionSerlizer(session).data,
+            "session": GameSessionSerlaiizer(session).data,
             "new_turn": GameTurnSerializer(new_turn).data,
         }
         return Response(payload, status=status.HTTP_200_OK)
@@ -178,6 +181,14 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         session_id = int(pk)
         version = serializer.validated_data["version"]
-        session = end_session(session_id=session_id, version=version, user=user)
-        payload = {"session": GameSessionSerlizer(session).data}
+        session, turn = end_session(session_id=session_id, version=version, user=user)
+        payload = {
+            "session": GameSessionSerlaiizer(session).data,
+            "turn": GameTurnSerializer(turn).data,
+        }
         return Response(payload, status=status.HTTP_200_OK)
+
+
+class GameTurnViewSet(viewsets.ModelViewSet):
+    queryset = GameTurn.objects.all()
+    serializer_class = GameTurnSerializer
