@@ -1,6 +1,14 @@
 import axios from "axios";
 import { GameTurn,GameSession } from "../context/AppContext";
+import { Song } from "../components/MusicQuiz";
 const backendIp = import.meta.env.VITE_BACKEND_IP;
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
 
 interface GuessResponse {
   isEnded: boolean;
@@ -16,6 +24,12 @@ interface NextResponse{
 interface EndSessionResponse{
   turn:GameTurn;
   session:GameSession
+}
+
+export interface PreviousSessionResults{
+  session_id:number;
+  score:number;
+  last_correct_song:Song
 }
 // Helper to inject Authorization header from stored token
 const authHeaders = () => {
@@ -129,6 +143,14 @@ export const endGameSession = async (
     payload,
     { headers: { ...authHeaders() } }
   );
+  return res.data;
+};
+
+export const fetchPreviousSessionResults = async (page:number):Promise<PaginatedResponse<PreviousSessionResults>> => {
+  const res = await axios.get(`${backendIp}/ts/game-sessions/previous-results/`, {
+    headers: { ...authHeaders() },
+    params: { page }
+  });
   return res.data;
 };
 

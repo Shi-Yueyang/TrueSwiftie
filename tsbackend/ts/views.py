@@ -1,8 +1,16 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
-
 from .services import create_next_turn, end_session, start_session, submit_guess
-from .models import GameSession, GameTurn, Song, SongTitle, Poster, GameHistory, Comment
+from .models import (
+    GameSession,
+    GameSessionStatus,
+    GameTurn,
+    Song,
+    SongTitle,
+    Poster,
+    GameHistory,
+    Comment,
+)
 from .serializers import (
     GameHistoryReadSerializer,
     GuessSerializer,
@@ -187,6 +195,60 @@ class GameSessionViewSet(viewsets.ModelViewSet):
             "turn": GameTurnSerializer(turn).data,
         }
         return Response(payload, status=status.HTTP_200_OK)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+        url_path="previous-results",
+    )
+    def previous_results(self, request):
+        """
+        Return finished (previous) game sessions for the authenticated user.
+        Each record includes: session_id, score, last_correct_song (serialized Song),
+        and end_time if available. Unfinished sessions are excluded.
+        Paginated response.
+        """
+        user = request.user
+        qs = (
+            GameSession.objects.filter(user=user)
+            .filter(status=GameSessionStatus.ENDED)
+            .order_by("-ended_at", "id")
+        )
+        
+        # Get paginated queryset
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            sessions = page
+        else:
+            sessions = qs
+            
+        results = []
+        for session in sessions:
+            # Get the last turn for this session
+            last_turn = session.turns.order_by('-sequence_index').first()
+            
+            result_data = {
+                'session_id': session.id,
+                'score': session.score,
+                'ended_at': session.ended_at,
+            }
+            
+            # Add last correct song if last turn exists
+            if last_turn:
+                result_data['last_correct_song'] = SongSerializer(last_turn.song).data
+            else:
+                result_data['last_correct_song'] = None
+                
+            results.append(result_data)
+        
+        if page is not None:
+            return self.get_paginated_response(results)
+        
+        return Response(results)
+
+
+
 
 
 class GameTurnViewSet(viewsets.ModelViewSet):

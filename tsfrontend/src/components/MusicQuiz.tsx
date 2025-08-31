@@ -9,7 +9,7 @@ import { IoArrowForwardOutline, IoCheckmarkCircle } from "react-icons/io5"; //Io
 import "../styles/App.css";
 import { WiRaindrop } from "react-icons/wi";
 
-interface SongTitle {
+export interface SongTitle {
   title: string;
   album: string;
   lyrics: string;

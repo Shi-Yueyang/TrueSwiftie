@@ -46,6 +46,9 @@ def build_options(correct_title: str, k: int = 3) -> List[str]:
 
 def _create_turn(session: GameSession, sequence_index: int) -> GameTurn:
     song = pick_song()
+    while song.song_title is None:
+        song = pick_song()
+
     if session.score >= 35:
         time_limit_sec = 7
     elif session.score >= 20:
