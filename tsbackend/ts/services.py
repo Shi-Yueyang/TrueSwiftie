@@ -115,11 +115,11 @@ def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: in
         outcome = GameTurnOutcome.WRONG
 
     turn.selected_option = option
-    turn.outcome = outcome
     turn.answered_at = now
 
+    session.version += 1
     if outcome == GameTurnOutcome.CORRECT:
-        session.version += 1
+        turn.outcome = outcome
         session.score += 1
         session.status = GameSessionStatus.REVEALING
         poster_url = (
@@ -129,13 +129,15 @@ def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: in
     elif session.score == 0:
         turn.outcome = GameTurnOutcome.PENDING
     else:
-        session.version += 1
-        session.status = GameSessionStatus.ENDED
-        session.ended_at = now
+        session.health -= 1
+        if session.health == 0:
+            turn.outcome = outcome
+            session.status = GameSessionStatus.ENDED
+            session.ended_at = now
         poster_url = None
 
     turn.save(update_fields=["selected_option", "outcome", "answered_at", "poster_url"])
-    session.save(update_fields=["score", "status", "ended_at", "version"])
+    session.save(update_fields=["score", "status", "ended_at", "version","health"])
     return turn, session
 
 @transaction.atomic

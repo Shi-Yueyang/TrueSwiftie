@@ -144,7 +144,6 @@ class GameSessionAdmin(admin.ModelAdmin):
                     "score",
                     "version",
                     "current_turn",
-                    "max_turns",
                 )
             },
         ),

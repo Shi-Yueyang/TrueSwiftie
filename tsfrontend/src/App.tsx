@@ -2,6 +2,7 @@ import GamePage from "./pages/GamePage";
 import { Route, Routes, useLocation } from "react-router-dom";
 import GameOver from "./pages/GameOver";
 import StartGame from "./pages/StartGame";
+import TopPlayers from "./pages/TopPlayers";
 import { Stack } from "@mui/material";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContex";
@@ -11,6 +12,7 @@ import Signup from "./pages/Signup";
 import "./styles/App.css";
 import GameHistoryList from "./components/GameHistoryList";
 import ProtectedRoute from "./components/ProtectedRoute ";
+import EditUserInfo from "./pages/EditUserInfo";
 
 // animations
 // import { useContext } from "react";
@@ -22,6 +24,7 @@ function App() {
   const { userId } = useContext(AuthContext);
   const location = useLocation();
   const isAuthRoute = location.pathname === "/login";
+  const isGameRoute = location.pathname === "/game";
 
   return (
     <>
@@ -29,9 +32,9 @@ function App() {
 
       <Stack
         direction={"column"}
-        sx={{ ml: userId && !isAuthRoute ? { md: "260px" } : 0 }}
+        sx={{ ml: userId && !isAuthRoute && !isGameRoute ? { md: "260px" } : 0 }}
       >
-        {userId && !isAuthRoute ? <NavBar /> : null}
+        {userId && !isAuthRoute && !isGameRoute ? <NavBar /> : null}
         <Routes>
           <Route
             path="/"
@@ -64,6 +67,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <GameHistoryList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit-user-info"
+            element={
+              <ProtectedRoute>
+                <EditUserInfo />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/top-players"
+            element={
+              <ProtectedRoute>
+                <TopPlayers />
               </ProtectedRoute>
             }
           />

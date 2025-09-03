@@ -20,7 +20,6 @@ const NavBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { logout } = useContext(AuthContext);
   const drawerWidth = 260;
-  // All users are treated as normal users; remove guest mode branching
 
   const navigate = useNavigate();
 
@@ -64,14 +63,14 @@ const NavBar = () => {
               <ListItemText primary={"Home"} />
             </ListItemButton>
           </ListItem>
-          <ListItem key={2} disablePadding>
+          <ListItem key={3} disablePadding>
             <ListItemButton
               onClick={() => {
-                navigate("/game-history");
+                navigate("/edit-user-info");
                 setDrawerOpen(false);
               }}
             >
-              <ListItemText primary={"Game History"} />
+              <ListItemText primary={"Edit User Info"} />
             </ListItemButton>
           </ListItem>
         </List>

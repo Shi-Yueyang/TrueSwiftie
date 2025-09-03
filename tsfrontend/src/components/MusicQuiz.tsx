@@ -4,7 +4,10 @@ import { AppContext } from "../context/AppContext";
 import { Button, CircularProgress } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { styled } from "@mui/system";
-import { IoArrowForwardOutline, IoCheckmarkCircle } from "react-icons/io5"; //IoMusicalNotes
+import {
+  IoArrowForwardOutline,
+  IoCheckmarkCircle,
+} from "react-icons/io5"; //IoMusicalNotes
 // import { TbChristmasTree } from "react-icons/tb";
 import "../styles/App.css";
 import { WiRaindrop } from "react-icons/wi";
@@ -26,14 +29,21 @@ interface Props {
   options: string[];
   timeLimit: number;
   handleNext: () => void;
-  handleGuess: (userGuess: string) => Promise<string|undefined>; 
-  handleTimeout:()=>void;
+  handleGuess: (userGuess: string) => Promise<string | undefined>;
+  handleTimeout: () => void;
 }
 
-const MusicQuiz = ({ options, handleNext, timeLimit, handleGuess, handleTimeout }: Props) => {
+const MusicQuiz = ({
+  options,
+  handleNext,
+  timeLimit,
+  handleGuess,
+  handleTimeout,
+}: Props) => {
   const { gameSession, currentTurn } = useContext(AppContext);
   const [timeLeft, setTimeLeft] = useState(1);
   const [correctOption, setCorrectOption] = useState("");
+  const [wrongOptions, setWrongOptions] = useState<string[]>([]);
   const onClickNext = () => {
     handleNext();
   };
@@ -42,10 +52,12 @@ const MusicQuiz = ({ options, handleNext, timeLimit, handleGuess, handleTimeout 
       const outcome = await handleGuess(option); // Await the async function
       if (outcome === "correct") {
         setCorrectOption(option);
+      } else {
+        setWrongOptions((prev) => [...prev, option]);
       }
     } catch (error) {
       console.error("Error handling guess:", error);
-    } 
+    }
   };
 
   useEffect(() => {
@@ -84,8 +96,10 @@ const MusicQuiz = ({ options, handleNext, timeLimit, handleGuess, handleTimeout 
               )
             }
             onClick={() => onClickOption(option)}
-            disabled={currentTurn?.outcome !== "pending"}
-            $highlight={currentTurn?.outcome === "correct" && option === correctOption}
+            disabled={currentTurn?.outcome !== "pending" || wrongOptions.includes(option)}
+            $highlight={
+              currentTurn?.outcome === "correct" && option === correctOption
+            }
           >
             {option}
           </StyledButton>

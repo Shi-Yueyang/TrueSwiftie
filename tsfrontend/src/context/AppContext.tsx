@@ -33,6 +33,7 @@ export interface GameSession {
   id: number;
   user: number;
   score: number;
+  health:number;
   version: number;
   current_turn: number;
   status: string;

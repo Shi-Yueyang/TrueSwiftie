@@ -3,6 +3,7 @@ import Grid from "@mui/material/Grid2";
 import { LinearProgress, Box, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
+import { IoHeart } from "react-icons/io5";
 import { endGameSession, fetchNextTurn } from "../services/api";
 import { AppContext } from "../context/AppContext";
 import MusicQuiz from "../components/MusicQuiz";
@@ -28,6 +29,7 @@ const GamePage = () => {
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
   const [hasPlayedFirstSong, setHasPlayedFirstSong] = useState(false);
+  const [health, setHealth] = useState(3);
 
   const handleNext = async () => {
     if (!gameSession) return;
@@ -71,7 +73,8 @@ const GamePage = () => {
       const result = await submitGuess(gameSession.id, payload);
       setGameSession(result.session);
       setCurrentTurn(result.turn);
-      if (result.turn.outcome === "wrong") {
+      setHealth(result.session.health);
+      if (result.session.status === "ended") {
         navigate("/game-over");
       }
       return result.turn.outcome;
@@ -85,8 +88,11 @@ const GamePage = () => {
       endGameSession(gameSession.id, { version: gameSession.version });
       navigate("/game-over")
     }      
-    
   }
+
+const handleEnd =  () => {
+  console.log("song end")
+}
   // fetch song, options, and poster
   // Using server-provided turn (currentTurn) instead of local random song logic now
   const song = useSong(currentTurn?.song);
@@ -105,7 +111,7 @@ const GamePage = () => {
       src: [song.file],
       volume: 1,
       html5: true,
-      onend: handleNext,
+      onend: handleEnd,
       onplay: handleSoundOnPlay,
     });
     setSound(newSound);
@@ -171,6 +177,16 @@ const GamePage = () => {
       {/* Score overlay (fixed) */}
       <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 2 }}>
         <Chip color="primary" label={`Score: ${gameSession?.score}`} />
+      </Box>
+
+      {/* Health overlay (fixed) */}
+      <Box sx={{ position: "fixed", top: 16, left: 16, zIndex: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '20px' }}>
+          <span style={{ fontWeight: 'bold' }}>Health: </span>
+          {Array.from({ length: health }, (_, index) => (
+            <IoHeart key={index} style={{ color: 'red', fontSize: '20px' }} />
+          ))}
+        </div>
       </Box>
 
       {/* Foreground content */}

@@ -141,6 +141,42 @@ const StartGame = () => {
             Let the Game Begin
           </Button>
         </Grid>
+        <Grid>
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={() => navigate("/game-history")}
+            style={{
+              padding: "1rem 3rem",
+              borderRadius: "30px",
+              fontFamily: "'Poppins', sans-serif",
+              letterSpacing: "1.5px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              minWidth: "250px",
+              marginTop: "1rem",
+            }}
+          >
+            View Game History
+          </Button>
+        </Grid>
+        <Grid>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => navigate("/top-players")}
+            style={{
+              padding: "1rem 3rem",
+              borderRadius: "30px",
+              fontFamily: "'Poppins', sans-serif",
+              letterSpacing: "1.5px",
+              boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.2)",
+              minWidth: "250px",
+              marginTop: "1rem",
+            }}
+          >
+            🏆 Best Game Scores
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   );

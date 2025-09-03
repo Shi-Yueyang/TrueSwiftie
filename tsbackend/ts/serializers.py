@@ -76,7 +76,8 @@ class GameSessionSerlaiizer(serializers.ModelSerializer):
             "score",
             "current_turn",
             "version",
-            "status"
+            "status",
+            "health"
         ]
 
 class GuessSerializer(serializers.Serializer):

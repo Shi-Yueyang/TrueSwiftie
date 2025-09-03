@@ -75,8 +75,6 @@ class GameSession(models.Model):
     )
     score = models.PositiveIntegerField(default=0)
     version = models.PositiveIntegerField(default=1)  # optimistic concurrency
-    started_at = models.DateTimeField(auto_now_add=True)
-    ended_at = models.DateTimeField(null=True, blank=True)
     current_turn = models.ForeignKey(
         "GameTurn",
         on_delete=models.SET_NULL,
@@ -84,7 +82,9 @@ class GameSession(models.Model):
         blank=True,
         related_name="+",
     )
-    max_turns = models.PositiveIntegerField(default=100)
+    health = models.PositiveIntegerField(default=3)
+    started_at = models.DateTimeField(auto_now_add=True)
+    ended_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
