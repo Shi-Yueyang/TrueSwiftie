@@ -7,6 +7,7 @@ export interface User {
   temporary_name: string;
   is_staff: boolean;
   groups: string[];
+  avatar: string;
 }
 
 interface AuthContextProps {
@@ -16,6 +17,7 @@ interface AuthContextProps {
   refreshToken: string | null;
   isStaff: boolean;
   groups: string[];
+  avatar: string | null;
   isLoading: boolean;
   login: (
     userId: string,
@@ -23,7 +25,8 @@ interface AuthContextProps {
     accessToken: string,
     refreshToken: string,
     isStaff: boolean,
-    groups: string[]
+    groups: string[],
+    avatar: string
   ) => void;
   logout: () => void;
 }
@@ -35,6 +38,7 @@ export const AuthContext = createContext<AuthContextProps>({
   refreshToken: null,
   isStaff: false,
   groups: [],
+  avatar: null,
   isLoading: true,
   login: () => {},
   logout: () => {},
@@ -54,14 +58,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [groups, setGroups] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-
+  const [avatar, setAvatar] = useState<string | null>(null);
   const login = (
     userId: string,
     userName: string,
     accessToken: string,
     refreshToken: string,
     isStaff: boolean,
-    groups: string[]
+    groups: string[],
+    avatar: string
   ) => {
     setUserId(userId);
     setUserName(userName);
@@ -69,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setRefreshToken(refreshToken);
     setIsStaff(isStaff);
     setGroups(groups);
+    setAvatar(avatar);
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
   };
@@ -79,6 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     setRefreshToken(null);
     setIsStaff(false);
     setGroups([]);
+    setAvatar(null);
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
   };
@@ -105,6 +112,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       setUserId(response.data.id);
       setIsStaff(response.data.is_staff);
       setGroups(response.data.groups);
+      setAvatar(response.data.avatar);
     } catch (err) {
       console.error("Error fetching user data:", err);
       logout();
@@ -131,6 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         refreshToken,
         isStaff,
         groups,
+        avatar,
         isLoading,
         login,
         logout,

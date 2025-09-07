@@ -53,7 +53,8 @@ const Signup = () => {
                   responseLogin.data.access,
                   responseLogin.data.refresh,
                   responseMe.data.is_staff,
-                  responseMe.data.groups
+                  responseMe.data.groups,
+                  responseMe.data.avatar
                 );
                 navigate("/");
               });

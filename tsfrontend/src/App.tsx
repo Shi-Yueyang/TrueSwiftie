@@ -13,6 +13,7 @@ import "./styles/App.css";
 import GameHistoryList from "./components/GameHistoryList";
 import ProtectedRoute from "./components/ProtectedRoute ";
 import EditUserInfo from "./pages/EditUserInfo";
+import UserProfile from "./pages/UserProfile";
 
 // animations
 // import { useContext } from "react";
@@ -25,7 +26,7 @@ function App() {
   const location = useLocation();
   const isAuthRoute = location.pathname === "/login";
   const isGameRoute = location.pathname === "/game";
-
+  const isEditRoute = location.pathname === "/edit-user-info";
   return (
     <>
       {/* <Snowfall {...snowfallProps} /> */}
@@ -34,13 +35,21 @@ function App() {
         direction={"column"}
         sx={{ ml: userId && !isAuthRoute && !isGameRoute ? { md: "260px" } : 0 }}
       >
-        {userId && !isAuthRoute && !isGameRoute ? <NavBar /> : null}
+        {userId && !isAuthRoute && !isGameRoute && !isEditRoute ? <NavBar /> : null}
         <Routes>
           <Route
             path="/"
             element={
               <ProtectedRoute>
                 <StartGame />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <UserProfile />
               </ProtectedRoute>
             }
           />

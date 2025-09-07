@@ -57,7 +57,8 @@ const Login = () => {
         responseLogin.data.access,
         responseLogin.data.refresh,
         responseMe.data.is_staff,
-        responseMe.data.groups
+        responseMe.data.groups,
+        responseMe.data.avatar
       );
 
       navigate("/", { replace: true });
@@ -90,7 +91,8 @@ const Login = () => {
           access,
           refresh,
           user.is_staff,
-          user.groups ?? []
+          user.groups ?? [],
+          user.avatar
         );
         navigate("/", { replace: true });
       } catch (err) {

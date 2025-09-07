@@ -1,7 +1,7 @@
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
-import { IoMenu } from "react-icons/io5";
+import { IoMenu, IoHome, IoPerson } from "react-icons/io5";
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/taylor-swift.svg";
@@ -12,6 +12,7 @@ import {
   List,
   ListItem,
   ListItemButton,
+  ListItemIcon,
   ListItemText,
   Drawer,
 } from "@mui/material";
@@ -35,7 +36,10 @@ const NavBar = () => {
       setDrawerOpen(open);
     };
   const list = () => (
-    <Box role="presentation" sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <Box
+      role="presentation"
+      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+    >
       {/* Header */}
       <Box display="flex" alignItems="center" p={2}>
         <img
@@ -60,17 +64,23 @@ const NavBar = () => {
                 setDrawerOpen(false);
               }}
             >
+              <ListItemIcon>
+                <IoHome />
+              </ListItemIcon>
               <ListItemText primary={"Home"} />
             </ListItemButton>
           </ListItem>
-          <ListItem key={3} disablePadding>
+          <ListItem key={2} disablePadding>
             <ListItemButton
               onClick={() => {
-                navigate("/edit-user-info");
+                navigate("/profile");
                 setDrawerOpen(false);
               }}
             >
-              <ListItemText primary={"Edit User Info"} />
+              <ListItemIcon>
+                <IoPerson />
+              </ListItemIcon>
+              <ListItemText primary={"ME!"} />
             </ListItemButton>
           </ListItem>
         </List>
@@ -95,19 +105,21 @@ const NavBar = () => {
   return (
     <>
       {/* Mobile menu opener (since top bar is removed) */}
-      <IconButton
-        aria-label="open menu"
-        onClick={toggleDrawer(true)}
-        sx={{
-          position: "fixed",
-          top: 12,
-          left: 12,
-          zIndex: 1300,
-          display: { xs: "inline-flex", md: "none" },
-        }}
-      >
-        <IoMenu />
-      </IconButton>
+      {!drawerOpen && (
+        <IconButton
+          aria-label="open menu"
+          onClick={toggleDrawer(true)}
+          sx={{
+            position: "fixed",
+            top: 12,
+            left: 12,
+            zIndex: 1300,
+            display: { xs: "inline-flex", md: "none" },
+          }}
+        >
+          <IoMenu />
+        </IconButton>
+      )}
       {/* Mobile: temporary drawer */}
       <Drawer
         anchor="left"

@@ -6,7 +6,7 @@ class CustomUserAdmin(admin.ModelAdmin):
     search_fields = ('username', 'email', 'temporary_name', 'cat_name')
     list_filter = ('is_staff', 'is_superuser', 'is_active', 'date_joined')
     fieldsets = (
-        (None, {'fields': ('username', 'password', 'email', 'temporary_name', 'cat_name')}),
+        (None, {'fields': ('username', 'password', 'email', 'temporary_name', 'cat_name','avatar')}),
         ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
     )
     add_fieldsets = (
