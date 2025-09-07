@@ -6,11 +6,12 @@ import {
   Avatar,
   Chip,
   Box,
-  Button,
+  IconButton,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { useNavigate } from "react-router-dom";
 import "@fontsource/poppins";
+import { IoArrowBack } from "react-icons/io5";
 
 interface TopPlayer {
   id: number;
@@ -114,21 +115,23 @@ const TopPlayers: React.FC = () => {
     <Box
       sx={{
         minHeight: "95vh",
-        backgroundColor: "#f5f5f5",
         padding: { xs: "1rem", sm: "1.5rem", md: "2rem" },
       }}
     >
       <Grid container justifyContent="center">
         <Grid size={{ xs: 12, sm: 10, md: 8, lg: 6 }}>
           {/* Header */}
-          <Box textAlign="center" mb={{ xs: 3, md: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: { xs: 3, md: 4 } }}>
+            <IconButton aria-label="back to home" onClick={() => navigate('/')}>
+              <IoArrowBack />
+            </IconButton>
             <Typography
               variant="h3"
               gutterBottom
               sx={{
                 fontFamily: "'Poppins', sans-serif",
                 fontWeight: "bold",
-                color: "#111",
+                color: "text.primary",
                 letterSpacing: "2px",
                 mb: 1,
                 fontSize: { xs: "1.8rem", sm: "2.5rem", md: "3rem" },
@@ -136,21 +139,6 @@ const TopPlayers: React.FC = () => {
             >
               Top Swifties
             </Typography>
-            <Button
-              variant="outlined"
-              onClick={() => navigate("/")}
-              sx={{
-                borderRadius: "25px",
-                fontFamily: "'Poppins', sans-serif",
-                letterSpacing: "1px",
-                mb: 4,
-                fontSize: { xs: "0.8rem", sm: "0.9rem" },
-                padding: { xs: "8px 16px", sm: "10px 20px" },
-              }}
-            >
-              ← Back to Start
-            </Button>
-
           </Box>
 
           {/* Top Players List */}

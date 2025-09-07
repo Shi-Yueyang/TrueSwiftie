@@ -1,7 +1,7 @@
 import GamePage from "./pages/GamePage";
 import { Route, Routes, useLocation } from "react-router-dom";
 import GameOver from "./pages/GameOver";
-import StartGame from "./pages/StartGame";
+import HomePage from "./pages/HomePage";
 import TopPlayers from "./pages/TopPlayers";
 import { Stack } from "@mui/material";
 import { useContext } from "react";
@@ -10,7 +10,7 @@ import NavBar from "./components/NavBar";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import "./styles/App.css";
-import GameHistoryList from "./components/GameHistoryList";
+import GameHistoryPage from "./pages/GameHistoryPage";
 import ProtectedRoute from "./components/ProtectedRoute ";
 import EditUserInfo from "./pages/EditUserInfo";
 import UserProfile from "./pages/UserProfile";
@@ -25,23 +25,25 @@ function App() {
   const { userId } = useContext(AuthContext);
   const location = useLocation();
   const isAuthRoute = location.pathname === "/login";
-  const isGameRoute = location.pathname === "/game";
-  const isEditRoute = location.pathname === "/edit-user-info";
+  const isHomeRoute = location.pathname === "/";
+  const isProfileRoute = location.pathname === "/profile";
   return (
     <>
       {/* <Snowfall {...snowfallProps} /> */}
 
       <Stack
         direction={"column"}
-        sx={{ ml: userId && !isAuthRoute && !isGameRoute ? { md: "260px" } : 0 }}
+        sx={{
+          ml: userId && !isAuthRoute  ? { md: "260px" } : 0,
+        }}
       >
-        {userId && !isAuthRoute && !isGameRoute && !isEditRoute ? <NavBar /> : null}
+        {userId && (isHomeRoute || isProfileRoute )? <NavBar /> : null}
         <Routes>
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <StartGame />
+                <HomePage />
               </ProtectedRoute>
             }
           />
@@ -75,7 +77,7 @@ function App() {
             path="/game-history"
             element={
               <ProtectedRoute>
-                <GameHistoryList />
+                <GameHistoryPage />
               </ProtectedRoute>
             }
           />

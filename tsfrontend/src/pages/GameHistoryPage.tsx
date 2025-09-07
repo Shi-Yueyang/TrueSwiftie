@@ -9,16 +9,19 @@ import {
   Container,
   CircularProgress,
   Pagination,
+  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import Grid from "@mui/material/Grid2";
 import { AuthContext } from "../context/AuthContex";
-import MusicPlayer from "./MusicPlayer";
+import { useNavigate } from "react-router-dom";
+import { IoArrowBack } from "react-icons/io5";
+import MusicPlayer from "../components/MusicPlayer";
 import {
   fetchPreviousSessionResults,
   PreviousSessionResults,
 } from "../services/api";
-import { Song } from "./MusicQuiz";
+import { Song } from "../components/MusicQuiz";
 
 // Styled components
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -52,8 +55,9 @@ const ScoreBox = styled(Box, {
 
 // New types for sessions
 
-const GameHistoryList: React.FC = () => {
+const GameHistoryPage: React.FC = () => {
   const { userId } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [previousResults, setPreviousResults] = useState<
     PreviousSessionResults[] | undefined
   >([]);
@@ -99,6 +103,15 @@ const GameHistoryList: React.FC = () => {
 
   return (
     <Container maxWidth="md">
+      <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 3 }}>
+        <IconButton aria-label="back to home" onClick={() => navigate('/') }>
+          <IoArrowBack />
+        </IconButton>
+        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+          Game History
+        </Typography>
+      </Box>
+
       <Box sx={{ py: 4, pb: selectedSong ? 12 : 4 }}>
         {loading && (
           <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
@@ -167,4 +180,4 @@ const GameHistoryList: React.FC = () => {
   );
 };
 
-export default GameHistoryList;
+export default GameHistoryPage;
