@@ -58,8 +58,9 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['post'], permission_classes=[AllowAny], url_path='google-login')
     def google_login(self, request):
         credential = request.data.get('credential')
+        print("credential",credential)
         if not credential:
-            return Response({'detail': 'Missing credential'}, status=400)
+            return Response({'detail': 'Missing access_token'}, status=400)
 
         # Decode without verification (no network calls)
         try:

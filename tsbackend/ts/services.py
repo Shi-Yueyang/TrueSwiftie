@@ -7,6 +7,7 @@ from typing import Iterable, List, Optional, Tuple
 from django.db import transaction
 from django.db.models import F
 from django.utils import timezone
+from datetime import timedelta
 
 from ts.models import (
     GameSession,
@@ -180,3 +181,42 @@ def end_session(session_id:int, version:int,user:User):
     session.save(update_fields=["status", "ended_at", "version"])
     turn.save(update_fields=["outcome"])
     return session, turn
+
+
+def get_top_score_of_current_week(
+    page: int = 1,
+    page_size: int = 10,
+) -> Tuple[List[Tuple[int, User]], int]:
+    """
+    Return paginated GameSession scores for the current week, ordered by score desc then ended_at desc.
+
+    Args:
+        page: 1-based page index.
+        page_size: number of records per page.
+
+    Returns:
+        (items, total_count)
+        items: List of tuples (score, user)
+        total_count: total number of matching sessions this week
+
+    Assumption: week starts on Monday (ISO weekday 0). We consider sessions with
+    a non-null ended_at on or after the start of the current week and status ENDED.
+    """
+    if page <= 0:
+        page = 1
+    if page_size <= 0:
+        page_size = 10
+
+    now = timezone.now()
+    start_of_week = now - timedelta(days=now.weekday())
+
+    qs = (
+        GameSession.objects.filter(ended_at__gte=start_of_week, status=GameSessionStatus.ENDED)
+        .order_by("-score", "-ended_at")
+        .select_related("user")
+    )
+    total = qs.count()
+    offset = (page - 1) * page_size
+    page_qs = qs[offset : offset + page_size]
+    items: List[Tuple[int, User]] = [(s.score, s.user) for s in page_qs]
+    return items, total

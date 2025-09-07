@@ -1,6 +1,13 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
-from .services import create_next_turn, end_session, start_session, submit_guess
+from .services import (
+    create_next_turn,
+    end_session,
+    start_session,
+    submit_guess,
+    get_top_score_of_current_week,
+)
+from .services import get_top_score_of_current_week
 from .models import (
     GameSession,
     GameSessionStatus,
@@ -8,17 +15,15 @@ from .models import (
     Song,
     SongTitle,
     Poster,
-    GameHistory,
     Comment,
 )
 from .serializers import (
-    GameHistoryReadSerializer,
+    
     GuessSerializer,
     VersionNumberSerializer,
     SongSerializer,
     SongTitleSerializer,
     PosterSerializer,
-    GameHistoryWriteSerializer,
     CommentSerializer,
     GameSessionSerlaiizer,
     GameTurnSerializer,
@@ -30,6 +35,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 import random
 from django.utils import timezone
 from datetime import timedelta
+from core.serializer import UserSerializer
 
 
 class SongViewSet(viewsets.ModelViewSet):
@@ -66,44 +72,6 @@ class SongTitleViewSet(viewsets.ModelViewSet):
 class PosterViewSet(viewsets.ModelViewSet):
     queryset = Poster.objects.all()
     serializer_class = PosterSerializer
-
-
-class GameHistoryViewSet(viewsets.ModelViewSet):
-    queryset = GameHistory.objects.all().order_by("-id")
-    serializer_class = GameHistoryWriteSerializer
-
-    def get_serializer(self, *args, **kwargs):
-        if self.action == "top_scores":
-            return GameHistoryReadSerializer(*args, **kwargs)
-        return super().get_serializer(*args, **kwargs)
-
-    def get_queryset(self):
-        start_time = self.request.query_params.get("start_time", None)
-        end_time = self.request.query_params.get("end_time", None)
-        user_id = self.request.query_params.get("user_id", None)
-        query = self.queryset
-        if user_id:
-            query = query.filter(score__gt=0)
-            query = query.filter(user=user_id)
-        if start_time:
-            query = query.filter(start_time__gte=start_time)
-        if end_time:
-            query = query.filter(end_time__lte=end_time)
-        return query
-
-    @action(detail=False, methods=["get"], url_path="top-scores")
-    def top_scores(self, request):
-        now = timezone.now()
-        start_of_week = now - timedelta(days=now.weekday() + 1)
-        top_scores = GameHistory.objects.filter(start_time__gte=start_of_week).order_by(
-            "-score", "pk"
-        )
-        page = self.paginate_queryset(top_scores)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        serializer = self.get_serializer(top_scores, many=True)
-        return Response(serializer.data)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -246,6 +214,57 @@ class GameSessionViewSet(viewsets.ModelViewSet):
             return self.get_paginated_response(results)
         
         return Response(results)
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+        url_path="top-week-scores",
+    )
+    def top_week_scores(self, request):
+        """
+        Return paginated best scores for the current week, ordered by score desc then ended_at desc.
+        Query params: page (1-based), page_size.
+        Response: { count, page, page_size, results: [{ score, user }] }
+        """
+        try:
+            page = int(request.query_params.get("page", 1))
+        except ValueError:
+            page = 1
+        # Default to paginator page_size if available
+        default_ps = getattr(getattr(self, 'paginator', None), 'page_size', 10) or 10
+        try:
+            page_size = int(request.query_params.get("page_size", default_ps))
+        except ValueError:
+            page_size = default_ps
+
+        items, total = get_top_score_of_current_week(page=page, page_size=page_size)
+        results = [{"score": score, "user": UserSerializer(user).data} for score, user in items]
+        payload = {
+            "count": total,
+            "page": page,
+            "page_size": page_size,
+            "results": results,
+        }
+        return Response(payload)
+
+    @action(detail=False, methods=["get"], url_path="top-week-score")
+    def top_week_score(self, request):
+        """Return the top finished game session score for the current week.
+
+        Response shape: {"score": int, "user": {"id": int, "username": str}}
+        If no sessions this week, return 204 No Content.
+        """
+        res = get_top_score_of_current_week()
+        if not res:
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        score, user = res
+        user_data = {"id": user.id}
+        # include username if available
+        username = getattr(user, "username", None)
+        if username:
+            user_data["username"] = username
+        return Response({"score": score, "user": user_data})
 
 
 

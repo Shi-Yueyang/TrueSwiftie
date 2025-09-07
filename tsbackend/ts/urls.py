@@ -5,7 +5,6 @@ from .views import (
     rand_titles,
     SongTitleViewSet,
     PosterViewSet,
-    GameHistoryViewSet,
     CommentViewSet,
     GameSessionViewSet,
     GameTurnViewSet,
@@ -15,7 +14,6 @@ router = DefaultRouter()
 router.register(r"songs", SongViewSet)
 router.register(r"song-titles", SongTitleViewSet)
 router.register(r"posters", PosterViewSet)
-router.register(r"game-histories", GameHistoryViewSet)
 router.register(r"comments", CommentViewSet)
 router.register(r"game-sessions", GameSessionViewSet, basename="game-session")
 router.register(r"game-turns", GameTurnViewSet, basename="game-turns")

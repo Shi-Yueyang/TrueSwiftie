@@ -70,11 +70,10 @@ const Login = () => {
 
   // Custom Google sign-in via useGoogleLogin; replace default button with an icon trigger
   const googleLogin = useGoogleLogin({
-    // Use implicit flow to obtain an access_token client-side.
-    // If your backend expects an auth code instead, set flow: 'auth-code'
-    // and send { code: codeResponse.code } below.
+
     onSuccess: async (tokenResponse) => {
       try {
+        console.log("Google token response:", tokenResponse);
         setError("");
         const access_token = (tokenResponse as any).access_token;
 
