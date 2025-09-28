@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Typography,
   Card,
@@ -12,91 +12,17 @@ import Grid from "@mui/material/Grid2";
 import { useNavigate } from "react-router-dom";
 import "@fontsource/poppins";
 import { IoArrowBack } from "react-icons/io5";
+import { fetchTopWeekScore, TopWeekScore } from "../services/api";
 
-interface TopPlayer {
-  id: number;
-  username: string;
-  score: number;
-  rank: number;
-  avatar?: string;
-}
+
+const backendIp = import.meta.env.VITE_BACKEND_IP;
 
 // Mock data for top single game scores this week
-const mockTopPlayers: TopPlayer[] = [
-  {
-    id: 1,
-    username: "SwiftieQueen13",
-    score: 1850,
-    rank: 1,
-    avatar: "🏆",
-  },
-  {
-    id: 2,
-    username: "TaylorFan22",
-    score: 1720,
-    rank: 2,
-    avatar: "🌟",
-  },
-  {
-    id: 3,
-    username: "RedLover89",
-    score: 1680,
-    rank: 3,
-    avatar: "💫",
-  },
-  {
-    id: 4,
-    username: "FolkloreVibes",
-    score: 1620,
-    rank: 4,
-    avatar: "🍂",
-  },
-  {
-    id: 5,
-    username: "MidnightMaster",
-    score: 1580,
-    rank: 5,
-    avatar: "🌙",
-  },
-  {
-    id: 6,
-    username: "ErasTourer",
-    score: 1540,
-    rank: 6,
-    avatar: "✨",
-  },
-  {
-    id: 7,
-    username: "Reputation13",
-    score: 1490,
-    rank: 7,
-    avatar: "🐍",
-  },
-  {
-    id: 8,
-    username: "LoverHeart",
-    score: 1450,
-    rank: 8,
-    avatar: "💖",
-  },
-  {
-    id: 9,
-    username: "SpeakNowFan",
-    score: 1420,
-    rank: 9,
-    avatar: "💜",
-  },
-  {
-    id: 10,
-    username: "FearlessSwiftie",
-    score: 1380,
-    rank: 10,
-    avatar: "🎸",
-  },
-];
+
 
 const TopPlayers: React.FC = () => {
   const navigate = useNavigate();
+  const [topWeekScores,setTopWeekScores] = useState<TopWeekScore[]|null>(null);
 
   const getRankColor = (rank: number) => {
     switch (rank) {
@@ -111,6 +37,13 @@ const TopPlayers: React.FC = () => {
     }
   };
 
+  useEffect(()=>{
+    const fetchScores = async ()=>{
+      const scores = await fetchTopWeekScore();
+      setTopWeekScores(scores);
+    }
+    fetchScores();
+  },[])
   return (
     <Box
       sx={{
@@ -143,87 +76,103 @@ const TopPlayers: React.FC = () => {
 
           {/* Top Players List */}
           <Grid container spacing={{ xs: 1, sm: 2 }}>
-            {mockTopPlayers.map((player) => (
-              <Grid size={12} key={player.id}>
-                <Card
-                  sx={{
-                    borderRadius: "15px",
-                    boxShadow: player.rank <= 3 ? "0px 6px 20px rgba(0, 0, 0, 0.15)" : "0px 2px 8px rgba(0, 0, 0, 0.1)",
-                    border: player.rank <= 3 ? `2px solid ${getRankColor(player.rank)}` : "none",
-                    transition: "transform 0.2s ease-in-out",
-                    "&:hover": {
-                      transform: "translateY(-2px)",
-                    },
-                  }}
-                >
-                  <CardContent sx={{ padding: { xs: "12px", sm: "16px" } }}>
-                    <Grid container alignItems="center" spacing={{ xs: 1, sm: 2 }}>
-                      {/* Rank */}
-                      <Grid>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            width: { xs: 40, sm: 50 },
-                            height: { xs: 40, sm: 50 },
-                            borderRadius: "50%",
-                            backgroundColor: player.rank <= 3 ? getRankColor(player.rank) : "#f0f0f0",
-                            color: player.rank <= 3 ? "white" : "#666",
-                            fontWeight: "bold",
-                            fontSize: { xs: "1rem", sm: "1.2rem" },
-                          }}
-                        >
-                          {player.rank}
-                        </Box>
-                      </Grid>
+            {topWeekScores?.map((playerScore, idx) => {
+              const rank = idx + 1;
+              const user = playerScore.user;
+              return (
+                <Grid size={12} key={`${user.id}-${idx}`}>
+                  <Card
+                    sx={{
+                      borderRadius: "15px",
+                      boxShadow:
+                        rank <= 3
+                          ? "0px 6px 20px rgba(0, 0, 0, 0.15)"
+                          : "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                      border: rank <= 3 ? `2px solid ${getRankColor(rank)}` : "none",
+                      transition: "transform 0.2s ease-in-out",
+                      "&:hover": {
+                        transform: "translateY(-2px)",
+                      },
+                    }}
+                  >
+                    <CardContent sx={{ padding: { xs: "12px", sm: "16px" } }}>
+                      <Grid container alignItems="center" spacing={{ xs: 1, sm: 2 }}>
+                        {/* Rank */}
+                        <Grid>
+                          <Box
+                            sx={{
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              width: { xs: 40, sm: 50 },
+                              height: { xs: 40, sm: 50 },
+                              borderRadius: "50%",
+                              backgroundColor: rank <= 3 ? getRankColor(rank) : "#f0f0f0",
+                              color: rank <= 3 ? "white" : "#666",
+                              fontWeight: "bold",
+                              fontSize: { xs: "1rem", sm: "1.2rem" },
+                            }}
+                          >
+                            {rank}
+                          </Box>
+                        </Grid>
 
-                      {/* Avatar */}
-                      <Grid>
-                        <Avatar
-                          sx={{
-                            width: { xs: 40, sm: 50 },
-                            height: { xs: 40, sm: 50 },
-                            fontSize: { xs: "1.2rem", sm: "1.5rem" },
-                            backgroundColor: "#f0f0f0",
-                          }}
-                        >
-                          {player.avatar}
-                        </Avatar>
-                      </Grid>
+                        {/* Avatar */}
+                        <Grid>
+                          <Avatar
+                            src={`${backendIp}/${user.avatar}`}
+                            alt={user.username}
+                            sx={{
+                              width: { xs: 40, sm: 50 },
+                              height: { xs: 40, sm: 50 },
+                              fontSize: { xs: "1.2rem", sm: "1.5rem" },
+                              backgroundColor: "#f0f0f0",
+                            }}
+                          >
+                            {(user.username || "?").charAt(0).toUpperCase()}
+                          </Avatar>
+                        </Grid>
 
-                      {/* Player Info and Score */}
-                      <Grid size="grow" container direction={{ xs: "column", sm: "row" }} alignItems={{ xs: "center", sm: "flex-start" }} justifyContent={{ sm: "space-between" }} spacing={{ xs: 1, sm: 0 }}>
-                        <Typography
-                          variant="h6"
-                          sx={{
-                            fontFamily: "'Poppins', sans-serif",
-                            fontWeight: "600",
-                            color: "#111",
-                            fontSize: { xs: "1rem", sm: "1.25rem" },
-                          }}
+                        {/* Player Info and Score */}
+                        <Grid
+                          size="grow"
+                          container
+                          direction={{ xs: "column", sm: "row" }}
+                          alignItems={{ xs: "center", sm: "flex-start" }}
+                          justifyContent={{ sm: "space-between" }}
+                          spacing={{ xs: 1, sm: 0 }}
                         >
-                          {player.username}
-                        </Typography>
-                        <Chip
-                          label={`${player.score.toLocaleString()} pts`}
-                          sx={{
-                            backgroundColor: player.rank <= 3 ? getRankColor(player.rank) : "#e0e0e0",
-                            color: player.rank <= 3 ? "white" : "#666",
-                            fontWeight: "bold",
-                            fontFamily: "'Poppins', sans-serif",
-                            fontSize: { xs: "0.75rem", sm: "0.9rem" },
-                            minWidth: { xs: "80px", sm: "100px" },
-                            height: { xs: "28px", sm: "32px" },
-                            textAlign: "right",
-                          }}
-                        />
+                          <Typography
+                            variant="h6"
+                            sx={{
+                              fontFamily: "'Poppins', sans-serif",
+                              fontWeight: "600",
+                              color: "#111",
+                              fontSize: { xs: "1rem", sm: "1.25rem" },
+                            }}
+                          >
+                            {user.username}
+                          </Typography>
+                          <Chip
+                            label={`${playerScore.score.toLocaleString()} pts`}
+                            sx={{
+                              backgroundColor: rank <= 3 ? getRankColor(rank) : "#e0e0e0",
+                              color: rank <= 3 ? "white" : "#666",
+                              fontWeight: "bold",
+                              fontFamily: "'Poppins', sans-serif",
+                              fontSize: { xs: "0.75rem", sm: "0.9rem" },
+                              minWidth: { xs: "80px", sm: "100px" },
+                              height: { xs: "28px", sm: "32px" },
+                              textAlign: "right",
+                            }}
+                          />
+                        </Grid>
                       </Grid>
-                    </Grid>
-                  </CardContent>
-                </Card>
-              </Grid>
-            ))}
+                    </CardContent>
+                  </Card>
+                </Grid>
+              );
+            })}
           </Grid>
 
         </Grid>

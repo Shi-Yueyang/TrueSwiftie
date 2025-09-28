@@ -183,29 +183,8 @@ def end_session(session_id:int, version:int,user:User):
     return session, turn
 
 
-def get_top_score_of_current_week(
-    page: int = 1,
-    page_size: int = 10,
-) -> Tuple[List[Tuple[int, User]], int]:
-    """
-    Return paginated GameSession scores for the current week, ordered by score desc then ended_at desc.
+def get_top_score_of_current_week() -> Tuple[List[Tuple[int, User]], int]:
 
-    Args:
-        page: 1-based page index.
-        page_size: number of records per page.
-
-    Returns:
-        (items, total_count)
-        items: List of tuples (score, user)
-        total_count: total number of matching sessions this week
-
-    Assumption: week starts on Monday (ISO weekday 0). We consider sessions with
-    a non-null ended_at on or after the start of the current week and status ENDED.
-    """
-    if page <= 0:
-        page = 1
-    if page_size <= 0:
-        page_size = 10
 
     now = timezone.now()
     start_of_week = now - timedelta(days=now.weekday())
@@ -215,8 +194,6 @@ def get_top_score_of_current_week(
         .order_by("-score", "-ended_at")
         .select_related("user")
     )
-    total = qs.count()
-    offset = (page - 1) * page_size
-    page_qs = qs[offset : offset + page_size]
+    page_qs = qs[0 : 13]
     items: List[Tuple[int, User]] = [(s.score, s.user) for s in page_qs]
-    return items, total
+    return items

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { GameTurn,GameSession } from "../context/AppContext";
 import { Song } from "../components/MusicQuiz";
+import { User } from "../context/AuthContex";
 const backendIp = import.meta.env.VITE_BACKEND_IP;
 
 export interface PaginatedResponse<T> {
@@ -25,6 +26,15 @@ interface EndSessionResponse{
   turn:GameTurn;
   session:GameSession
 }
+
+export interface TopWeekScore{
+  score:number;
+  user:User
+}
+export const createBlobUrl = (arrayBuffer: ArrayBuffer, mimeType: string) => {
+  const blob = new Blob([arrayBuffer], { type: mimeType });
+  return URL.createObjectURL(blob);
+};
 
 export interface PreviousSessionResults{
   session_id:number;
@@ -154,7 +164,11 @@ export const fetchPreviousSessionResults = async (page:number):Promise<Paginated
   return res.data;
 };
 
-export const createBlobUrl = (arrayBuffer: ArrayBuffer, mimeType: string) => {
-  const blob = new Blob([arrayBuffer], { type: mimeType });
-  return URL.createObjectURL(blob);
-};
+export const fetchTopWeekScore = async ():Promise<TopWeekScore[]> =>{
+  const res = await axios.get(`${backendIp}/ts/game-sessions/top-week-scores/`, {
+    headers: { ...authHeaders() }
+  });
+  return res.data
+}
+
+

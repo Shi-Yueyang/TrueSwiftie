@@ -17,7 +17,7 @@ import {
   Drawer,
 } from "@mui/material";
 
-const NavBar = () => {
+const SideBar = () => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { logout } = useContext(AuthContext);
   const drawerWidth = 260;
@@ -151,4 +151,4 @@ const NavBar = () => {
   );
 };
 
-export default NavBar;
+export default SideBar;

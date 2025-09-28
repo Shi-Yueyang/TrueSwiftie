@@ -3,10 +3,11 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import GameOver from "./pages/GameOver";
 import HomePage from "./pages/HomePage";
 import TopPlayers from "./pages/TopPlayers";
-import { Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import { useContext } from "react";
 import { AuthContext } from "./context/AuthContex";
-import NavBar from "./components/NavBar";
+import SideBar from "./components/SideBar";
+import BottomBar from "./components/BottomBar";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import "./styles/App.css";
@@ -24,7 +25,6 @@ function App() {
   // const {  snowfallProps } = useContext(AppContext);
   const { userId } = useContext(AuthContext);
   const location = useLocation();
-  const isAuthRoute = location.pathname === "/login";
   const isHomeRoute = location.pathname === "/";
   const isProfileRoute = location.pathname === "/profile";
   return (
@@ -34,10 +34,25 @@ function App() {
       <Stack
         direction={"column"}
         sx={{
-          ml: userId && !isAuthRoute  ? { md: "260px" } : 0,
+          // Only reserve left space when the desktop sidebar is actually shown
+          ml:
+            userId && (isHomeRoute || isProfileRoute)
+              ? { md: "260px" }
+              : 0,
         }}
       >
-        {userId && (isHomeRoute || isProfileRoute )? <NavBar /> : null}
+        {userId && (isHomeRoute || isProfileRoute) ? (
+          <>
+            {/* Desktop Sidebar */}
+            <Box sx={{ display: { xs: "none", md: "block" } }}>
+              <SideBar />
+            </Box>
+            {/* Mobile Bottom Bar */}
+            <Box sx={{ display: { xs: "block", md: "none" } }}>
+              <BottomBar />
+            </Box>
+          </>
+        ) : null}
         <Routes>
           <Route
             path="/"

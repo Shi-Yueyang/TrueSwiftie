@@ -3,17 +3,16 @@ import { useContext } from "react";
 import Grid from "@mui/material/Grid2";
 import Avatar from "@mui/material/Avatar";
 import { AuthContext } from "../context/AuthContex";
-import { IoPencil, IoTrophy, IoMusicalNote } from "react-icons/io5";
+import { IoPencil, IoTrophy } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
-  const { userName, avatar } = useContext(AuthContext);
+  const { userName, avatar, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   console.log("Avatar URL:", avatar);
   // Placeholder stats - wire up to real data later
   const stats = [
     { label: "Games Played", value: 56, icon: <IoTrophy /> },
-    { label: "Songs Guessed", value: 12, icon: <IoMusicalNote /> },
   ];
 
   const achievements = [{ title: "Tree Hugger" }, { title: "Sharpshooter" }];
@@ -31,21 +30,30 @@ const UserProfile = () => {
           {userName ?? "Player"}
         </Typography>
 
-        <Button
-          startIcon={<IoPencil />}
-          variant="contained"
-          color="primary"
-          onClick={() => navigate("/edit-user-info")}
-          sx={{
-            mt: 2,
-            textTransform: "none",
-            borderRadius: 3,
-            px: 2.5,
-            boxShadow: 2,
-          }}
-        >
-          Edit Profile
-        </Button>
+        <Box sx={{ display: "flex", gap: 1.5, mt: 2, flexWrap: "wrap" }}>
+          <Button
+            startIcon={<IoPencil />}
+            variant="contained"
+            color="primary"
+            onClick={() => navigate("/edit-user-info")}
+            sx={{
+              textTransform: "none",
+              borderRadius: 3,
+              px: 2.5,
+              boxShadow: 2,
+            }}
+          >
+            Edit Profile
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => logout()}
+            sx={{ textTransform: "none", borderRadius: 3, px: 2.5 }}
+          >
+            Log out
+          </Button>
+        </Box>
       </Box>
 
       {/* Stats */}

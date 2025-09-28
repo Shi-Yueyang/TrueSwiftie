@@ -222,51 +222,9 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         url_path="top-week-scores",
     )
     def top_week_scores(self, request):
-        """
-        Return paginated best scores for the current week, ordered by score desc then ended_at desc.
-        Query params: page (1-based), page_size.
-        Response: { count, page, page_size, results: [{ score, user }] }
-        """
-        try:
-            page = int(request.query_params.get("page", 1))
-        except ValueError:
-            page = 1
-        # Default to paginator page_size if available
-        default_ps = getattr(getattr(self, 'paginator', None), 'page_size', 10) or 10
-        try:
-            page_size = int(request.query_params.get("page_size", default_ps))
-        except ValueError:
-            page_size = default_ps
-
-        items, total = get_top_score_of_current_week(page=page, page_size=page_size)
+        items = get_top_score_of_current_week()
         results = [{"score": score, "user": UserSerializer(user).data} for score, user in items]
-        payload = {
-            "count": total,
-            "page": page,
-            "page_size": page_size,
-            "results": results,
-        }
-        return Response(payload)
-
-    @action(detail=False, methods=["get"], url_path="top-week-score")
-    def top_week_score(self, request):
-        """Return the top finished game session score for the current week.
-
-        Response shape: {"score": int, "user": {"id": int, "username": str}}
-        If no sessions this week, return 204 No Content.
-        """
-        res = get_top_score_of_current_week()
-        if not res:
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        score, user = res
-        user_data = {"id": user.id}
-        # include username if available
-        username = getattr(user, "username", None)
-        if username:
-            user_data["username"] = username
-        return Response({"score": score, "user": user_data})
-
-
+        return Response(results)
 
 
 
