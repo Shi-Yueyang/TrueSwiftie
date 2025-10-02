@@ -13,6 +13,7 @@ export interface User {
 interface AuthContextProps {
   userId: string | null;
   userName: string | null;
+  email: string | null;
   accessToken: string | null;
   refreshToken: string | null;
   isStaff: boolean;
@@ -29,11 +30,13 @@ interface AuthContextProps {
     avatar: string
   ) => void;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 export const AuthContext = createContext<AuthContextProps>({
   userId: null,
   userName: null,
+  email: null,
   accessToken: null,
   refreshToken: null,
   isStaff: false,
@@ -42,6 +45,7 @@ export const AuthContext = createContext<AuthContextProps>({
   isLoading: true,
   login: () => {},
   logout: () => {},
+  refreshUser: async () => {},
 });
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -49,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [userId, setUserId] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
@@ -109,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } else {
         setUserName(response.data.temporary_name);
       }
+      setEmail(response.data.email ?? null);
       setUserId(response.data.id);
       setIsStaff(response.data.is_staff);
       setGroups(response.data.groups);
@@ -135,6 +141,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         userId,
         userName,
+  email,
         accessToken,
         refreshToken,
         isStaff,
@@ -143,6 +150,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading,
         login,
         logout,
+        refreshUser: fetchUserData,
       }}
     >
       {children}

@@ -33,8 +33,6 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import random
-from django.utils import timezone
-from datetime import timedelta
 from core.serializer import UserSerializer
 
 
@@ -215,6 +213,23 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         
         return Response(results)
 
+
+    @action(
+        detail=False,
+        methods=["get"],
+        permission_classes=[IsAuthenticated],
+        url_path="total-played",
+    )
+    def total_played(self, request):
+        """
+        Return the total number of games played by the authenticated user.
+        Here we consider a "played" game as a finished session (status=ENDED).
+        """
+        user = request.user
+        total = GameSession.objects.filter(user=user, status=GameSessionStatus.ENDED).count()
+        return Response({"total_played": total})
+
+    
     @action(
         detail=False,
         methods=["get"],

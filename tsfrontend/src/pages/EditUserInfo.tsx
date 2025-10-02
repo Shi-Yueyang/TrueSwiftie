@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, TextField, Typography, IconButton, InputAdornment } from "@mui/material";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { Box, Button, TextField, Typography, IconButton, InputAdornment, Snackbar, Alert, CircularProgress } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../context/AuthContex";
+import { updateUserProfile } from "../services/api";
 import {
   IoPencil,
   IoPerson,
@@ -13,10 +15,11 @@ import {
 
 const EditUserInfo = () => {
   const navigate = useNavigate();
+  const { userId, userName, email: ctxEmail, avatar: ctxAvatar, refreshUser } = useContext(AuthContext);
 
-  // Form state (replace defaults with your real data source if available)
-  const [username, setUsername] = useState("Gamer123");
-  const [email, setEmail] = useState("gamer@example.com");
+  // Form state (prefilled from AuthContext)
+  const [username, setUsername] = useState(userName ?? "");
+  const [email, setEmail] = useState(ctxEmail ?? "");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -26,10 +29,28 @@ const EditUserInfo = () => {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // UX state
+  const [saving, setSaving] = useState(false);
+  const [snackbar, setSnackbar] = useState<{open:boolean; message:string; severity:"success"|"error"}>({open:false, message:"", severity:"success"});
+
+  // track original values based on current context (updates when context changes)
+  const original = useMemo(() => ({ username: userName ?? "", email: ctxEmail ?? "" }), [userName, ctxEmail]);
+  const isDirty =
+    username !== original.username ||
+    email !== original.email ||
+    password.length > 0 ||
+    avatarFile !== null;
+
   const previewUrl = useMemo(() => {
     if (avatarFile) return URL.createObjectURL(avatarFile);
-    return null;
-  }, [avatarFile]);
+    return ctxAvatar || null;
+  }, [avatarFile, ctxAvatar]);
+
+  // keep local form inputs in sync if context changes (e.g., after refreshUser)
+  useEffect(() => {
+    setUsername(userName ?? "");
+    setEmail(ctxEmail ?? "");
+  }, [userName, ctxEmail]);
 
   useEffect(() => {
     return () => {
@@ -45,12 +66,29 @@ const EditUserInfo = () => {
     if (file) setAvatarFile(file);
   };
 
-  const onSave = (e: React.FormEvent) => {
+  const onSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: integrate with your API and/or AuthContext.
-    // Example:
-    // await api.updateProfile({ username, email, password, avatar: avatarFile });
-    navigate(-1);
+    if (!userId) return;
+    if (!isDirty) return;
+    if (confirmPassword !== "" && confirmPassword !== password) return;
+    try {
+      setSaving(true);
+      await updateUserProfile(userId, {
+        username,
+        email,
+        password: password || undefined,
+        avatar: avatarFile,
+      });
+      await refreshUser();
+      setSnackbar({ open: true, message: "Profile updated", severity: "success" });
+      // Optionally navigate back after a short delay
+      setTimeout(() => navigate(-1), 600);
+    } catch (err) {
+      console.error("Failed to update profile", err);
+      setSnackbar({ open: true, message: "Failed to update profile", severity: "error" });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // password visibility toggle handled inline
@@ -226,13 +264,33 @@ const EditUserInfo = () => {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={confirmPassword !== "" && confirmPassword !== password}
+            disabled={
+              saving ||
+              !isDirty ||
+              (confirmPassword !== "" && confirmPassword !== password)
+            }
+            startIcon={saving ? <CircularProgress color="inherit" size={16} /> : undefined}
             sx={{ borderRadius: 2, px: 3 }}
           >
-            Save
+            {saving ? "Saving..." : "Save"}
           </Button>
         </Box>
       </Box>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={2000}
+        onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setSnackbar((s) => ({ ...s, open: false }))}
+          severity={snackbar.severity}
+          variant="filled"
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

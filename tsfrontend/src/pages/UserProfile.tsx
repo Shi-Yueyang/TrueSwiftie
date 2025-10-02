@@ -1,21 +1,35 @@
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import Grid from "@mui/material/Grid2";
 import Avatar from "@mui/material/Avatar";
 import { AuthContext } from "../context/AuthContex";
 import { IoPencil, IoTrophy } from "react-icons/io5";
+import { fetchTotalGamesPlayed } from "../services/api";
 import { useNavigate } from "react-router-dom";
 
 const UserProfile = () => {
   const { userName, avatar, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   console.log("Avatar URL:", avatar);
-  // Placeholder stats - wire up to real data later
-  const stats = [
-    { label: "Games Played", value: 56, icon: <IoTrophy /> },
-  ];
+  const [totalPlayed, setTotalPlayed] = useState<number | null>(null);
 
-  const achievements = [{ title: "Tree Hugger" }, { title: "Sharpshooter" }];
+  useEffect(() => {
+    let mounted = true;
+    fetchTotalGamesPlayed()
+      .then((n) => {
+        if (mounted) setTotalPlayed(n);
+      })
+      .catch(() => {
+        if (mounted) setTotalPlayed(0);
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const stats = [{ label: "Games Played", value: totalPlayed ?? "-", icon: <IoTrophy /> }];
+
+  // Achievements will be added in a future update
 
   return (
     <Box sx={{ minHeight: "100vh", py: 4, px: { xs: 2, sm: 3, md: 4 } }}>
@@ -110,32 +124,21 @@ const UserProfile = () => {
         >
           Achievements
         </Typography>
-        <Grid container spacing={2} >
-          {achievements.map((a, i) => (
-            <Grid key={`${a.title}-${i}`} size={{ xs: 12, sm: 4, md: 3 }}>
-              <Card
-                elevation={0}
-                sx={(theme) => ({
-                  borderRadius: 3,
-                  bgcolor: theme.palette.background.paper,
-                  border: 1,
-                  borderColor: "divider",
-                })}
-              >
-                <CardContent
-                  sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.2 }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ color: "text.primary", fontWeight: 600 }}
-                  >
-                    {a.title}
-                  </Typography>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
+        <Card
+          elevation={0}
+          sx={(theme) => ({
+            borderRadius: 3,
+            bgcolor: theme.palette.background.paper,
+            border: 1,
+            borderColor: "divider",
+          })}
+        >
+          <CardContent sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
+            <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', fontWeight: 600 }}>
+              Achievements coming soon
+            </Typography>
+          </CardContent>
+        </Card>
       </Box>
     </Box>
   );

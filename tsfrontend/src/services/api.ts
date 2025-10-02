@@ -171,4 +171,53 @@ export const fetchTopWeekScore = async ():Promise<TopWeekScore[]> =>{
   return res.data
 }
 
+export const fetchTotalGamesPlayed = async (): Promise<number> => {
+  const res = await axios.get(`${backendIp}/ts/game-sessions/total-played/`, {
+    headers: { ...authHeaders() },
+  });
+  return res.data.total_played as number;
+};
+
+// Core User APIs
+export interface UpdateUserPayload {
+  username?: string;
+  email?: string;
+  password?: string;
+  avatar?: File | null;
+}
+
+export const updateUserProfile = async (
+  userId: string | number,
+  data: UpdateUserPayload
+) => {
+  const hasFile = !!data.avatar;
+  if (hasFile) {
+    const form = new FormData();
+    if (data.username !== undefined) form.append("username", data.username);
+    if (data.email !== undefined) form.append("email", data.email);
+    if (data.password) form.append("password", data.password);
+    if (data.avatar) form.append("avatar", data.avatar);
+    const res = await axios.patch(`${backendIp}/core/users/${userId}/`, form, {
+      headers: {
+        ...authHeaders(),
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return res.data;
+  } else {
+    const payload: Record<string, any> = {};
+    if (data.username !== undefined) payload.username = data.username;
+    if (data.email !== undefined) payload.email = data.email;
+    if (data.password) payload.password = data.password;
+    const res = await axios.patch(
+      `${backendIp}/core/users/${userId}/`,
+      payload,
+      {
+        headers: { ...authHeaders() },
+      }
+    );
+    return res.data;
+  }
+};
+
 

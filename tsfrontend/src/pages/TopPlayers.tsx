@@ -76,6 +76,28 @@ const TopPlayers: React.FC = () => {
 
           {/* Top Players List */}
           <Grid container spacing={{ xs: 1, sm: 2 }}>
+            {topWeekScores && topWeekScores.length === 0 && (
+              <Grid size={12}>
+                <Card
+                  sx={{
+                    borderRadius: "15px",
+                    border: 1,
+                    borderColor: "divider",
+                    boxShadow: "none",
+                  }}
+                >
+                  <CardContent>
+                    <Typography
+                      variant="body1"
+                      color="text.secondary"
+                      sx={{ textAlign: "center" }}
+                    >
+                      No games were played in the past week. Be the first to climb the leaderboard!
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            )}
             {topWeekScores?.map((playerScore, idx) => {
               const rank = idx + 1;
               const user = playerScore.user;
