@@ -17,6 +17,7 @@ db.sqlite3
 **/media/**
 **/audio
 **/music
+**/pics
 **/taylor_swift_images/
 **/staticfiles
 **.log

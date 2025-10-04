@@ -10,7 +10,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         csv_file = kwargs['csv_file']
-        with open(csv_file, newline='', encoding='utf-8') as file:
+        with open(csv_file, newline='', encoding='latin1') as file:
             reader = csv.DictReader(file)
             for row in reader:
                 title = row['track_name']

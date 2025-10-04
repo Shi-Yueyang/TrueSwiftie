@@ -67,8 +67,6 @@ const GameHistoryPage: React.FC = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [selectedSong, setSelectedSong] = useState<Song | null>(null);
 
-  // helper caches
-
   useEffect(() => {
     const fetchSessions = async () => {
       if (!userId) return;
@@ -104,11 +102,11 @@ const GameHistoryPage: React.FC = () => {
   return (
     <Container maxWidth="md">
       <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 3 }}>
-        <IconButton aria-label="back to home" onClick={() => navigate('/') }>
+        <IconButton aria-label="back to home" onClick={() => navigate("/")}>
           <IoArrowBack />
         </IconButton>
         <Typography variant="h5" sx={{ fontWeight: 700 }}>
-          Game History
+          游玩记录
         </Typography>
       </Box>
 

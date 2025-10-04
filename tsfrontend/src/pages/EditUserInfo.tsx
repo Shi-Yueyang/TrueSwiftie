@@ -1,5 +1,15 @@
 import { useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Box, Button, TextField, Typography, IconButton, InputAdornment, Snackbar, Alert, CircularProgress } from "@mui/material";
+import {
+  Box,
+  Button,
+  TextField,
+  Typography,
+  IconButton,
+  InputAdornment,
+  Snackbar,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContex";
 import { updateUserProfile } from "../services/api";
@@ -15,7 +25,13 @@ import {
 
 const EditUserInfo = () => {
   const navigate = useNavigate();
-  const { userId, userName, email: ctxEmail, avatar: ctxAvatar, refreshUser } = useContext(AuthContext);
+  const {
+    userId,
+    userName,
+    email: ctxEmail,
+    avatar: ctxAvatar,
+    refreshUser,
+  } = useContext(AuthContext);
 
   // Form state (prefilled from AuthContext)
   const [username, setUsername] = useState(userName ?? "");
@@ -31,10 +47,17 @@ const EditUserInfo = () => {
 
   // UX state
   const [saving, setSaving] = useState(false);
-  const [snackbar, setSnackbar] = useState<{open:boolean; message:string; severity:"success"|"error"}>({open:false, message:"", severity:"success"});
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
 
   // track original values based on current context (updates when context changes)
-  const original = useMemo(() => ({ username: userName ?? "", email: ctxEmail ?? "" }), [userName, ctxEmail]);
+  const original = useMemo(
+    () => ({ username: userName ?? "", email: ctxEmail ?? "" }),
+    [userName, ctxEmail]
+  );
   const isDirty =
     username !== original.username ||
     email !== original.email ||
@@ -80,12 +103,20 @@ const EditUserInfo = () => {
         avatar: avatarFile,
       });
       await refreshUser();
-      setSnackbar({ open: true, message: "Profile updated", severity: "success" });
+      setSnackbar({
+        open: true,
+        message: "Profile updated",
+        severity: "success",
+      });
       // Optionally navigate back after a short delay
       setTimeout(() => navigate(-1), 600);
     } catch (err) {
       console.error("Failed to update profile", err);
-      setSnackbar({ open: true, message: "Failed to update profile", severity: "error" });
+      setSnackbar({
+        open: true,
+        message: "Failed to update profile",
+        severity: "error",
+      });
     } finally {
       setSaving(false);
     }
@@ -103,7 +134,10 @@ const EditUserInfo = () => {
     >
       {/* Back */}
       <Box sx={{ mb: 2 }}>
-        <IconButton aria-label="Back to profile" onClick={() => navigate("/profile")}> 
+        <IconButton
+          aria-label="Back to profile"
+          onClick={() => navigate("/profile")}
+        >
           <IoChevronBack />
         </IconButton>
       </Box>
@@ -154,14 +188,14 @@ const EditUserInfo = () => {
           onClick={onPickAvatar}
           sx={{ mt: 2, borderRadius: 999 }}
         >
-          Edit Avatar
+          编辑头像
         </Button>
       </Box>
 
       {/* Form fields */}
       <Box sx={{ mt: { xs: 3, sm: 4 } }}>
         <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-          Username
+          用户名
         </Typography>
         <TextField
           value={username}
@@ -179,8 +213,12 @@ const EditUserInfo = () => {
           }}
         />
 
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 3, mb: 1 }}>
-          Email
+        <Typography
+          variant="subtitle2"
+          color="text.secondary"
+          sx={{ mt: 3, mb: 1 }}
+        >
+          邮箱
         </Typography>
         <TextField
           value={email}
@@ -198,8 +236,12 @@ const EditUserInfo = () => {
           }}
         />
 
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 3, mb: 1 }}>
-          Password
+        <Typography
+          variant="subtitle2"
+          color="text.secondary"
+          sx={{ mt: 3, mb: 1 }}
+        >
+          密码
         </Typography>
         <TextField
           value={password}
@@ -217,7 +259,10 @@ const EditUserInfo = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowPassword((s) => !s)} edge="end">
+                <IconButton
+                  onClick={() => setShowPassword((s) => !s)}
+                  edge="end"
+                >
                   {showPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
                 </IconButton>
               </InputAdornment>
@@ -225,8 +270,12 @@ const EditUserInfo = () => {
           }}
         />
 
-        <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 3, mb: 1 }}>
-          Confirm Password
+        <Typography
+          variant="subtitle2"
+          color="text.secondary"
+          sx={{ mt: 3, mb: 1 }}
+        >
+          确认密码
         </Typography>
         <TextField
           value={confirmPassword}
@@ -250,7 +299,10 @@ const EditUserInfo = () => {
             ),
             endAdornment: (
               <InputAdornment position="end">
-                <IconButton onClick={() => setShowConfirmPassword((s) => !s)} edge="end">
+                <IconButton
+                  onClick={() => setShowConfirmPassword((s) => !s)}
+                  edge="end"
+                >
                   {showConfirmPassword ? <IoEyeOffOutline /> : <IoEyeOutline />}
                 </IconButton>
               </InputAdornment>
@@ -269,7 +321,11 @@ const EditUserInfo = () => {
               !isDirty ||
               (confirmPassword !== "" && confirmPassword !== password)
             }
-            startIcon={saving ? <CircularProgress color="inherit" size={16} /> : undefined}
+            startIcon={
+              saving ? (
+                <CircularProgress color="inherit" size={16} />
+              ) : undefined
+            }
             sx={{ borderRadius: 2, px: 3 }}
           >
             {saving ? "Saving..." : "Save"}

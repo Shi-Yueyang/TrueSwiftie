@@ -26,8 +26,10 @@ from .exceptions import (
 )
 from core.models import CustomUser as User
 
-def pick_song() -> Song:
+def pick_song(era=None) -> Song:
     qs = Song.objects.all()
+    if era:
+        qs = qs.filter(song_title__album=era)
     count = qs.count()
     offset = random.randint(0, max(0, count - 1))
     song = qs[offset]
@@ -46,7 +48,17 @@ def build_options(correct_title: str, k: int = 3) -> List[str]:
 
 
 def _create_turn(session: GameSession, sequence_index: int) -> GameTurn:
-    song = pick_song()
+    era = None
+    if session.score == 0:
+        era = "The Life of a Showgirl"
+    elif session.score <=5:
+        if random.randint(1,10)>4:
+            era = "The Life of a Showgirl"
+    elif session.score<=10:
+        if random.randint(1,10)>8:
+            era = "The Life of a Showgirl"
+
+    song = pick_song(era)
     while song.song_title is None:
         song = pick_song()
 
@@ -73,13 +85,11 @@ def _create_turn(session: GameSession, sequence_index: int) -> GameTurn:
 
 @transaction.atomic
 def start_session(user) -> GameSession:
-    print("user",user)
     session = GameSession.objects.create(
         user=user,
         status=GameSessionStatus.IN_PROGRESS,
         score=0,
     )
-    print("session",session)
     first_turn = _create_turn(session, sequence_index=1)
     session.current_turn = first_turn
     session.save(update_fields=["current_turn"])

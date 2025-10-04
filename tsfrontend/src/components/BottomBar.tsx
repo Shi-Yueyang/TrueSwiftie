@@ -22,7 +22,7 @@ const BottomBar = () => {
   // Define items to mirror Sidebar/NavBar
   const items = useMemo(
     () => [
-      { label: "Home", icon: <IoHome />, path: "/" },
+      { label: "主页", icon: <IoHome />, path: "/" },
       { label: "ME!", icon: <IoPerson />, path: "/profile" },
     ],
     []

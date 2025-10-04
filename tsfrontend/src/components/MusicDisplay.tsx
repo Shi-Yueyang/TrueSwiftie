@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import { AppContext } from "../context/AppContext";
 
 interface MusicDisplayProps {
@@ -10,7 +10,6 @@ interface MusicDisplayProps {
 
 const MusicDisplay: React.FC<MusicDisplayProps> = ({
     imageUrl,
-  onButtonClick,
 }) => {
   const context = useContext(AppContext);
 const {song} = context
@@ -60,25 +59,7 @@ const {song} = context
           }}
         />
 
-        {/* Small Button */}
-        <Button
-          onClick={onButtonClick}
-          sx={{
-            position: "absolute",
-            top: "10px",
-            backgroundColor: "#fff",
-            color: "#000",
-            padding: "5px 10px",
-            borderRadius: "15px",
-            textTransform: "capitalize",
-            zIndex: 2,
-            "&:hover": {
-              backgroundColor: "#f5f5f5",
-            },
-          }}
-        >
-          View Rankings
-        </Button>
+
       </Box>
     </Stack>
   );

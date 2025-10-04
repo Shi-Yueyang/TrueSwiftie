@@ -30,7 +30,6 @@ interface Props {
   timeLimit: number;
   handleNext: () => void;
   handleGuess: (userGuess: string) => Promise<string | undefined>;
-  handleTimeout: () => void;
 }
 
 const MusicQuiz = ({
@@ -38,7 +37,6 @@ const MusicQuiz = ({
   handleNext,
   timeLimit,
   handleGuess,
-  handleTimeout,
 }: Props) => {
   const { gameSession, currentTurn } = useContext(AppContext);
   const [timeLeft, setTimeLeft] = useState(1);
@@ -69,7 +67,7 @@ const MusicQuiz = ({
       if (timeLeft > 0 && currentTurn?.outcome === "pending") {
         setTimeLeft(timeLeft - 1);
         if (timeLeft === 1 && gameSession) {
-          handleTimeout();
+          handleGuess("-timeout-");
         }
       }
     }, 1000);

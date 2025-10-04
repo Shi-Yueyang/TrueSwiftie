@@ -27,7 +27,7 @@ const UserProfile = () => {
     };
   }, []);
 
-  const stats = [{ label: "Games Played", value: totalPlayed ?? "-", icon: <IoTrophy /> }];
+  const stats = [{ label: "游玩次数", value: totalPlayed ?? "-", icon: <IoTrophy /> }];
 
   // Achievements will be added in a future update
 
@@ -57,7 +57,7 @@ const UserProfile = () => {
               boxShadow: 2,
             }}
           >
-            Edit Profile
+            编辑信息
           </Button>
           <Button
             variant="outlined"
@@ -65,7 +65,7 @@ const UserProfile = () => {
             onClick={() => logout()}
             sx={{ textTransform: "none", borderRadius: 3, px: 2.5 }}
           >
-            Log out
+            退出
           </Button>
         </Box>
       </Box>
@@ -122,7 +122,7 @@ const UserProfile = () => {
           variant="h6"
           sx={{ mb: 1.5, color: "text.primary", fontWeight: 700 }}
         >
-          Achievements
+          成就
         </Typography>
         <Card
           elevation={0}
@@ -135,7 +135,7 @@ const UserProfile = () => {
         >
           <CardContent sx={{ p: 3, display: 'flex', justifyContent: 'center' }}>
             <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', fontWeight: 600 }}>
-              Achievements coming soon
+              敬请期待
             </Typography>
           </CardContent>
         </Card>

@@ -4,7 +4,7 @@ import { LinearProgress, Box, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
 import { IoHeart } from "react-icons/io5";
-import { endGameSession, fetchNextTurn } from "../services/api";
+import { fetchNextTurn } from "../services/api";
 import { AppContext } from "../context/AppContext";
 import MusicQuiz from "../components/MusicQuiz";
 import { useSong } from "../hooks/hooks";
@@ -83,16 +83,9 @@ const GamePage = () => {
     }
   };
 
-  const handleTimeout = async()=>{
-    if(gameSession){
-      endGameSession(gameSession.id, { version: gameSession.version });
-      navigate("/game-over")
-    }      
-  }
-
-const handleEnd =  () => {
-  console.log("song end")
-}
+  const handleEnd = () => {
+    console.log("song end");
+  };
   // fetch song, options, and poster
   // Using server-provided turn (currentTurn) instead of local random song logic now
   const song = useSong(currentTurn?.song);
@@ -181,10 +174,19 @@ const handleEnd =  () => {
 
       {/* Health overlay (fixed) */}
       <Box sx={{ position: "fixed", top: 16, left: 16, zIndex: 2 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'rgba(255,255,255,0.9)', padding: '8px 12px', borderRadius: '20px' }}>
-          <span style={{ fontWeight: 'bold' }}>Health: </span>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            backgroundColor: "rgba(255,255,255,0.9)",
+            padding: "8px 12px",
+            borderRadius: "20px",
+          }}
+        >
+          <span style={{ fontWeight: "bold" }}>Health: </span>
           {Array.from({ length: health }, (_, index) => (
-            <IoHeart key={index} style={{ color: 'red', fontSize: '20px' }} />
+            <IoHeart key={index} style={{ color: "red", fontSize: "20px" }} />
           ))}
         </div>
       </Box>
@@ -215,7 +217,6 @@ const handleEnd =  () => {
                 handleNext={handleNext}
                 timeLimit={timeLimit}
                 handleGuess={handleGuess}
-                handleTimeout={handleTimeout}
               />
             ) : (
               <div>
@@ -225,6 +226,8 @@ const handleEnd =  () => {
             )}
           </motion.div>
         </Grid>
+
+        
       </Grid>
     </>
   );

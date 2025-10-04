@@ -15,6 +15,7 @@ import {
 import { usePoster, useSong } from "../hooks/hooks";
 import { AppContext } from "../context/AppContext";
 import LyricDialogue from "./LyricDialogue";
+import { Howl } from "howler";
 
 interface MusicPlayerProps {
   songId: number;
@@ -32,6 +33,7 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ songId, songName }) => {
   const song = useSong(songId);
   const poster = usePoster(song);
 
+  console.log("Rendering MusicPlayer with songId:", songId, "songName:", songName);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -48,26 +50,45 @@ const MusicPlayer: React.FC<MusicPlayerProps> = ({ songId, songName }) => {
 
   // set sound
   useEffect(() => {
-    const setNewSound = async () => {
-      if (sound) {
-        sound.fade(volume, 0, 1000);
-        sound.stop();
-        sound.unload();
-      }
+    let createdSound: Howl | null = null;
 
-      if (song) {
-        const newSound = new Howl({
-          src: [song.file],
-          volume: volume,
-          html5: true,
-        });
-        setSound(newSound);
-        newSound.play();
+    const stopAndUnload = (s?: Howl | null) => {
+      if (s) {
+        try {
+          s.fade(volume, 0, 300);
+        } catch (_) {}
+        s.stop();
+        s.unload();
       }
     };
-    setIsPlaying(true);
-    setNewSound();
-  }, [song]);
+
+    // Always stop/unload any existing sound before starting a new one
+    if (sound) {
+      stopAndUnload(sound);
+    }
+
+    if (song) {
+      const newSound = new Howl({
+        src: [song.file],
+        volume: volume,
+        html5: true,
+      });
+      createdSound = newSound;
+      setSound(newSound);
+      newSound.play();
+      setIsPlaying(true);
+    }
+
+    return () => {
+      // Only clean up the sound created by this effect run
+      if (createdSound) {
+        stopAndUnload(createdSound);
+        if (sound === createdSound) {
+          setSound(null);
+        }
+      }
+    };
+  }, [song?.id]);
 
   const togglePlay = () => {
     if (sound) {

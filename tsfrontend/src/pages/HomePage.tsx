@@ -173,7 +173,7 @@ const DataCard: React.FC<DataCardProps> = ({ title, Icon, onClick }) => (
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { setGameSession, setCurrentTurn,sound } = useContext(AppContext);
+  const { setGameSession, setCurrentTurn,sound,setSound } = useContext(AppContext);
   const quickRowRef = useRef<HTMLDivElement | null>(null);
 
   // Gradients built from theme palette only
@@ -208,9 +208,11 @@ const HomePage: React.FC = () => {
       sound.fade(1, 0, 300);
       sound.stop();
       sound.unload();
+      setSound(null);
+
+      console.log("homepage unload sound")
     }
-  }
-  , []);
+  }, []);
   return (
     <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
       {/* Quick Play */}
@@ -224,7 +226,7 @@ const HomePage: React.FC = () => {
           color: "text.primary",
         }}
       >
-        Quick Play
+        快速游戏
       </Typography>
 
       <Box
@@ -248,7 +250,7 @@ const HomePage: React.FC = () => {
       >
         <Box sx={{ flex: "0 0 auto", width: { xs: 280, sm: 360, md: 420 }, scrollSnapAlign: { xs: "start", sm: "none" } }}>
           <QuickPlayCard
-            title="Classic Mode"
+            title="经典猜歌"
             Icon={IoGameControllerOutline}
             gradient={classicGradient}
             onClick={handleStartClassic}
@@ -256,7 +258,7 @@ const HomePage: React.FC = () => {
         </Box>
         <Box sx={{ flex: "0 0 auto", width: { xs: 280, sm: 360, md: 420 }, scrollSnapAlign: { xs: "start", sm: "none" } }}>
           <QuickPlayCard
-            title="Arcade Mode"
+            title="新模式"
             Icon={IoRocketOutline}
             gradient={arcadeGradient}
             onClick={() => {}}
@@ -276,20 +278,20 @@ const HomePage: React.FC = () => {
           color: "text.primary",
         }}
       >
-        Data
+        查看
       </Typography>
 
       <Grid container spacing={2}>
         <Grid size={{ xs: 12, sm: 6 }}>
           <DataCard
-            title="Ranks"
+            title="周榜"
             Icon={IoTrophyOutline}
             onClick={() => navigate("/top-players")}
           />
         </Grid>
         <Grid size={{ xs: 12, sm: 6 }}>
           <DataCard
-            title="Stats"
+            title="游戏记录"
             Icon={IoStatsChartOutline}
             onClick={() => navigate("/game-history")}
           />
