@@ -142,7 +142,7 @@ const TopPlayers: React.FC = () => {
                         {/* Avatar */}
                         <Grid>
                           <Avatar
-                            src={`${backendIp}/${user.avatar}`}
+                            src={`${backendIp.replace('api','')}/${user.avatar}`}
                             alt={user.username}
                             sx={{
                               width: { xs: 40, sm: 50 },

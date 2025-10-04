@@ -90,12 +90,12 @@ const Signup = () => {
             Start your journey
           </Typography>
           <Typography variant="h5" sx={{ mb: 3, fontWeight: 700 }}>
-            Sign up to be a TrueSwiftie
+            注册
           </Typography>
 
           {/* Form */}
           <TextField
-            label="Username"
+            label="用户名"
             placeholder="yourname"
             variant="outlined"
             margin="normal"
@@ -112,7 +112,7 @@ const Signup = () => {
           />
 
           <TextField
-            label="Password"
+            label="密码"
             type={showPassword ? "text" : "password"}
             variant="outlined"
             margin="normal"
@@ -135,7 +135,7 @@ const Signup = () => {
             }}
           />
           <TextField
-            label="Re-enter Password"
+            label="确认密码"
             type={showRePassword ? "text" : "password"}
             variant="outlined"
             margin="normal"
@@ -165,7 +165,7 @@ const Signup = () => {
             sx={{ mt: 2, py: 1.2 }}
             onClick={handleSignup}
           >
-            Sign Up
+            注册
           </Button>
 
           {error && (
@@ -178,9 +178,9 @@ const Signup = () => {
 
           {/* Login link */}
           <Box display="flex" alignItems="center" gap={1} mt={3}>
-            <Typography variant="body2">Have an account?</Typography>
+            <Typography variant="body2">已有账户</Typography>
             <Button variant="text" onClick={() => navigate("/login")}>
-              Sign in
+              登录
             </Button>
           </Box>
         </Box>

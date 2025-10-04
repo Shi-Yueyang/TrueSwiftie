@@ -9,7 +9,6 @@ import {
   IconButton,
 } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { GameHistory } from "./GameOver";
 import { useEffect, useState } from "react";
 import {
   IoArrowBack,
@@ -18,6 +17,7 @@ import {
   IoHeartOutline,
 } from "react-icons/io5";
 import axios from "axios";
+import { GameHistory } from "../pages/GameOver";
 
 interface Props {
   gamehistories: GameHistory[];

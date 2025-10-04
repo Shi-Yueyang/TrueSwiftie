@@ -136,14 +136,13 @@ const GamePage = () => {
       }
     };
   }, [sound, navigate, hasPlayedFirstSong]);
-  console.log("currentTurn", currentTurn?.poster_url, currentTurn?.outcome);
   // Full-page background styles (fixed layer under content)
   const bgStyle: React.CSSProperties = {
     position: "fixed",
     inset: 0,
     backgroundImage:
       currentTurn?.outcome === "correct"
-        ? `url(${backendIp}/${currentTurn?.poster_url})`
+        ? `url(${backendIp.replace('api', '')}/${currentTurn?.poster_url})`
         : "none",
     backgroundSize: "cover",
     backgroundPosition: "center",

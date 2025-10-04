@@ -6,15 +6,15 @@ import {
   Alert,
   InputAdornment,
   IconButton,
-  Divider,
+  // Divider,
 } from "@mui/material";
 import axios from "axios";
 import { useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContex";
 import { FiMail, FiEye, FiEyeOff } from "react-icons/fi";
-import { FcGoogle } from "react-icons/fc";
-import { useGoogleLogin } from "@react-oauth/google";
+// import { FcGoogle } from "react-icons/fc";
+// import { useGoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -69,37 +69,37 @@ const Login = () => {
   };
 
   // Custom Google sign-in via useGoogleLogin; replace default button with an icon trigger
-  const googleLogin = useGoogleLogin({
+  // const googleLogin = useGoogleLogin({
 
-    onSuccess: async (tokenResponse) => {
-      try {
-        console.log("Google token response:", tokenResponse);
-        setError("");
-        const access_token = (tokenResponse as any).access_token;
+  //   onSuccess: async (tokenResponse) => {
+  //     try {
+  //       console.log("Google token response:", tokenResponse);
+  //       setError("");
+  //       const access_token = (tokenResponse as any).access_token;
 
-        // Exchange Google OAuth token with your backend for your app's JWT
-        const res = await axios.post(
-          `${import.meta.env.VITE_BACKEND_IP}/core/users/google-login/`,
-          { access_token }
-        );
+  //       // Exchange Google OAuth token with your backend for your app's JWT
+  //       const res = await axios.post(
+  //         `${import.meta.env.VITE_BACKEND_IP}/core/users/google-login/`,
+  //         { access_token }
+  //       );
 
-        const { access, refresh, user } = res.data;
-        login(
-          user.id,
-          user.username,
-          access,
-          refresh,
-          user.is_staff,
-          user.groups ?? [],
-          user.avatar
-        );
-        navigate("/", { replace: true });
-      } catch (err) {
-        setError("Google sign-in failed. Please try again.");
-      }
-    },
-    onError: () => setError("Google sign-in was cancelled or failed."),
-  });
+  //       const { access, refresh, user } = res.data;
+  //       login(
+  //         user.id,
+  //         user.username,
+  //         access,
+  //         refresh,
+  //         user.is_staff,
+  //         user.groups ?? [],
+  //         user.avatar
+  //       );
+  //       navigate("/", { replace: true });
+  //     } catch (err) {
+  //       setError("Google sign-in failed. Please try again.");
+  //     }
+  //   },
+  //   onError: () => setError("Google sign-in was cancelled or failed."),
+  // });
   return (
     <Box display="flex" minHeight="100vh">
       {/* Left: Form panel */}
@@ -120,19 +120,15 @@ const Login = () => {
             TrueSwiftie
           </Typography>
 
-          {/* Headings */}
-          <Typography variant="overline" sx={{ color: "text.secondary" }}>
-            Welcome back
-          </Typography>
+
           <Typography variant="h4" sx={{ mb: 3, fontWeight: 700 }}>
-            Sign in as a TrueSwiftie
+            登录
           </Typography>
 
           {/* Form */}
           <Box component="form" ref={formRef} onSubmit={handleLogin}>
             <TextField
-              label="E-mail or Username"
-              placeholder="example@email.com"
+              label="邮箱或用户名"
               margin="normal"
               fullWidth
               value={username}
@@ -146,7 +142,7 @@ const Login = () => {
               }}
             />
             <TextField
-              label="Password"
+              label="密码"
               type={showPassword ? "text" : "password"}
               margin="normal"
               fullWidth
@@ -176,7 +172,7 @@ const Login = () => {
               sx={{ mt: 2, py: 1.2 }}
               onClick={handleLogin}
             >
-              Sign In
+              登录
             </Button>
 
             {error && (
@@ -186,7 +182,7 @@ const Login = () => {
             )}
 
             {/* Divider and social sign-in placeholders */}
-            <Divider sx={{ my: 3 }}>or sign in with</Divider>
+            {/* <Divider sx={{ my: 3 }}>or sign in with</Divider>
             <Box display="flex" gap={2} justifyContent="center">
               <IconButton
                 size="large"
@@ -195,15 +191,13 @@ const Login = () => {
               >
                 <FcGoogle size={28} />
               </IconButton>
-
-
-            </Box>
+            </Box> */}
 
             {/* Register link */}
             <Box display="flex" alignItems="center" gap={1} mt={3}>
-              <Typography variant="body2">Don't have an account?</Typography>
+              <Typography variant="body2">没有账户?</Typography>
               <Button variant="text" onClick={() => navigate("/signup")}>
-                Register
+                注册
               </Button>
             </Box>
           </Box>
