@@ -15,6 +15,7 @@ import GameHistoryPage from "./pages/GameHistoryPage";
 import ProtectedRoute from "./components/ProtectedRoute ";
 import EditUserInfo from "./pages/EditUserInfo";
 import UserProfile from "./pages/UserProfile";
+import Support from "./pages/Support";
 
 // animations
 // import { useContext } from "react";
@@ -109,6 +110,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <TopPlayers />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/support"
+            element={
+              <ProtectedRoute>
+                <Support />
               </ProtectedRoute>
             }
           />

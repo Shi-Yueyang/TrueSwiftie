@@ -8,6 +8,7 @@ import {
   CardContent,
   Typography,
   Stack,
+  Button,
 } from "@mui/material";
 import { useTheme, alpha } from "@mui/material/styles";
 import {
@@ -214,7 +215,7 @@ const HomePage: React.FC = () => {
     }
   }, []);
   return (
-    <Box sx={{ px: { xs: 2, sm: 3 }, py: 2 }}>
+    <Box sx={{ px: { xs: 2, sm: 3 }, pt: 2, pb: { xs: 10, sm: 2 } }}>
       {/* Quick Play */}
       <Typography
         variant="h6"
@@ -263,7 +264,7 @@ const HomePage: React.FC = () => {
             gradient={arcadeGradient}
             onClick={() => {}}
             disabled
-            badgeText="Under construction"
+            badgeText="敬请期待"
           />
         </Box>
       </Box>
@@ -297,6 +298,18 @@ const HomePage: React.FC = () => {
           />
         </Grid>
       </Grid>
+
+      {/* Support button */}
+      <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate("/support")}
+          sx={{ borderRadius: 999, px: 2.5, textTransform: "none", fontWeight: 600 }}
+        >
+          请我喝杯咖啡
+        </Button>
+      </Box>
     </Box>
   );
 };
