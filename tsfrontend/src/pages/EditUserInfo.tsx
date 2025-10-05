@@ -33,6 +33,8 @@ const EditUserInfo = () => {
     refreshUser,
   } = useContext(AuthContext);
 
+  console.log("EditUserInfo render", { userId, userName, ctxEmail, ctxAvatar });
+
   // Form state (prefilled from AuthContext)
   const [username, setUsername] = useState(userName ?? "");
   const [email, setEmail] = useState(ctxEmail ?? "");
@@ -200,7 +202,6 @@ const EditUserInfo = () => {
         <TextField
           value={username}
           onChange={(e) => setUsername(e.target.value)}
-          placeholder="Gamer123"
           fullWidth
           size="medium"
           autoComplete="off"
@@ -223,7 +224,6 @@ const EditUserInfo = () => {
         <TextField
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="gamer@example.com"
           fullWidth
           size="medium"
           autoComplete="email"

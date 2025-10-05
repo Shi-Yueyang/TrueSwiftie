@@ -211,7 +211,6 @@ const HomePage: React.FC = () => {
       sound.unload();
       setSound(null);
 
-      console.log("homepage unload sound")
     }
   }, []);
   return (
@@ -220,8 +219,6 @@ const HomePage: React.FC = () => {
       <Typography
         variant="h6"
         sx={{
-          mt: { xs: 7, sm: 2 },
-          mb: 1.5,
           fontFamily: "'Poppins', sans-serif",
           fontWeight: 700,
           color: "text.primary",
@@ -303,11 +300,17 @@ const HomePage: React.FC = () => {
       <Box sx={{ mt: 3, display: "flex", justifyContent: "center" }}>
         <Button
           variant="outlined"
-          color="secondary"
+          color="inherit"
           onClick={() => navigate("/support")}
-          sx={{ borderRadius: 999, px: 2.5, textTransform: "none", fontWeight: 600 }}
+          sx={{
+            borderRadius: 999,
+            px: 2.5,
+            textTransform: "none",
+            fontWeight: 600,
+            color: (theme) => theme.palette.text.secondary,
+          }}
         >
-          请我喝杯咖啡
+          请作者喝杯咖啡
         </Button>
       </Box>
     </Box>

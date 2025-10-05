@@ -51,13 +51,13 @@ export const AuthContext = createContext<AuthContextProps>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [userName, setUserName] = useState<string | null>(null);
+  const [ctxUserId, setUserId] = useState<string | null>(null);
+  const [ctxUserName, setUserName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(
     localStorage.getItem("accessToken")
   );
-  const [refreshToken, setRefreshToken] = useState<string | null>(
+  const [ctxRefreshToken, setRefreshToken] = useState<string | null>(
     localStorage.getItem("refreshToken")
   );
   const [isStaff, setIsStaff] = useState<boolean>(false);
@@ -139,11 +139,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   return (
     <AuthContext.Provider
       value={{
-        userId,
-        userName,
-  email,
+        userId: ctxUserId,
+        userName: ctxUserName,
+        email,
         accessToken,
-        refreshToken,
+        refreshToken: ctxRefreshToken,
         isStaff,
         groups,
         avatar,
