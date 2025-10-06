@@ -4,7 +4,6 @@ import { AuthContext } from "../context/AuthContex";
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { userId, isLoading } = useContext(AuthContext);
-
   if (isLoading) {
     return null;
   }

@@ -109,11 +109,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           },
         }
       );
-      if (response.data.groups.includes("formal")) {
-        setUserName(response.data.username);
-      } else {
-        setUserName(response.data.temporary_name);
-      }
+      setUserName(response.data.username);
+
       setEmail(response.data.email ?? null);
       setUserId(response.data.id);
       setIsStaff(response.data.is_staff);

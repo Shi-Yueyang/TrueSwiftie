@@ -105,7 +105,7 @@ const GamePage = () => {
     const newSound = new Howl({
       src: [file],
       volume: 1,
-      html5: true,  
+      html5: true,
       preload: true,
       onend: handleEnd,
       format: ["mp3"],
@@ -113,16 +113,26 @@ const GamePage = () => {
 
     // Prepare time limit once per turn
     setTimeLimit(getTimeLimitForScore(gameSession?.score ?? 0));
-
+    let skipTo = 0;
     newSound.once("load", () => {
       if (disposed) return;
       newSound.play();
+      if (gameSession && gameSession?.score >= 5) {
+        const duration = newSound.duration();
+        const maxSkip = Math.min(90, Math.max(0, duration - 1));
+        if (Math.random() > 0.25) {
+          skipTo = Math.random() * maxSkip;
+        }
+      }
     });
 
     // Mark UI ready when playback actually starts
-    newSound.once("play", () => {
+    newSound.once("play", (id) => {
       if (disposed) return;
       setIsSoundLoaded(true);
+      if (skipTo > 0) {
+        newSound.seek(skipTo, id);
+      }
     });
 
     // Handle autoplay restrictions or transient errors
@@ -134,13 +144,11 @@ const GamePage = () => {
       console.error("Howler loaderror", { id, err, src: file });
     });
 
-    console.log("new sound", newSound);
     setSound(newSound);
 
     return () => {
       disposed = true;
     };
-
   }, [currentTurn?.id, song?.file]);
 
   // Guard: if not actively playing, redirect home (independent of sound lifecycle)
@@ -148,9 +156,9 @@ const GamePage = () => {
     if (
       !gameSession ||
       (gameSession.status !== "in_progress" &&
-        gameSession.status !== "revealing") 
+        gameSession.status !== "revealing")
     ) {
-      if(gameSession?.status === "ended"){
+      if (gameSession?.status === "ended") {
         navigate("/game-over", { replace: true });
         return;
       }
@@ -158,7 +166,6 @@ const GamePage = () => {
     }
   }, [gameSession, navigate]);
 
-  
   // Full-page background styles (fixed layer under content)
   const bgStyle: React.CSSProperties = {
     position: "fixed",
@@ -167,7 +174,7 @@ const GamePage = () => {
     pointerEvents: "none",
     overflow: "hidden",
   };
-  
+
   const bgOverlayStyle: React.CSSProperties = {
     position: "fixed",
     inset: 0,
@@ -180,7 +187,7 @@ const GamePage = () => {
   // Update background image URL when a correct answer is revealed
   useEffect(() => {
     if (currentTurn?.outcome === "correct" && currentTurn?.poster_url) {
-      const url = `${backendIp.replace('api', '')}/${currentTurn.poster_url}`;
+      const url = `${backendIp.replace("api", "")}/${currentTurn.poster_url}`;
       setBgUrl(url);
       setBgLoaded(false);
     } else {
@@ -208,7 +215,8 @@ const GamePage = () => {
               filter: bgLoaded ? "blur(0px)" : "blur(18px)",
               transform: bgLoaded ? "scale(1)" : "scale(1.05)",
               opacity: bgLoaded ? 1 : 0.6,
-              transition: "filter 400ms ease, transform 400ms ease, opacity 400ms ease",
+              transition:
+                "filter 400ms ease, transform 400ms ease, opacity 400ms ease",
             }}
           />
         )}
@@ -234,7 +242,10 @@ const GamePage = () => {
         >
           <span style={{ fontWeight: "bold" }}>Health: </span>
           {Array.from({ length: health }, (_, index) => (
-            <IoHeart key={index} style={{ color: "orange", fontSize: "20px" }} />
+            <IoHeart
+              key={index}
+              style={{ color: "orange", fontSize: "20px" }}
+            />
           ))}
         </div>
       </Box>
@@ -274,8 +285,6 @@ const GamePage = () => {
             )}
           </motion.div>
         </Grid>
-
-        
       </Grid>
     </>
   );

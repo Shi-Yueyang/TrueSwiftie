@@ -67,7 +67,6 @@ const MusicQuiz = ({
       setIsSubmitting(true);
       setSubmittingOption(option);
       const outcome = await handleGuess(option); // Await the async function
-      console.log("Guess outcome:", outcome);
       if (outcome === "correct") {
         setCorrectOption(option);
       } else {

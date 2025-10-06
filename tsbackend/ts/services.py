@@ -195,10 +195,10 @@ def end_session(session_id:int, version:int,user:User):
 
 def get_top_score_of_current_week() -> Tuple[List[Tuple[int, User]], int]:
 
-
-    now = timezone.now()
-    start_of_week = now - timedelta(days=now.weekday())
-
+    local_now = timezone.localtime()
+    start_of_week = (local_now - timedelta(days=local_now.weekday())).replace(
+        hour=0, minute=0, second=0, microsecond=0
+    )
     qs = (
         GameSession.objects.filter(ended_at__gte=start_of_week, status=GameSessionStatus.ENDED)
         .order_by("-score", "-ended_at")
