@@ -36,6 +36,7 @@ export interface GameSession {
   health:number;
   version: number;
   current_turn: number;
+  next_turn: number;
   status: string;
 }
 
@@ -50,8 +51,12 @@ interface AppContextProps {
   setGameSession: (session: GameSession | null) => void;
   currentTurn: GameTurn | null;
   setCurrentTurn: (t: GameTurn | null) => void;
+  nextTurn: GameTurn | null;
+  setNextTurn: (t: GameTurn | null) => void;
   sound: Howl | null;
   setSound: (sound: Howl | null) => void;
+  nextSound: Howl | null;
+  setNextSound: (sound: Howl | null) => void;
   song: Song | null;
   setSong: (song: Song | null) => void;
   csrfToken: string;
@@ -71,8 +76,12 @@ const AppContext = createContext<AppContextProps>({
   setGameSession: () => {},
   currentTurn: null,
   setCurrentTurn: () => {},
+  nextTurn: null,
+  setNextTurn: () => {},
   sound: null,
   setSound: () => {},
+  nextSound: null,
+  setNextSound: () => {},
   song: null,
   setSong: () => {},
   csrfToken: "",
@@ -89,7 +98,9 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
   const [startTime, setStartTime] = useState<Date>(new Date());
   const [gameSession, setGameSession] = useState<GameSession | null>(null);
   const [currentTurn, setCurrentTurn] = useState<GameTurn | null>(null);
+  const [nextTurn, setNextTurn] = useState<GameTurn | null>(null);
   const [sound, setSound] = useState<Howl | null>(null);
+  const [nextSound, setNextSound] = useState<Howl | null>(null);
   const [song, setSong] = useState<Song | null>(null);
   const [csrfToken, setCsrfToken] = useState("");
   const [snowfallProps, setSnowfallProps] = useState<SnowfallProps | null>({
@@ -109,8 +120,12 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
         setGameSession,
         currentTurn,
         setCurrentTurn,
+        nextTurn,
+        setNextTurn,
         sound,
         setSound,
+        nextSound,
+        setNextSound,
         song,
         setSong,
         csrfToken,

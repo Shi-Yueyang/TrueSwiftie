@@ -21,9 +21,13 @@ const GamePage = () => {
     gameSession,
     setGameSession,
     currentTurn,
+    setCurrentTurn,
+    nextTurn,
+    setNextTurn,
     sound,
     setSound,
-    setCurrentTurn,
+    nextSound,
+    setNextSound,
   } = useContext(AppContext);
   const volume = 1;
   const [timeLimit, setTimeLimit] = useState(-1);
@@ -32,14 +36,24 @@ const GamePage = () => {
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [bgLoaded, setBgLoaded] = useState(false);
 
+  // fetch song, options, and poster
+  // Using server-provided turn (currentTurn) instead of local random song logic now
+  const currentSong = useSong(currentTurn?.song, "current");
+  const nextSong = useSong(nextTurn?.song, "next");
+  const options = currentTurn?.options || [];
+
+
+
   const handleNext = async () => {
     if (!gameSession) return;
+    console.log("next");
     try {
       const data = await fetchNextTurn(gameSession.id, {
         version: gameSession.version,
       });
       setGameSession(data.session);
       setCurrentTurn(data.new_turn);
+      setNextTurn(data.preloaded_turn);
       setIsSoundLoaded(false);
     } catch (e) {
       console.error("Next turn failed", e);
@@ -57,7 +71,7 @@ const GamePage = () => {
 
   const handleGuess = async (userGuess: string) => {
     if (!gameSession || !currentTurn) return;
-
+    console.log("guess")
     const payload = {
       turn_id: currentTurn.id,
       option: userGuess,
@@ -79,43 +93,80 @@ const GamePage = () => {
     }
   };
 
-  const handleEnd = () => {
-    console.log("song end");
-  };
-  // fetch song, options, and poster
-  // Using server-provided turn (currentTurn) instead of local random song logic now
-  const song = useSong(currentTurn?.song);
-  const options = currentTurn?.options || [];
-  // Create and manage Howl for the current song in a single effect
+
+  console.log("cur", currentSong?.song_title.title, "|| nxt", nextSong?.song_title.title,"|| turn", currentTurn?.id);
+
+  // current sound
   useEffect(() => {
-    const file = song?.file;
-    if (!file || !currentTurn) return;
+        // Preload next sound in background
+    const nextFile = nextSong?.file;
+    if (nextFile) {
 
-    // reset UI while switching tracks
-    setIsSoundLoaded(false);
-
+      console.log("preload next sound",nextSong?.song_title.title);
+      const nextNewSound = new Howl({
+        src: [nextFile],
+        volume: 1,
+        html5: true,
+        preload: true,
+        format: ["mp3"],
+      });
+      setNextSound(nextNewSound);
+    }
     // clean up any existing sound instance only when switching to a different track
-    if (sound) {
+    const currentFile = currentSong?.file;
+    if (!currentFile || !currentTurn) return;
+
+    let disposed = false;
+    let newSound: Howl;
+    if (nextSound && gameSession?.score !== 0) {
+      console.log("Using preloaded next sound");
+      newSound = nextSound;
+    } else if (!sound) {
+      console.log("fetch new sound", currentSong);
+
+      newSound = new Howl({
+        src: [currentFile],
+        volume: 1,
+        html5: true,
+        preload: true,
+        format: ["mp3"],
+      });
+    } else {
+      setIsSoundLoaded(sound.playing());
+      console.log("disposed", disposed);
+      return;
+    }
+    if (sound && (sound !== newSound || gameSession?.score === 0)) {
       sound.fade(volume, 0, 200);
       sound.stop();
       sound.unload();
+      console.log("unloaded");
     }
-
-    let disposed = false;
-    const newSound = new Howl({
-      src: [file],
-      volume: 1,
-      html5: true,
-      preload: true,
-      onend: handleEnd,
-      format: ["mp3"],
-    });
-
     // Prepare time limit once per turn
     setTimeLimit(getTimeLimitForScore(gameSession?.score ?? 0));
+
     let skipTo = 0;
-    newSound.once("load", () => {
-      if (disposed) return;
+    // Mark UI ready when playback actually starts
+    newSound.once("play", (id) => {
+      if (disposed) {
+        console.log("not play disposed");
+        return;
+      }
+      console.log("playback started", id, newSound);
+      setIsSoundLoaded(true);
+      if (skipTo > 0) {
+        newSound.seek(skipTo, id);
+      }
+    });
+
+    // set load handler
+    if (newSound.state() === "loaded") {
+      if(sound === nextSound) {
+        console.log("next sound === sound");
+        return;
+      }
+      console.log("sound already loaded", newSound);
+      // If loaded, call play directly
       newSound.play();
       if (gameSession && gameSession?.score >= 5) {
         const duration = newSound.duration();
@@ -124,16 +175,24 @@ const GamePage = () => {
           skipTo = Math.random() * maxSkip;
         }
       }
-    });
+    } else {
+      console.log("song not loaded", newSound);
 
-    // Mark UI ready when playback actually starts
-    newSound.once("play", (id) => {
-      if (disposed) return;
-      setIsSoundLoaded(true);
-      if (skipTo > 0) {
-        newSound.seek(skipTo, id);
-      }
-    });
+      newSound.once("load", () => {
+        if (disposed) {
+          console.log("not load disposed");
+          return;
+        }
+        newSound.play();
+        if (gameSession && gameSession?.score >= 5) {
+          const duration = newSound.duration();
+          const maxSkip = Math.min(90, Math.max(0, duration - 1));
+          if (Math.random() > 0.25) {
+            skipTo = Math.random() * maxSkip;
+          }
+        }
+      });
+    }
 
     // Handle autoplay restrictions or transient errors
     newSound.on("playerror", () => {
@@ -141,15 +200,37 @@ const GamePage = () => {
     });
 
     newSound.on("loaderror", (id, err) => {
-      console.error("Howler loaderror", { id, err, src: file });
+      console.error("Howler loaderror", { id, err });
     });
+    console.log("setsound", (newSound as any)._src);
 
     setSound(newSound);
 
+
+
+
     return () => {
-      disposed = true;
+      console.log("Disposed");
+      // disposed = true;
     };
-  }, [currentTurn?.id, song?.file]);
+  }, [currentTurn?.id, currentSong?.file]);
+
+  // Preload next sound in background
+  useEffect(() => {
+
+    // const nextFile = nextSong?.file;
+    // if (!nextFile || !nextTurn) return;
+    // if (isSameSrc(nextSound, nextFile)) return;
+    // console.log("preload next sound");
+    // const nextNewSound = new Howl({
+    //   src: [nextFile],
+    //   volume: 1,
+    //   html5: true,
+    //   preload: true,
+    //   format: ["mp3"],
+    // });
+    // setNextSound(nextNewSound);
+  }, [nextSong?.file, sound]); //bug
 
   // Guard: if not actively playing, redirect home (independent of sound lifecycle)
   useEffect(() => {
@@ -264,7 +345,7 @@ const GamePage = () => {
       >
         <Grid size={{ xs: 12, md: 8, lg: 6 }}>
           <motion.div
-            key={song?.song_title?.title || ""}
+            key={currentSong?.song_title?.title || ""}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}

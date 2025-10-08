@@ -1,7 +1,7 @@
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
 from .services import (
-    create_next_turn,
+    handle_next,
     end_session,
     start_session,
     submit_guess,
@@ -134,12 +134,13 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         session_id = int(pk)
         version = serializer.validated_data["version"]
-        session, new_turn = create_next_turn(
+        session, new_turn,preloaded_turn = handle_next(
             session_id=session_id, version=version, user=user
         )
         payload = {
             "session": GameSessionSerlaiizer(session).data,
             "new_turn": GameTurnSerializer(new_turn).data,
+            "preloaded_turn": GameTurnSerializer(preloaded_turn).data,
         }
         return Response(payload, status=status.HTTP_200_OK)
 

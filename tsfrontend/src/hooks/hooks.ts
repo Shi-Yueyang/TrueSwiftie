@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from "react";
 import {
-  fetchRandomSong,
   fetchSongWithName,
   fetchSongWithId,
   fetchRandomTitles,
@@ -11,33 +10,12 @@ import { Poster } from "../components/MusicPoster";
 import noPicture from "../assets/ts_placeholder.jpg";
 import { AppContext } from "../context/AppContext";
 
-export const useRandomSong = (isToFetch: number, album?: string) => {
-  const { song, setSong } = useContext(AppContext);
 
-  useEffect(() => {
-    const fetchSong = async () => {
-      try {
-        const data = await fetchRandomSong(album);
-        if (data.song_title) {
-          setSong(data);
-        } else {
-          fetchSong();
-        }
-      } catch (error) {
-        console.error("Error fetching song data:", error);
-      }
-    };
 
-    if (isToFetch) {
-      fetchSong();
-    }
-  }, [isToFetch]);
+export const useSong = (arg: string | number|undefined, curOrNext: "current" | "next"="current") => {
+  const {song, setSong} = useContext(AppContext);
 
-  return song;
-};
-
-export const useSong = (arg: string | number|undefined) => {
-  const { song, setSong } = useContext(AppContext);
+  const [nextSong, setNextSong] = useState<Song | null>(null);
   useEffect(() => {
     try {
       const fetchSong = async () => {
@@ -49,7 +27,11 @@ export const useSong = (arg: string | number|undefined) => {
               ? await fetchSongWithId(arg.toString())
               : null;
           if (response) {
-            setSong(response);
+            if (curOrNext === "current") {
+              setSong(response);
+            } else {
+              setNextSong(response);
+            }
           }
         } catch (error) {
           console.error("Error fetching song data:", error);
@@ -60,8 +42,8 @@ export const useSong = (arg: string | number|undefined) => {
       console.error("Error fetching song data:", error);
     }
   }, [arg]);
+  return curOrNext === "current" ? song : nextSong;
 
-  return song;
 };
 
 export const useOptions = (song: Song | null) => {

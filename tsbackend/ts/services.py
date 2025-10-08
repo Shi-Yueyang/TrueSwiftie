@@ -26,15 +26,32 @@ from .exceptions import (
 )
 from core.models import CustomUser as User
 
-def pick_song(era=None) -> Song:
+def pick_song(score) -> Song:
+    era = None
+    if score == 0:
+        era = "The Life of a Showgirl"
+    elif score <=5:
+        if random.randint(1,10)>4:
+            era = "The Life of a Showgirl"    
     qs = Song.objects.all()
     if era:
         qs = qs.filter(song_title__album=era)
     count = qs.count()
     offset = random.randint(0, max(0, count - 1))
     song = qs[offset]
+    if song.song_title is None:
+        song = pick_song(score)
     return song
 
+def calc_time_limit(score:int)->int:
+    if score >= 35:
+        return 7
+    elif score >= 20:
+        return 10
+    elif score >= 10:
+        return 15
+    else:
+        return 20
 
 def build_options(correct_title: str, k: int = 3) -> List[str]:
     titles = list(
@@ -48,28 +65,9 @@ def build_options(correct_title: str, k: int = 3) -> List[str]:
 
 
 def _create_turn(session: GameSession, sequence_index: int) -> GameTurn:
-    era = None
-    if session.score == 0:
-        era = "The Life of a Showgirl"
-    elif session.score <=5:
-        if random.randint(1,10)>4:
-            era = "The Life of a Showgirl"
-    elif session.score<=10:
-        if random.randint(1,10)>8:
-            era = "The Life of a Showgirl"
 
-    song = pick_song(era)
-    while song.song_title is None:
-        song = pick_song()
-
-    if session.score >= 35:
-        time_limit_sec = 7
-    elif session.score >= 20:
-        time_limit_sec = 10
-    elif session.score >= 10:
-        time_limit_sec = 15
-    else:
-        time_limit_sec = 20
+    song = pick_song(session.score)
+    time_limit_sec = calc_time_limit(session.score)
 
     return GameTurn.objects.create(
         session=session,
@@ -90,9 +88,11 @@ def start_session(user) -> GameSession:
         status=GameSessionStatus.IN_PROGRESS,
         score=0,
     )
-    first_turn = _create_turn(session, sequence_index=1)
-    session.current_turn = first_turn
-    session.save(update_fields=["current_turn"])
+
+    session.current_turn = _create_turn(session, sequence_index=1)
+    session.next_turn = _create_turn(session, sequence_index=2)
+
+    session.save(update_fields=["current_turn", "next_turn"])
     return session
 
 
@@ -152,10 +152,10 @@ def submit_guess(session_id: int, option: str, elapsed_time_ms: int, version: in
     return turn, session
 
 @transaction.atomic
-def create_next_turn(session_id:int, version:int,user:User) -> Tuple[GameSession,GameTurn]:
+def handle_next(session_id:int, version:int,user:User) -> Tuple[GameSession, GameTurn, GameTurn]:
     session = (
         GameSession.objects.select_for_update()
-        .select_related("current_turn")
+        .select_related("current_turn","next_turn")
         .get(id=session_id,user=user)
     )
 
@@ -167,13 +167,14 @@ def create_next_turn(session_id:int, version:int,user:User) -> Tuple[GameSession
     if session.status != GameSessionStatus.REVEALING:
         raise InvalidState(f"Session is not in reavaling: {session.status}")
 
-    next_index = session.current_turn.sequence_index + 1
-    new_turn = _create_turn(session, sequence_index=next_index)
-    session.current_turn = new_turn
+    preloaded_turn_index = session.current_turn.sequence_index + 2
+    preloaded_turn = _create_turn(session, sequence_index=preloaded_turn_index)
+    session.current_turn = session.next_turn
+    session.next_turn = preloaded_turn
     session.status = GameSessionStatus.IN_PROGRESS
     session.version += 1
-    session.save(update_fields=["current_turn", "status", "version"])
-    return session,new_turn
+    session.save(update_fields=["current_turn", "next_turn", "status", "version"])
+    return session, session.current_turn, preloaded_turn
 
 @transaction.atomic
 def end_session(session_id:int, version:int,user:User):

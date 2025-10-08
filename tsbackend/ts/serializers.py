@@ -53,6 +53,7 @@ class GameSessionSerlaiizer(serializers.ModelSerializer):
             "user",
             "score",
             "current_turn",
+            "next_turn",
             "version",
             "status",
             "health"

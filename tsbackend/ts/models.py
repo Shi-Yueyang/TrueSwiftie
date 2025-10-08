@@ -82,6 +82,13 @@ class GameSession(models.Model):
         blank=True,
         related_name="+",
     )
+    next_turn = models.ForeignKey(
+        "GameTurn",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+    )
     health = models.PositiveIntegerField(default=3)
     started_at = models.DateTimeField(auto_now_add=True)
     ended_at = models.DateTimeField(null=True, blank=True)

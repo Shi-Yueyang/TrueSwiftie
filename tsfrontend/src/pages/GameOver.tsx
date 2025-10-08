@@ -18,9 +18,8 @@ export interface GameHistory {
 
 const GameOver = () => {
   const backendIp = import.meta.env.VITE_BACKEND_IP;
-  const context = useContext(AppContext);
   const navigate = useNavigate();
-  const { song, gameSession } = context;
+  const { song, gameSession } = useContext(AppContext);
   const { userName } = useContext(AuthContext);
 
   const poster = usePoster(song);

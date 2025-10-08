@@ -1,4 +1,4 @@
-import React, { useContext,useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid2";
 import {
@@ -174,7 +174,8 @@ const DataCard: React.FC<DataCardProps> = ({ title, Icon, onClick }) => (
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { setGameSession, setCurrentTurn,sound,setSound } = useContext(AppContext);
+  const { setGameSession, setCurrentTurn, setNextTurn,sound, setSound } =
+    useContext(AppContext);
   const quickRowRef = useRef<HTMLDivElement | null>(null);
 
   // Gradients built from theme palette only
@@ -188,12 +189,15 @@ const HomePage: React.FC = () => {
       if (session.current_turn) {
         const turn = await fetchGameTurn(session.current_turn);
         setCurrentTurn(turn);
+        const nextTurnId = await fetchGameTurn(session.next_turn);
+        setNextTurn(nextTurnId);
       }
       navigate("/game");
     } catch (e) {
       console.error("Failed to start game session", e);
     }
   };
+
   const handleWheelHorizontal = (e: React.WheelEvent<HTMLDivElement>) => {
     const el = quickRowRef.current;
     if (!el) return;
@@ -210,7 +214,6 @@ const HomePage: React.FC = () => {
       sound.stop();
       sound.unload();
       setSound(null);
-
     }
   }, []);
   return (
@@ -246,7 +249,13 @@ const HomePage: React.FC = () => {
           "&::-webkit-scrollbar": { display: "none" }, // Chrome/Safari
         }}
       >
-        <Box sx={{ flex: "0 0 auto", width: { xs: 280, sm: 360, md: 420 }, scrollSnapAlign: { xs: "start", sm: "none" } }}>
+        <Box
+          sx={{
+            flex: "0 0 auto",
+            width: { xs: 280, sm: 360, md: 420 },
+            scrollSnapAlign: { xs: "start", sm: "none" },
+          }}
+        >
           <QuickPlayCard
             title="经典猜歌"
             Icon={IoGameControllerOutline}
@@ -254,7 +263,13 @@ const HomePage: React.FC = () => {
             onClick={handleStartClassic}
           />
         </Box>
-        <Box sx={{ flex: "0 0 auto", width: { xs: 280, sm: 360, md: 420 }, scrollSnapAlign: { xs: "start", sm: "none" } }}>
+        <Box
+          sx={{
+            flex: "0 0 auto",
+            width: { xs: 280, sm: 360, md: 420 },
+            scrollSnapAlign: { xs: "start", sm: "none" },
+          }}
+        >
           <QuickPlayCard
             title="新模式"
             Icon={IoRocketOutline}

@@ -19,6 +19,7 @@ interface GuessResponse {
 
 interface NextResponse{
   new_turn:GameTurn;
+  preloaded_turn:GameTurn;
   session:GameSession
 }
 
