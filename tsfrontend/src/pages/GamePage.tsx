@@ -4,10 +4,9 @@ import { LinearProgress, Box, Chip } from "@mui/material";
 import { motion } from "framer-motion";
 import { Howl } from "howler";
 import { IoHeart } from "react-icons/io5";
-import { fetchNextTurn } from "../services/api";
+import { fetchNextTurn, fetchSongWithId } from "../services/api";
 import { AppContext } from "../context/AppContext";
-import MusicQuiz from "../components/MusicQuiz";
-import { useSong } from "../hooks/hooks";
+import MusicQuiz, { Song } from "../components/MusicQuiz";
 import { useNavigate } from "react-router-dom";
 const backendIp = import.meta.env.VITE_BACKEND_IP;
 
@@ -29,32 +28,55 @@ const GamePage = () => {
     nextSound,
     setNextSound,
   } = useContext(AppContext);
-  const volume = 1;
   const [timeLimit, setTimeLimit] = useState(-1);
   const [isSoundLoaded, setIsSoundLoaded] = useState(false);
   const [health, setHealth] = useState(3);
   const [bgUrl, setBgUrl] = useState<string | null>(null);
   const [bgLoaded, setBgLoaded] = useState(false);
-
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [nextSong, setNextSong] = useState<Song | null>(null);
+  const [isInitialFetchDone, setIsInitialFetchDone] = useState(false);
   // fetch song, options, and poster
   // Using server-provided turn (currentTurn) instead of local random song logic now
-  const currentSong = useSong(currentTurn?.song, "current");
-  const nextSong = useSong(nextTurn?.song, "next");
+
   const options = currentTurn?.options || [];
 
+  // const { currentSong, nextSong } = useSongsPair(
+  //   currentTurn?.song,
+  //   nextTurn?.song
+  // );
 
+  useEffect(() => {
+    const fetchInitialSongs = async () => {
+      if (!currentTurn || !nextTurn) return;
+      if(currentSong && nextSong) return;
+      const data2 = await fetchSongWithId(currentTurn.song.toString());
+      const data3 = await fetchSongWithId(nextTurn.song.toString());
+      setCurrentSong(data2);
+      setNextSong(data3);
+      setIsInitialFetchDone(true);
+      console.log("initial fetch finished")
+    };
+    fetchInitialSongs();
+  }, []);
 
   const handleNext = async () => {
     if (!gameSession) return;
     console.log("next");
+    setIsSoundLoaded(false);
+
     try {
       const data = await fetchNextTurn(gameSession.id, {
         version: gameSession.version,
       });
+      const data2 = await fetchSongWithId(data.new_turn.song.toString());
+
+      const data3 = await fetchSongWithId(data.preloaded_turn.song.toString());
+      setCurrentSong(data2);
+      setNextSong(data3);
       setGameSession(data.session);
       setCurrentTurn(data.new_turn);
       setNextTurn(data.preloaded_turn);
-      setIsSoundLoaded(false);
     } catch (e) {
       console.error("Next turn failed", e);
     }
@@ -71,7 +93,7 @@ const GamePage = () => {
 
   const handleGuess = async (userGuess: string) => {
     if (!gameSession || !currentTurn) return;
-    console.log("guess")
+    console.log("guess");
     const payload = {
       turn_id: currentTurn.id,
       option: userGuess,
@@ -86,6 +108,9 @@ const GamePage = () => {
       setHealth(result.session.health);
       if (result.session.status === "ended") {
         navigate("/game-over");
+        setNextSound(null);
+        setCurrentTurn(null);
+        setNextTurn(null);
       }
       return result.turn.outcome;
     } catch (error) {
@@ -93,37 +118,40 @@ const GamePage = () => {
     }
   };
 
-
-  console.log("cur", currentSong?.song_title.title, "|| nxt", nextSong?.song_title.title,"|| turn", currentTurn?.id);
+  // console.log(
+  //   "cur",
+  //   currentSong?.song_title.title,
+  //   "|| nxt",
+  //   nextSong?.song_title.title,
+  //   "|| turn",
+  //   currentTurn?.id
+  // );
 
   // current sound
   useEffect(() => {
-        // Preload next sound in background
-    const nextFile = nextSong?.file;
-    if (nextFile) {
-
-      console.log("preload next sound",nextSong?.song_title.title);
-      const nextNewSound = new Howl({
-        src: [nextFile],
-        volume: 1,
-        html5: true,
-        preload: true,
-        format: ["mp3"],
-      });
-      setNextSound(nextNewSound);
-    }
+    console.log("setIsInitialFetchDone", isInitialFetchDone);
     // clean up any existing sound instance only when switching to a different track
+    if(isSoundLoaded){
+      console.log("sound already loaded, skip effect");
+      return;
+    }
     const currentFile = currentSong?.file;
-    if (!currentFile || !currentTurn) return;
+    if (!currentFile || !currentTurn || !nextSong) {
+      console.log(
+        "no current file or turn",
+        currentFile,
+        currentTurn,
+        nextSong
+      );
+      return;
+    }
 
-    let disposed = false;
     let newSound: Howl;
     if (nextSound && gameSession?.score !== 0) {
       console.log("Using preloaded next sound");
       newSound = nextSound;
-    } else if (!sound) {
+    } else {
       console.log("fetch new sound", currentSong);
-
       newSound = new Howl({
         src: [currentFile],
         volume: 1,
@@ -131,37 +159,52 @@ const GamePage = () => {
         preload: true,
         format: ["mp3"],
       });
-    } else {
-      setIsSoundLoaded(sound.playing());
-      console.log("disposed", disposed);
-      return;
     }
-    if (sound && (sound !== newSound || gameSession?.score === 0)) {
-      sound.fade(volume, 0, 200);
-      sound.stop();
-      sound.unload();
-      console.log("unloaded");
+
+    if (sound) {
+      if (sound !== newSound || gameSession?.score === 0) {
+        sound.fade(1, 0, 200);
+        sound.stop();
+        sound.unload();
+        console.log("unloaded");
+        setIsSoundLoaded(false);
+        setTimeLimit(getTimeLimitForScore(gameSession?.score ?? 0));
+      }else{
+        console.log("not unloaded same sound");
+        return;
+      }
     }
+
     // Prepare time limit once per turn
     setTimeLimit(getTimeLimitForScore(gameSession?.score ?? 0));
 
     let skipTo = 0;
     // Mark UI ready when playback actually starts
     newSound.once("play", (id) => {
-      if (disposed) {
-        console.log("not play disposed");
-        return;
-      }
       console.log("playback started", id, newSound);
-      setIsSoundLoaded(true);
       if (skipTo > 0) {
         newSound.seek(skipTo, id);
+      }
+      setIsSoundLoaded(true);
+      const nextFile = nextSong?.file;
+      if (nextFile) {
+        console.log("preload next sound", nextSong?.song_title.title);
+        const nextNewSound = new Howl({
+          src: [nextFile],
+          volume: 1,
+          html5: true,
+          preload: true,
+          format: ["mp3"],
+        });
+        setNextSound(nextNewSound);
+      } else {
+        console.log("no next sound", nextSong);
       }
     });
 
     // set load handler
     if (newSound.state() === "loaded") {
-      if(sound === nextSound) {
+      if (sound === nextSound) {
         console.log("next sound === sound");
         return;
       }
@@ -176,13 +219,8 @@ const GamePage = () => {
         }
       }
     } else {
-      console.log("song not loaded", newSound);
-
+      console.log("song has not loaded", newSound);
       newSound.once("load", () => {
-        if (disposed) {
-          console.log("not load disposed");
-          return;
-        }
         newSound.play();
         if (gameSession && gameSession?.score >= 5) {
           const duration = newSound.duration();
@@ -206,31 +244,8 @@ const GamePage = () => {
 
     setSound(newSound);
 
-
-
-
-    return () => {
-      console.log("Disposed");
-      // disposed = true;
-    };
-  }, [currentTurn?.id, currentSong?.file]);
-
-  // Preload next sound in background
-  useEffect(() => {
-
-    // const nextFile = nextSong?.file;
-    // if (!nextFile || !nextTurn) return;
-    // if (isSameSrc(nextSound, nextFile)) return;
-    // console.log("preload next sound");
-    // const nextNewSound = new Howl({
-    //   src: [nextFile],
-    //   volume: 1,
-    //   html5: true,
-    //   preload: true,
-    //   format: ["mp3"],
-    // });
-    // setNextSound(nextNewSound);
-  }, [nextSong?.file, sound]); //bug
+    return () => {};
+  }, [currentTurn?.id,isInitialFetchDone]);
 
   // Guard: if not actively playing, redirect home (independent of sound lifecycle)
   useEffect(() => {

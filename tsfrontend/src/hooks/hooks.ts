@@ -46,6 +46,59 @@ export const useSong = (arg: string | number|undefined, curOrNext: "current" | "
 
 };
 
+export const useSongsPair = (
+  currentArg: string | number | undefined,
+  nextArg: string | number | undefined
+) => {
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [nextSong, setNextSong] = useState<Song | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchByArg = async (arg: string | number | undefined) => {
+      if (arg === undefined || arg === null) return null;
+      if (typeof arg === "string" && isNaN(Number(arg))) {
+        return await fetchSongWithName(arg);
+      }
+      return await fetchSongWithId(String(arg));
+    };
+
+    const run = async () => {
+      if (!currentArg && !nextArg) {
+        setCurrentSong(null);
+        setNextSong(null);
+        return;
+      }
+      setLoading(true);
+      setError(null);
+      try {
+        const [cur, nxt] = await Promise.all([
+          fetchByArg(currentArg),
+          fetchByArg(nextArg),
+        ]);
+        if (!cancelled) {
+          setCurrentSong(cur);
+          setNextSong(nxt);
+        }
+      } catch (e: any) {
+        if (!cancelled) setError(e?.message ?? "Failed to fetch songs");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [currentArg, nextArg]);
+
+  return { currentSong, nextSong, loading, error };
+};
+
 export const useOptions = (song: Song | null) => {
   const [options, setOptions] = useState<string[]>();
 

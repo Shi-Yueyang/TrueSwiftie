@@ -12,6 +12,7 @@ from .models import (
     GameSession,
     GameSessionStatus,
     GameTurn,
+    GameTurnOutcome,
     Song,
     SongTitle,
     Poster,
@@ -193,8 +194,10 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         results = []
         for session in sessions:
             # Get the last turn for this session
-            last_turn = session.turns.order_by('-sequence_index').first()
+            last_turn: GameTurn = session.turns.filter(outcome=GameTurnOutcome.WRONG).order_by('-sequence_index').first()
             
+
+
             result_data = {
                 'session_id': session.id,
                 'score': session.score,
