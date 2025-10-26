@@ -13,13 +13,13 @@ from .models import (
     GameSessionStatus,
     GameTurn,
     GameTurnOutcome,
+    GameRoom,
     Song,
     SongTitle,
     Poster,
     Comment,
 )
 from .serializers import (
-    
     GuessSerializer,
     VersionNumberSerializer,
     SongSerializer,
@@ -28,6 +28,7 @@ from .serializers import (
     CommentSerializer,
     GameSessionSerlaiizer,
     GameTurnSerializer,
+    RoomSerializer,
 )
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -135,7 +136,7 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         session_id = int(pk)
         version = serializer.validated_data["version"]
-        session, new_turn,preloaded_turn = handle_next(
+        session, new_turn, preloaded_turn = handle_next(
             session_id=session_id, version=version, user=user
         )
         payload = {
@@ -183,40 +184,41 @@ class GameSessionViewSet(viewsets.ModelViewSet):
             .filter(status=GameSessionStatus.ENDED)
             .order_by("-ended_at", "id")
         )
-        
+
         # Get paginated queryset
         page = self.paginate_queryset(qs)
         if page is not None:
             sessions = page
         else:
             sessions = qs
-            
+
         results = []
         for session in sessions:
             # Get the last turn for this session
-            last_turn: GameTurn = session.turns.filter(outcome=GameTurnOutcome.WRONG).order_by('-sequence_index').first()
-            
-
+            last_turn: GameTurn = (
+                session.turns.filter(outcome=GameTurnOutcome.WRONG)
+                .order_by("-sequence_index")
+                .first()
+            )
 
             result_data = {
-                'session_id': session.id,
-                'score': session.score,
-                'ended_at': session.ended_at,
+                "session_id": session.id,
+                "score": session.score,
+                "ended_at": session.ended_at,
             }
-            
+
             # Add last correct song if last turn exists
             if last_turn:
-                result_data['last_correct_song'] = SongSerializer(last_turn.song).data
+                result_data["last_correct_song"] = SongSerializer(last_turn.song).data
             else:
-                result_data['last_correct_song'] = None
-                
+                result_data["last_correct_song"] = None
+
             results.append(result_data)
-        
+
         if page is not None:
             return self.get_paginated_response(results)
-        
-        return Response(results)
 
+        return Response(results)
 
     @action(
         detail=False,
@@ -230,10 +232,11 @@ class GameSessionViewSet(viewsets.ModelViewSet):
         Here we consider a "played" game as a finished session (status=ENDED).
         """
         user = request.user
-        total = GameSession.objects.filter(user=user, status=GameSessionStatus.ENDED).count()
+        total = GameSession.objects.filter(
+            user=user, status=GameSessionStatus.ENDED
+        ).count()
         return Response({"total_played": total})
 
-    
     @action(
         detail=False,
         methods=["get"],
@@ -242,11 +245,51 @@ class GameSessionViewSet(viewsets.ModelViewSet):
     )
     def top_week_scores(self, request):
         items = get_top_score_of_current_week()
-        results = [{"score": score, "user": UserSerializer(user).data} for score, user in items]
+        results = [
+            {"score": score, "user": UserSerializer(user).data} for score, user in items
+        ]
         return Response(results)
-
 
 
 class GameTurnViewSet(viewsets.ModelViewSet):
     queryset = GameTurn.objects.all()
     serializer_class = GameTurnSerializer
+
+
+class RoomViewSet(viewsets.ModelViewSet):
+    queryset = GameRoom.objects.all().select_related("player_1", "player_2", "current_song")
+    serializer_class = RoomSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        status_param = self.request.query_params.get("status")
+        if status_param:
+            qs = qs.filter(status=status_param)
+        return qs.order_by("-created_at")
+
+    def perform_create(self, serializer):
+        # creator is always player_1; ignore any incoming player_1
+        serializer.save(player_1=self.request.user)
+
+    @action(detail=True, methods=["post"], url_path="join")
+    def join(self, request, pk=None):
+        room: Room = self.get_object()
+        user = request.user
+
+        if room.player_1_id == user.id or room.player_2_id == user.id:
+            # already in the room
+            return Response(self.get_serializer(room).data)
+
+        if room.player_2_id is not None:
+            return Response({"detail": "Room is full."}, status=status.HTTP_400_BAD_REQUEST)
+
+        room.player_2 = user
+        # Transition to IN_GAME when both players present
+        from .models import RoomStatus
+
+        if room.status == RoomStatus.WAITING:
+            room.status = RoomStatus.IN_GAME
+        room.save(update_fields=["player_2", "status", "updated_at"])
+        return Response(self.get_serializer(room).data)

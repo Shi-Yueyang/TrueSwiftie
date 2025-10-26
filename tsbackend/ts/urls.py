@@ -8,6 +8,7 @@ from .views import (
     CommentViewSet,
     GameSessionViewSet,
     GameTurnViewSet,
+    RoomViewSet,
 )
 
 router = DefaultRouter()
@@ -17,6 +18,7 @@ router.register(r"posters", PosterViewSet)
 router.register(r"comments", CommentViewSet)
 router.register(r"game-sessions", GameSessionViewSet, basename="game-session")
 router.register(r"game-turns", GameTurnViewSet, basename="game-turns")
+router.register(r"game-rooms", RoomViewSet, basename="game-rooms")
 
 
 urlpatterns = [

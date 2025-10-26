@@ -63,6 +63,12 @@ class GameTurnOutcome(models.TextChoices):
     TIMEOUT = "timeout"
 
 
+class RoomStatus(models.TextChoices):
+    WAITING = "WAITING", "Waiting"
+    IN_GAME = "IN_GAME", "In Game"
+    FINISHED = "FINISHED", "Finished"
+
+
 class GameSession(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="game_sessions"
@@ -149,3 +155,45 @@ class GameTurn(models.Model):
         self.selected_option = option
         self.outcome = outcome
         self.answered_at = timezone.now()
+
+
+class GameRoom(models.Model):
+    status = models.CharField(
+        max_length=16,
+        choices=RoomStatus.choices,
+        default=RoomStatus.WAITING,
+        db_index=True,
+    )
+    player_1 = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="player_1_room"
+    )
+    player_2 = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="player_2_room",
+    )
+    player_1_score = models.IntegerField(default=0)
+    player_2_score = models.IntegerField(default=0)
+    current_song = models.ForeignKey(
+        Song, on_delete=models.SET_NULL, null=True, blank=True
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("-created_at",)
+        indexes = [
+            models.Index(fields=("status",)),
+            models.Index(fields=("player_1", "player_2")),
+        ]
+
+    def __str__(self):
+        p2 = self.player_2_id or "waiting"
+        return f"Room {self.id} ({self.status}) p1={self.player_1_id}, p2={p2}"
+
+    @property
+    def is_full(self) -> bool:
+        return self.player_2_id is not None

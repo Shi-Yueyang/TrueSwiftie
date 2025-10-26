@@ -1,11 +1,9 @@
 from __future__ import annotations
 
 import random
-from dataclasses import dataclass
-from typing import Iterable, List, Optional, Tuple
+from typing import List, Tuple
 
 from django.db import transaction
-from django.db.models import F
 from django.utils import timezone
 from datetime import timedelta
 
@@ -20,8 +18,6 @@ from ts.models import (
 from .exceptions import (
     VersionConflict,
     InvalidState,
-    TurnNotCurrent,
-    OptionInvalid,
     TurnAlreadyAnswered,
 )
 from core.models import CustomUser as User

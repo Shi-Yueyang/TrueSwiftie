@@ -221,4 +221,36 @@ export const updateUserProfile = async (
   }
 };
 
+// Multiplayer Room APIs
+export interface Room {
+  id: number;
+  status: "WAITING" | "IN_GAME" | "FINISHED" | string;
+  player_1: number;
+  player_2: number | null;
+  player_1_score: number;
+  player_2_score: number;
+  current_song: number | null;
+  is_full: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export const fetchWaitingRooms = async (): Promise<Room[]> => {
+  const res = await axios.get(`${backendIp}/ts/game-rooms/`, {
+    headers: { ...authHeaders() },
+    params: { status: "WAITING" },
+  });
+  const data = res.data as any;
+  return Array.isArray(data) ? data : (data.results ?? []);
+};
+
+export const joinRoom = async (roomId: number): Promise<Room> => {
+  const res = await axios.post(
+    `${backendIp}/ts/game-rooms/${roomId}/join/`,
+    null,
+    { headers: { ...authHeaders() } }
+  );
+  return res.data as Room;
+};
+
 

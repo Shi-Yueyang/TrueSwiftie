@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute ";
 import EditUserInfo from "./pages/EditUserInfo";
 import UserProfile from "./pages/UserProfile";
 import Support from "./pages/Support";
+import GameLobby from "./pages/GameLobby";
 
 // animations
 // import { useContext } from "react";
@@ -60,6 +61,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <HomePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/lobby"
+            element={
+              <ProtectedRoute>
+                <GameLobby />
               </ProtectedRoute>
             }
           />

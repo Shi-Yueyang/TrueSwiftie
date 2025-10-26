@@ -8,6 +8,7 @@ from .models import (
     Poster,
     Comment,
     GameTurnOutcome,
+    GameRoom,
 )
 from django.db import models
 from django import forms
@@ -204,3 +205,46 @@ admin.site.register(SongTitle, SongTitleAdmin)
 admin.site.register(GameHistory, GameHistoryAdmin)
 admin.site.register(Poster, PosterAdmin)
 admin.site.register(Comment, CommentAdmin)
+
+
+@admin.register(GameRoom)
+class GameRoomAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "status",
+        "player_1",
+        "player_2",
+        "player_1_score",
+        "player_2_score",
+        "current_song",
+        "created_at",
+        "updated_at",
+    )
+    list_filter = ("status", "created_at")
+    search_fields = (
+        "id",
+        "player_1__username",
+        "player_2__username",
+        "current_song__song_title__title",
+    )
+    raw_id_fields = ("player_1", "player_2", "current_song")
+    readonly_fields = ("created_at", "updated_at")
+    fieldsets = (
+        (
+            None,
+            {
+                "fields": (
+                    "status",
+                    "player_1",
+                    "player_2",
+                    "player_1_score",
+                    "player_2_score",
+                    "current_song",
+                )
+            },
+        ),
+        (
+            "Timestamps",
+            {"fields": ("created_at", "updated_at")},
+        ),
+    )

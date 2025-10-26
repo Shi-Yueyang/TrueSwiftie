@@ -271,12 +271,10 @@ const HomePage: React.FC = () => {
           }}
         >
           <QuickPlayCard
-            title="新模式"
+            title="双人模式"
             Icon={IoRocketOutline}
             gradient={arcadeGradient}
-            onClick={() => {}}
-            disabled
-            badgeText="敬请期待"
+            onClick={() => navigate("/lobby")}
           />
         </Box>
       </Box>

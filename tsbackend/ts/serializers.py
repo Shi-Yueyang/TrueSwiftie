@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Song, SongTitle, Poster, Comment, GameSession, GameTurn
+from .models import Song, SongTitle, Poster, Comment, GameSession, GameTurn, GameRoom
 from core.serializer import UserSerializer
 
 
@@ -66,4 +66,29 @@ class GuessSerializer(serializers.Serializer):
 
 class VersionNumberSerializer(serializers.Serializer):
     version = serializers.IntegerField()
+
+
+class RoomSerializer(serializers.ModelSerializer):
+    is_full = serializers.BooleanField(read_only=True)
+
+    class Meta:
+        model = GameRoom
+        fields = [
+            "id",
+            "status",
+            "player_1",
+            "player_2",
+            "player_1_score",
+            "player_2_score",
+            "current_song",
+            "is_full",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "player_1",
+            "is_full",
+            "created_at",
+            "updated_at",
+        ]
 
