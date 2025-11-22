@@ -36,6 +36,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import random
 from core.serializer import UserSerializer
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 class SongViewSet(viewsets.ModelViewSet):
@@ -272,6 +274,30 @@ class RoomViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # creator is always player_1; ignore any incoming player_1
         serializer.save(player_1=self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        # Use DRF's standard flow so we can broadcast after saving
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # Broadcast to the lobby that a new room is created
+        try:
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "lobby",
+                {
+                    "type": "broadcast",
+                    "message_type": "room_created",
+                    "data": serializer.data,
+                },
+            )
+        except Exception:
+            # Non-fatal: room is created even if broadcast fails
+            pass
+
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     @action(detail=True, methods=["post"], url_path="join")
     def join(self, request, pk=None):

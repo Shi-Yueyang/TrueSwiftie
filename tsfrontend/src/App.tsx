@@ -17,6 +17,8 @@ import EditUserInfo from "./pages/EditUserInfo";
 import UserProfile from "./pages/UserProfile";
 import Support from "./pages/Support";
 import GameLobby from "./pages/GameLobby";
+import WsTest from "./pages/WsTest";
+import WaitingRoom from "./pages/WaitingRoom";
 
 // animations
 // import { useContext } from "react";
@@ -73,6 +75,14 @@ function App() {
             }
           />
           <Route
+            path="/waiting-room"
+            element={
+              <ProtectedRoute>
+                <WaitingRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <ProtectedRoute>
@@ -98,6 +108,8 @@ function App() {
           />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          {/* Unprotected test page for WebSocket */}
+          <Route path="/ws-test" element={<WsTest />} />
           <Route
             path="/game-history"
             element={

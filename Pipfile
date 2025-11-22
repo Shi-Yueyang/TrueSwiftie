@@ -17,8 +17,13 @@ matplotlib = "*"
 python-dotenv = "*"
 djangorestframework-simplejwt = "*"
 google-auth = "*"
+channels = "*"
+daphne = "*"
+channels-redis = "*"
 
 [dev-packages]
+watchfiles = "*"
+uvicorn = "*"
 
 [requires]
 python_version = "3.10"
