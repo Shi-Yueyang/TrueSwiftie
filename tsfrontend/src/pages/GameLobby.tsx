@@ -44,7 +44,11 @@ const GameLobby: React.FC = () => {
   useEffect(() => {
     const base = (import.meta as any).env.VITE_BACKEND_WS as string;
     if (!base) return;
-    const url = `${String(base).replace(/\/+$/, "")}/ws/ts/lobby/`;
+    let url = `${String(base).replace(/\/+$/, "")}/ws/ts/lobby/`;
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      url += `?token=${token}`;
+    }
 
     try {
       const ws = new WebSocket(url);
@@ -101,25 +105,12 @@ const GameLobby: React.FC = () => {
 
   const handleJoin = async (roomId: number | string) => {
     try {
-      // For in-memory rooms, we might not need an HTTP join call if we just connect via WS.
-      // But the existing handleJoin called joinRoom API.
-      // If we are fully switching to WS/in-memory, joinRoom API (which updates DB) might be wrong.
-      // However, the user only asked to change creation to WS.
-      // But if creation makes in-memory rooms, joinRoom API (DB) will fail to find them.
-      // So we should probably just navigate to waiting room and let WS connection handle joining.
-      
-      // const updated = await joinRoom(roomId); // This is likely DB based
-      // setRooms((prev) => prev.map((r) => (r.id === roomId ? updated : r)));
-      
-      // Instead:
       connect(roomId);
-      // We need the room object to pass to state.
       const room = rooms.find(r => r.id === roomId);
       if (room) {
           navigate("/waiting-room", { state: { room } });
       }
     } catch (e) {
-      // optionally handle error (room full, unauthorized, etc.)
     }
   };
 

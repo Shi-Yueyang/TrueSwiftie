@@ -221,6 +221,13 @@ export const updateUserProfile = async (
   }
 };
 
+export const fetchUserById = async (userId: number | string): Promise<any> => {
+  const res = await axios.get(`${backendIp}/core/users/${userId}/`, {
+    headers: { ...authHeaders() },
+  });
+  return res.data;
+};
+
 // Multiplayer Room APIs
 export interface Room {
   id: number | string;

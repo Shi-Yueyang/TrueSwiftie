@@ -21,7 +21,6 @@ interface WsContextValue {
   roomId: string | null;
   wsUrl: string | null;
   lastMessage: WsEvent | null;
-  log: string[];
 }
 
 const WsContext = createContext<WsContextValue | undefined>(undefined);
@@ -33,18 +32,15 @@ export const WsProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [roomId, setRoomId] = useState<string | null>(null);
   const [wsUrl, setWsUrl] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<WsEvent | null>(null);
-  const [log, setLog] = useState<string[]>([]);
-
-  const appendLog = useCallback((line: string) => {
-    setLog((prev) => [
-      ...prev,
-      `${new Date().toLocaleTimeString()} - ${line}`,
-    ].slice(-500));
-  }, []);
 
   const buildUrl = useCallback((rid: string | number) => {
     const base = (WS_BASE || "").replace(/\/+$/, "");
-    return `${base}/ws/ts/dualmode/${rid}/`;
+    const token = localStorage.getItem("accessToken");
+    const url = `${base}/ws/ts/dualmode/${rid}/`;
+    if (token) {
+      return `${url}?token=${token}`;
+    }
+    return url;
   }, []);
 
   const disconnect = useCallback(() => {
@@ -54,8 +50,8 @@ export const WsProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     wsRef.current = null;
     setConnected(false);
     setReadyState(WebSocket.CLOSED);
-    appendLog("Disconnected");
-  }, [appendLog]);
+    console.log("Disconnected room", roomId);
+  }, [roomId]);
 
   const connect = useCallback((rid: string | number) => {
     const url = buildUrl(rid);
@@ -75,19 +71,19 @@ export const WsProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       ws.onopen = () => {
         setConnected(true);
         setReadyState(ws.readyState);
-        appendLog(`Connected to ${url}`);
+        console.log(`Connected to room ${url}`);
       };
       ws.onclose = () => {
         setConnected(false);
         setReadyState(WebSocket.CLOSED);
-        appendLog("Socket closed");
+        console.log("Socket closed");
       };
       ws.onerror = (ev: Event) => {
         setReadyState(ws.readyState);
-        appendLog(`Error: ${(ev as any)?.message ?? "event"}`);
+        console.log(`Error: ${(ev as any)?.message ?? "event"}`);
       };
       ws.onmessage = (ev: MessageEvent<string>) => {
-        appendLog(`<- ${ev.data}`);
+        console.log(`<- ${ev.data}`);
         try {
           const parsed = JSON.parse(ev.data);
           setLastMessage({
@@ -101,21 +97,21 @@ export const WsProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         }
       };
     } catch (e: any) {
-      appendLog(`Connect failed: ${e?.message ?? String(e)}`);
+      console.log(`Connect failed: ${e?.message ?? String(e)}`);
     }
-  }, [appendLog, buildUrl]);
+  }, [buildUrl]);
 
   const send = useCallback((type: string, data?: any) => {
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) {
-      appendLog("WebSocket is not open");
+      console.log("WebSocket is not open");
       return false;
     }
     const payload = { type, data: data ?? {} };
     ws.send(JSON.stringify(payload));
-    appendLog(`-> ${JSON.stringify(payload)}`);
+    console.log(`-> ${JSON.stringify(payload)}`);
     return true;
-  }, [appendLog]);
+  }, []);
 
   const value = useMemo<WsContextValue>(() => ({
     connect,
@@ -126,8 +122,7 @@ export const WsProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     roomId,
     wsUrl,
     lastMessage,
-    log,
-  }), [connect, disconnect, send, connected, readyState, roomId, wsUrl, lastMessage, log]);
+  }), [connect, disconnect, send, connected, readyState, roomId, wsUrl, lastMessage]);
 
   // Cleanup on unmount
   React.useEffect(() => () => {

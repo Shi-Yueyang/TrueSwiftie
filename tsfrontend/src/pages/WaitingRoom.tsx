@@ -11,20 +11,59 @@ import {
 import { alpha, useTheme } from "@mui/material/styles";
 import { IoArrowBackOutline, IoAddOutline, IoCheckmark } from "react-icons/io5";
 import { useLocation } from "react-router-dom";
-import { Room } from "../services/api";
+import {
+  fetchUserById,
+  Room,
+} from "../services/api";
 import { useWs } from "../context/WsContext";
 import { AuthContext, User } from "../context/AuthContex";
 
+const resolveAvatar = (url: string | undefined | null) => {
+  if (!url) return undefined;
+  if (url.startsWith("http") || url.startsWith("data:")) return url;
+  const backend = (import.meta as any).env.VITE_BACKEND_IP?.replace(/\/+$/, "");
+  return `${backend}${url.startsWith("/") ? "" : "/"}${url}`;
+};
 
 // A self-contained waiting room page matching the provided mock.
 const WaitingRoom = ({}) => {
   const theme = useTheme();
   const [ready, setReady] = useState<boolean>(false);
   const location = useLocation();
-  const { connect, disconnect, connected, roomId } = useWs();
+  const { connect, disconnect, connected, roomId, lastMessage } = useWs();
   const roomFromState = (location.state as any)?.room as Room | undefined;
-  const { userName, avatar } = useContext(AuthContext);
-  const [opponent] = useState<User | null>(null);
+  const { userName, avatar, userId } = useContext(AuthContext);
+  const [opponent, setOpponent] = useState<User | null>(null);
+
+  useEffect(() => {
+    if (!lastMessage) return;
+    if (lastMessage.type === "room_state") {
+      const data = lastMessage.data;
+      const myId = userId;
+      
+      const fetchOpponent = async (id: number) => {
+        try {
+          const user = await fetchUserById(id);
+          setOpponent(user);
+        } catch (e) {
+          console.error("Failed to fetch opponent info", e);
+        }
+      };
+
+      if (data.player_1 === myId) {
+        if (data.player_2) fetchOpponent(data.player_2);
+      } else if (data.player_2 === myId) {
+        if (data.player_1) fetchOpponent(data.player_1);
+      }
+    } else if (lastMessage.type === "player_joined") {
+      const data = lastMessage.data;
+      if (data.user && data.user.id !== userId) {
+        setOpponent(data.user);
+      }
+    } else if (lastMessage.type === "player_left") {
+       setOpponent(null);
+    }
+  }, [lastMessage, userId]);
 
   const handleBack = () => {
     disconnect();
@@ -106,7 +145,7 @@ const WaitingRoom = ({}) => {
           <Stack alignItems="center" spacing={1.25} sx={{ flex: 1 }}>
             <Box sx={{ position: "relative" }}>
               <Avatar
-                src={avatar ?? ""}
+                src={resolveAvatar(avatar)}
                 alt={userName??""}
                 sx={{ width: 88, height: 88, boxShadow: 3 }}
               >
@@ -146,7 +185,7 @@ const WaitingRoom = ({}) => {
             {opponent ? (
               <>
                 <Avatar
-                  src={opponent.avatar}
+                  src={resolveAvatar(opponent.avatar)}
                   alt={opponent.username}
                   sx={{ width: 88, height: 88 }}
                 >

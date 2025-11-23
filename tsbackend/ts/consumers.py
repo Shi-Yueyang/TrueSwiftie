@@ -45,10 +45,42 @@ class RoomConsumer(AsyncJsonWebsocketConsumer):
     async def connect(self):
         self.room_id = self.scope["url_route"]["kwargs"]["room_id"]
         self.group_name = f"room_{self.room_id}"
-        # track membership in lobby registry
-        await LobbyConsumer.add_member(self.room_id, self.channel_name)
+        
+        user = self.scope.get("user")
+        print(f"RoomConsumer: connecting to room {self.room_id} for user {getattr(user, 'id', None)}")
+        room_state = await LobbyConsumer.add_member(self.room_id, self.channel_name, user)
+        
         await self.channel_layer.group_add(self.group_name, self.channel_name)
         await self.accept()
+
+        # Send current room state to the connecting user
+        await self.send_json({
+            "type": "room_state",
+            "data": room_state
+        })
+
+        # Broadcast to room that someone joined
+        user_info = None
+        if user and getattr(user, "is_authenticated", False):
+            user_info = {
+                "id": user.id,
+                "username": user.username,
+                "avatar": getattr(user, "avatar", None) and str(user.avatar.url) or None
+            }
+
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "broadcast",
+                "message_type": "player_joined",
+                "data": {
+                    "room_id": self.room_id,
+                    "user": user_info
+                },
+                "sender": "system",
+            },
+        )
+
         # broadcast updated rooms list to lobby
         await self.channel_layer.group_send(
             LobbyConsumer.group_name,
@@ -63,6 +95,18 @@ class RoomConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
         # update lobby registry and broadcast
         await LobbyConsumer.remove_member(self.room_id, self.channel_name)
+        
+        # Broadcast to room that someone left
+        await self.channel_layer.group_send(
+            self.group_name,
+            {
+                "type": "broadcast",
+                "message_type": "player_left",
+                "data": {"room_id": self.room_id},
+                "sender": "system",
+            },
+        )
+
         await self.channel_layer.group_send(
             LobbyConsumer.group_name,
             {
@@ -121,24 +165,41 @@ class LobbyConsumer(AsyncJsonWebsocketConsumer):
             return room
 
     @classmethod
-    async def add_member(cls, room_id: str, channel_name: str) -> None:
+    async def add_member(cls, room_id: str, channel_name: str, user: Any = None) -> Dict[str, Any]:
         async with cls.LIVE_ROOMS_LOCK:
             room = cls.LIVE_ROOMS.get(room_id)
             if room is None:
                 # create adhoc room if joined directly by id
                 room = LiveRoom(id=room_id)
                 cls.LIVE_ROOMS[room_id] = room
+                logger.info(f"Created adhoc room {room_id}")
             room.members.add(channel_name)
             room.updated_at = timezone.now()
+            logger.info(f"Room {room_id}: member {channel_name} joined. Members count: {len(room.members)}")
+
+            if user and getattr(user, "is_authenticated", False):
+                # Assign slots
+                if room.player_1 == user.id:
+                    pass
+                elif room.player_2 == user.id:
+                    pass
+                elif room.player_1 is None:
+                    room.player_1 = user.id
+                elif room.player_2 is None:
+                    room.player_2 = user.id
+            
+            return room.to_dict()
 
     @classmethod
     async def remove_member(cls, room_id: str, channel_name: str) -> None:
         async with cls.LIVE_ROOMS_LOCK:
             room = cls.LIVE_ROOMS.get(room_id)
             if room is None:
+                logger.warning(f"Attempted to remove member from non-existent room {room_id}")
                 return
             room.members.discard(channel_name)
             room.updated_at = timezone.now()
+            logger.info(f"Room {room_id}: member {channel_name} left. Members count: {len(room.members)}")
             # delete room if empty
             if not room.members:
                 del cls.LIVE_ROOMS[room_id]
@@ -147,6 +208,20 @@ class LobbyConsumer(AsyncJsonWebsocketConsumer):
     @classmethod
     async def snapshot_rooms(cls) -> List[Dict[str, Any]]:
         async with cls.LIVE_ROOMS_LOCK:
+            # Cleanup empty rooms (zombies or just emptied)
+            now = timezone.now()
+            to_delete = []
+            for rid, room in cls.LIVE_ROOMS.items():
+                if not room.members:
+                    # If empty, check age. 
+                    # Give 10s grace period for creator to connect.
+                    if (now - room.updated_at).total_seconds() > 10:
+                        to_delete.append(rid)
+            
+            for rid in to_delete:
+                del cls.LIVE_ROOMS[rid]
+                logger.info(f"Deleted empty/zombie room {rid} during snapshot")
+
             return [room.to_dict() for room in cls.LIVE_ROOMS.values()]
 
     async def connect(self):
@@ -170,7 +245,6 @@ class LobbyConsumer(AsyncJsonWebsocketConsumer):
             user_id = getattr(user, "id", None) if getattr(user, "is_authenticated", False) else None
             room = await self.create_room(player_1=user_id)
             await self.send_json({"type": "room_created", "data": room.to_dict()})
-            # broadcast updated rooms list to everyone in lobby
             await self.channel_layer.group_send(
                 self.group_name,
                 {
